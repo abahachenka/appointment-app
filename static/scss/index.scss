@@ -2,15 +2,27 @@
 @import 'variables';
 @import 'header';
 @import 'home';
+@import 'address-form';
+@import 'search-results';
 @import 'footer';
 
 body {
     font: 14px 'Roboto Condensed';
-    color: white;
+    color: black;
 }
 
 .page-wrapper {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+}
+
+.page-container {
+	flex: 1;
+	padding: 30px;
+}
+
+.page-title {
+	text-align: center;
+	text-transform: capitalize;
 }

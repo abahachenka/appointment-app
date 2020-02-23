@@ -7206,7 +7206,6 @@ a.text-dark:hover, a.text-dark:focus {
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.3); }
 
 .home-page {
-  flex: 1;
   display: flex;
   align-items: center; }
   .home-page .column {
@@ -7234,6 +7233,44 @@ a.text-dark:hover, a.text-dark:focus {
     border-color: #dc5858;
     background: #dc5858; }
 
+.address-form {
+  margin: 30px 0;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  background: #afcbf9; }
+  .address-form input[type="text"] {
+    margin-right: 10px;
+    height: 36px;
+    width: 290px;
+    padding: 2px 3px; }
+  .address-form input[type="submit"] {
+    padding: 10px 30px;
+    background: #4784EB;
+    border: none;
+    color: white; }
+    .address-form input[type="submit"]:hover {
+      background: #3e79dc; }
+
+.search-results {
+  margin: 50px 0 25px; }
+  .search-results .subtitle {
+    font-size: 24px; }
+
+.search-results-list {
+  margin: 25px 0;
+  list-style: none;
+  padding: 0; }
+  .search-results-list li {
+    margin: 25px 0;
+    padding: 20px;
+    border: none;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
+    .search-results-list li:hover {
+      background: #afcbf9;
+      cursor: pointer; }
+
 .page-footer {
   background: black;
   padding: 25px;
@@ -7243,11 +7280,19 @@ a.text-dark:hover, a.text-dark:focus {
 
 body {
   font: 14px 'Roboto Condensed';
-  color: white; }
+  color: black; }
 
 .page-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh; }
+
+.page-container {
+  flex: 1;
+  padding: 30px; }
+
+.page-title {
+  text-align: center;
+  text-transform: capitalize; }
 
 /*# sourceMappingURL=index.css.map */
