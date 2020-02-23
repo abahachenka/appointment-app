@@ -1,0 +1,43 @@
+.home-page {
+	flex: 1;
+	display: flex;
+	align-items: center;
+
+	.column {
+		text-align: center;
+
+		button {
+			padding: 30px;
+			height: 150px;
+    		width: 350px;
+    		text-transform: uppercase;
+    		font-size: 20px;
+    		color: white;
+    		box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+		}
+	} 
+}
+
+.column-new {
+	button {
+		border: 1px solid $primary-color;
+		background: $primary-color;
+
+		&:hover {
+			border-color: $primary-color-hover;
+			background: $primary-color-hover;
+		}
+	}
+}
+
+.column-cancel {
+	button {
+		background: $danger-color;
+		border: 1px solid $danger-color;
+
+		&:hover {
+			border-color: $danger-color-hover;
+			background: $danger-color-hover;
+		}
+	}
+}

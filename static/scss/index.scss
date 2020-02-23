@@ -1,6 +1,16 @@
-body {
-    background: red;
-    font-size: 14px;
-        color: white;
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+@import 'variables';
+@import 'header';
+@import 'home';
+@import 'footer';
 
+body {
+    font: 14px 'Roboto Condensed';
+    color: white;
+}
+
+.page-wrapper {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
