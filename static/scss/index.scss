@@ -3,7 +3,7 @@
 @import 'header';
 @import 'home';
 @import 'address-form';
-@import 'search-results';
+@import 'category-list';
 @import 'footer';
 
 body {
@@ -12,17 +12,31 @@ body {
 }
 
 .page-wrapper {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .page-container {
-	flex: 1;
-	padding: 30px;
+    flex: 1;
+    padding: 30px;
 }
 
 .page-title {
-	text-align: center;
-	text-transform: capitalize;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.page-subtitle {
+    font-size: 24px;
+}
+
+.doctor-specialisations-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    li {
+        flex: 0 0 45%;
+    }
 }

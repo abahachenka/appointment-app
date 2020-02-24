@@ -7255,19 +7255,17 @@ a.text-dark:hover, a.text-dark:focus {
 
 .search-results {
   margin: 50px 0 25px; }
-  .search-results .subtitle {
-    font-size: 24px; }
 
-.search-results-list {
+.category-list {
   margin: 25px 0;
   list-style: none;
   padding: 0; }
-  .search-results-list li {
+  .category-list li {
     margin: 25px 0;
     padding: 20px;
     border: none;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
-    .search-results-list li:hover {
+    .category-list li:hover {
       background: #afcbf9;
       cursor: pointer; }
 
@@ -7294,5 +7292,15 @@ body {
 .page-title {
   text-align: center;
   text-transform: capitalize; }
+
+.page-subtitle {
+  font-size: 24px; }
+
+.doctor-specialisations-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; }
+  .doctor-specialisations-list li {
+    flex: 0 0 45%; }
 
 /*# sourceMappingURL=index.css.map */
