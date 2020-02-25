@@ -1,0 +1,84 @@
+.patient-selection {
+    margin-bottom: 80px;
+}
+
+.patient-selection-label {
+    font-size: 30px;
+    text-align: center;
+}
+
+.patient-selection-info {
+    display: flex;
+    box-shadow: $block-shadow;
+    background: $primary-light-color;
+    width: 50%;
+    margin: 30px auto;
+}
+
+.patient-selection-date {
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+
+    .day {
+        font-size: 24px;
+        display: block;
+    }
+}
+
+.patient-selection-time {
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.patient-selection-doctor {
+    padding: 20px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.patient-details-form-title {
+    font-size: 24px;
+    text-align: center;
+}
+
+.patient-details-form {
+    width: 50%;
+    margin: 30px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    input {
+        height: 40px;
+        font-size: 18px;
+    }
+
+    input[type="text"] {
+        flex: 0 0 48%;
+        padding: 1px 5px;
+        box-shadow: $block-shadow;
+        border: none;
+    }
+
+    input[type="tel"] {
+        margin: 20px 0;
+        flex: 0 0 100%;
+        padding: 1px 5px;
+        box-shadow: $block-shadow;
+        border: none;
+    }
+
+    input[type="submit"] {
+        background: $primary-color;
+        color: white;
+        margin: auto;
+        width: 120px;
+    }
+}
