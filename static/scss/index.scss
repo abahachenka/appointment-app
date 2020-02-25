@@ -5,7 +5,11 @@
 @import 'address-form';
 @import 'category-list';
 @import 'footer';
+@import 'available-appointments';
 
+* {
+    box-sizing: border-box;
+}
 body {
     font: 14px 'Roboto Condensed';
     color: black;
