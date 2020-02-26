@@ -1,0 +1,25 @@
+.clinic-registration-form {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    margin: 30px auto 0;
+    padding: 20px;
+    box-shadow: $block-shadow;
+
+    input {
+        margin-bottom: 20px;
+        height: 40px;
+        font-size: 16px;
+        padding: 1px 5px;
+    }
+
+    input[type="submit"] {
+        background: $primary-color;
+        color: white;
+        margin-bottom: 0;
+
+        &:hover {
+            background: $primary-color-hover;
+        }
+    }
+}

@@ -7485,6 +7485,25 @@ a.text-dark:hover, a.text-dark:focus {
   .sign-in-form a {
     text-align: center; }
 
+.clinic-registration-form {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  margin: 30px auto 0;
+  padding: 20px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
+  .clinic-registration-form input {
+    margin-bottom: 20px;
+    height: 40px;
+    font-size: 16px;
+    padding: 1px 5px; }
+  .clinic-registration-form input[type="submit"] {
+    background: #4784EB;
+    color: white;
+    margin-bottom: 0; }
+    .clinic-registration-form input[type="submit"]:hover {
+      background: #3e79dc; }
+
 * {
   box-sizing: border-box; }
 
