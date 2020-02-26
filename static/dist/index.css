@@ -7457,6 +7457,34 @@ a.text-dark:hover, a.text-dark:focus {
   .cancel-sample img {
     width: 100%; }
 
+.sign-in-form {
+  width: 300px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin: 100px auto 0; }
+  .sign-in-form input[type="text"],
+  .sign-in-form input[type="password"] {
+    margin-bottom: 20px;
+    height: 40px;
+    font-size: 16px;
+    border: 0;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    padding: 1px 5px; }
+  .sign-in-form input[type="submit"] {
+    height: 40px;
+    font-size: 16px;
+    border: none;
+    background: #4784EB;
+    color: white;
+    margin-bottom: 20px; }
+    .sign-in-form input[type="submit"]:hover {
+      background: #3e79dc; }
+  .sign-in-form p,
+  .sign-in-form a {
+    text-align: center; }
+
 * {
   box-sizing: border-box; }
 
