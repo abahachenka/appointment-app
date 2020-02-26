@@ -7504,6 +7504,50 @@ a.text-dark:hover, a.text-dark:focus {
     .clinic-registration-form input[type="submit"]:hover {
       background: #3e79dc; }
 
+.account-page {
+  position: relative; }
+  .account-page .page-title {
+    text-align: left; }
+
+.account-settings {
+  position: absolute;
+  right: 30px;
+  top: 45px;
+  text-decoration: underline; }
+  .account-settings:hover {
+    text-decoration: none; }
+
+.doctor-specialisations {
+  position: relative; }
+  .doctor-specialisations .page-subtitle {
+    border-bottom: 1px solid black;
+    padding: 10px 110px 10px 0; }
+  .doctor-specialisations button {
+    position: absolute;
+    right: 0;
+    top: 10px;
+    background: #4784EB;
+    border: none;
+    color: white;
+    height: 35px;
+    font-size: 16px;
+    width: 100px; }
+    .doctor-specialisations button:hover {
+      background: #3e79dc; }
+
+.doctor-specialisations-list {
+  display: flex; }
+  .doctor-specialisations-list ul {
+    flex: 0 0 33%;
+    list-style: none;
+    padding: 0; }
+  .doctor-specialisations-list li {
+    margin: 20px 0; }
+  .doctor-specialisations-list a {
+    text-decoration: underline; }
+    .doctor-specialisations-list a:hover {
+      text-decoration: underline; }
+
 * {
   box-sizing: border-box; }
 

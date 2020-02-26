@@ -1,0 +1,65 @@
+.account-page {
+    position: relative;
+
+    .page-title {
+        text-align: left;
+    }
+}
+
+.account-settings {
+    position: absolute;
+    right: 30px;
+    top: 45px;
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.doctor-specialisations {
+    position: relative;
+
+    .page-subtitle {
+        border-bottom: 1px solid black;
+        padding: 10px 110px 10px 0;
+    }
+
+    button {
+        position: absolute;
+        right: 0;
+        top: 10px;
+        background: $primary-color;
+        border: none;
+        color: white;
+        height: 35px;
+        font-size: 16px;
+        width: 100px;
+
+        &:hover {
+            background: $primary-color-hover;
+        }
+    }
+}
+
+.doctor-specialisations-list {
+    display: flex;
+    
+    ul {
+        flex: 0 0 33%;
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        margin: 20px 0;
+    }
+
+    a {
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
