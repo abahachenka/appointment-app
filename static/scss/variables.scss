@@ -1,12 +1,12 @@
 // Colors
-$primary-color: #4784EB;
-$primary-color-hover: #3e79dc;
-$primary-light-color: #c8dcfd;
+$primary: #4784EB;
+$primary-hover: #3e79dc;
+$primary-light: #c8dcfd;
 
-$danger-color: #d87373;
-$danger-color-hover: #dc5858;
+$danger: #d87373;
+$danger-hover: #dc5858;
 
-$success-color: #00b900;
+$success: #00b900;
 
 $dark: #000;
 $dark-hover: #8c8a8a;
@@ -15,3 +15,4 @@ $dark-transparent: rgba(0, 0, 0, 0.7);
 $white: #fff;
 
 $block-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+$block-padding: 20px;
