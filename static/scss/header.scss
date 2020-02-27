@@ -1,7 +1,7 @@
 .page-header {
-    padding: 25px;
-    color: white;
-    background: $primary-color; // cornflower blue
+    padding: $block-padding;
+    color: $white;
+    background: $primary;
     font-size: 24px;
     text-align: center;
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.3);
