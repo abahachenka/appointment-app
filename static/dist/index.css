@@ -349,44 +349,6 @@
     .doctor-specialisations-list a:hover {
       text-decoration: underline; }
 
-.doctors {
-  position: relative; }
-  .doctors .page-title {
-    border-bottom: 1px solid black;
-    padding: 10px 100px 10px 0;
-    font-size: 30px; }
-  .doctors button {
-    position: absolute;
-    top: 10px;
-    right: 0;
-    width: 100px;
-    height: 35px;
-    font-size: 16px;
-    color: white;
-    background: #4784EB;
-    border: none; }
-    .doctors button:hover {
-      background: #3e79dc; }
-
-.doctors-data {
-  width: 100%;
-  border: 1px solid #dad8d8;
-  border-spacing: 0; }
-  .doctors-data thead {
-    background: #efefef; }
-  .doctors-data tr:nth-child(even) {
-    background: #efefef; }
-  .doctors-data tr.invited td {
-    color: #999; }
-  .doctors-data th,
-  .doctors-data td {
-    padding: 5px;
-    border-right: 1px solid #dad8d8; }
-  .doctors-data tbody tr:not(.invited):hover td {
-    background: #c8dcfd;
-    border-right: 1px solid #c8dcfd;
-    cursor: pointer; }
-
 .breadcrumbs {
   padding: 0; }
   .breadcrumbs li {
@@ -451,6 +413,50 @@
       background: #3e79dc;
       cursor: pointer; }
 
+.data-table {
+  width: 100%;
+  border: 1px solid #dad8d8;
+  border-spacing: 0; }
+  .data-table thead {
+    background: #efefef; }
+  .data-table tr:nth-child(even) {
+    background: #efefef; }
+  .data-table tr.disabled td {
+    color: #999; }
+  .data-table th,
+  .data-table td {
+    padding: 5px;
+    border-right: 1px solid #dad8d8; }
+    .data-table th:last-child,
+    .data-table td:last-child {
+      border: 0; }
+  .data-table tbody tr:not(.disabled):hover td {
+    background: #c8dcfd;
+    border-right: 1px solid #c8dcfd;
+    cursor: pointer; }
+
+.data-section-header {
+  position: relative; }
+
+.data-section-title {
+  border-bottom: 1px solid #000;
+  padding: 10px 100px 10px 0;
+  font-size: 24px;
+  font-weight: normal; }
+
+.data-section-btn {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  width: 100px;
+  height: 35px;
+  font-size: 16px;
+  color: white;
+  background: #4784EB;
+  border: none; }
+  .data-section-btn:hover {
+    background: #3e79dc; }
+
 * {
   box-sizing: border-box; }
 
@@ -475,10 +481,13 @@ body {
 
 .page-title {
   text-align: center;
-  text-transform: capitalize; }
+  text-transform: capitalize;
+  font-weight: normal;
+  font-size: 30px; }
 
 .page-subtitle {
-  font-size: 24px; }
+  font-size: 26px;
+  font-weight: normal; }
 
 .doctor-specialisations-list {
   display: flex;

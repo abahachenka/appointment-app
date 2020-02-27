@@ -1,0 +1,39 @@
+.data-table {
+    width: 100%;
+    border: 1px solid #dad8d8;
+    border-spacing: 0;
+
+    thead {
+        background: #efefef;;
+    }
+
+    tr:nth-child(even) {
+        background: #efefef;
+    }
+
+    tr.disabled {
+        td {
+            color: #999;
+        }
+    }
+
+    th,
+    td {
+        padding: 5px;
+        border-right: 1px solid #dad8d8;
+
+        &:last-child {
+            border: 0;
+        }
+    }
+
+    tbody {
+        tr:not(.disabled):hover {
+            td {
+                background: $primary-light-color;
+                border-right: 1px solid $primary-light-color;
+                cursor: pointer;
+            }
+        }
+    }
+}
