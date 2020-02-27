@@ -1,0 +1,67 @@
+.modal-blackout {
+    background: $dark-transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.modal {
+    width: 300px;
+    background: $white;
+    margin: auto;
+    padding: 20px;
+
+    header {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    button {
+        border: none;
+        position: absolute;
+        right: 0;
+        top: 1px;
+        font-size: 18px;
+        background: transparent;
+        padding: 0;
+        
+        &:hover {
+            cursor: pointer;
+            color: $dark-hover;
+        }
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: normal;
+        margin: 0;
+        padding: 0 50px 10px 0;
+        border-bottom: 1px solid $dark;
+    }
+
+    input {
+        width: 100%;
+        height: 35px;
+        font-size: 14px;
+        padding: 1px 5px;
+        margin-bottom: 15px;
+    }
+
+    input[type="submit"] {
+        height: 35px;
+        border-radius: 0;
+        border: 0;
+        background: $primary-color;
+        color: $white;
+        margin: 0;
+
+        &:hover {
+            background: $primary-color-hover;
+            cursor: pointer;
+        }
+    }
+}

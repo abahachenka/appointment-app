@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment App</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dist/index.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="page-header">
+            APPOINTMENT APP
+        </header>
+
+        <main class="account-page page-container container">
+            <ul class="breadcrumbs">
+                <li>
+                    <a href="#">Clinic #17</a>
+                    <span class="separator">></span>
+                </li>
+                <li>
+                    <a href="#">Doctor Specialisations</a>
+                    <span class="separator">></span>
+                </li>
+                <li>Therapist</li>
+            </ul>
+
+            <section class="doctors">
+                <h1 class="page-title">Therapist</h1>
+                <button>Invite</button>
+
+                <table class="doctors-data">
+                    <thead>
+                        <tr>
+                            <th>Last Name</th>
+                            <th>First Name</th>
+                            <th>Title</th>
+                            <th>Room</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>White</td>
+                            <td>Anna</td>
+                            <td>Mrs.</td>
+                            <td>234</td>
+                            <td>anna.white@gmail.com</td>
+                            <td>Active</td>
+                        </tr>
+                        <tr>
+                            <td>Kim</td>
+                            <td>Paul</td>
+                            <td>Mr.</td>
+                            <td>125</td>
+                            <td>p.kim1990@yahoo.com</td>
+                            <td>Active</td>
+                        </tr>
+                        <tr>
+                            <td>Rich</td>
+                            <td>Johnatan</td>
+                            <td>Mr.</td>
+                            <td>453</td>
+                            <td>johnatan_rich86@gmail.com</td>
+                            <td>Active</td>
+                        </tr>
+                        <tr>
+                            <td>Woods</td>
+                            <td>Jane</td>
+                            <td>Mrs.</td>
+                            <td>324</td>
+                            <td>jane.woods@mail.com</td>
+                            <td>Active</td>
+                        </tr>
+                        <tr>
+                            <td>Fog</td>
+                            <td>Kate</td>
+                            <td>Mrs.</td>
+                            <td>206</td>
+                            <td>kate-fog@aol.co.uk</td>
+                            <td>Active</td>
+                        </tr>
+                        <tr class="invited">
+                            <td>Lisa</td>
+                            <td>McCormack</td>
+                            <td>Mrs.</td>
+                            <td>310</td>
+                            <td>mccormack_lisa@gmail.com</td>
+                            <td>Invited</td>
+                        </tr>
+                        <tr class="invited">
+                            <td>Grunewald</td>
+                            <td>Johanes</td>
+                            <td>Mr.</td>
+                            <td>315</td>
+                            <td>j.grunewald@web.de</td>
+                            <td>Invited</td>
+                        </tr>
+                        <tr class="invited">
+                            <td>Orange</td>
+                            <td>Helen</td>
+                            <td>Mrs.</td>
+                            <td>110</td>
+                            <td>helen.orange777@gmail.com</td>
+                            <td>Invited</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+        <div class="modal-blackout">
+            <div class="modal">
+                <header>
+                    <h3 class="modal-title">Invite a doctor</h3>
+                    
+                    <button>
+                        X
+                    </button>
+                </header>
+                <form>
+                    <input type="text" placeholder="Title">
+                    <input type="text" placeholder="First Name">
+                    <input type="text" placeholder="Last Name">
+                    <input type="text" placeholder="Room">
+                    <input type="email" placeholder="Email">
+                    <input type="submit" value="Invite">
+                </form>
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            &copy;2020 Alena Bayraktar 
+        </footer>
+    </div>
+</body>
+</html>
