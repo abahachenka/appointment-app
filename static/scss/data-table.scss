@@ -31,7 +31,7 @@
         tr:not(.disabled):hover {
             td {
                 background: $primary-light;
-                border-right: 1px solid $primary-light;
+                border-color: $primary-light;
                 cursor: pointer;
             }
         }

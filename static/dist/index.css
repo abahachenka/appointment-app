@@ -394,12 +394,16 @@
     border-bottom: 1px solid #000; }
   .modal .modal-description {
     line-height: 1.5; }
-  .modal input {
+  .modal input,
+  .modal select {
     width: 100%;
     height: 35px;
     font-size: 16px;
     padding: 1px 5px;
     margin-bottom: 15px; }
+  .modal select {
+    border-radius: 0;
+    -webkit-border-radius: 0; }
   .modal input[type="submit"] {
     border: none;
     background: #4784EB;
@@ -428,7 +432,7 @@
       border: 0; }
   .data-table tbody tr:not(.disabled):hover td {
     background: #c8dcfd;
-    border-right: 1px solid #c8dcfd;
+    border-color: #c8dcfd;
     cursor: pointer; }
 
 .data-section-header {
@@ -453,6 +457,16 @@
   .data-section-btn:hover {
     background: #3e79dc;
     cursor: pointer; }
+
+.doctor-account-page .page-title {
+  border-bottom: 1px solid #000;
+  padding: 8px 60px 8px 0; }
+
+.doctor-account-page .account-settings {
+  top: 70px; }
+
+.doctor-account-page .data-section {
+  margin: 40px 0; }
 
 * {
   box-sizing: border-box; }
