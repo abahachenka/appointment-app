@@ -30,8 +30,8 @@
     tbody {
         tr:not(.disabled):hover {
             td {
-                background: $primary-light-color;
-                border-right: 1px solid $primary-light-color;
+                background: $primary-light;
+                border-right: 1px solid $primary-light;
                 cursor: pointer;
             }
         }

@@ -6,23 +6,23 @@
     padding: $block-padding;
     background: $primary-light;
 
+    input {
+        font-size: $input-font-size;
+        height: $input-height;
+        border: none;
+    }
+
     input[type="text"] {
         margin-right: 10px;
-        height: 35px;
         width: 290px;
         padding: 2px 3px;
-        border: none;
-        font-size: 14px;
         padding: 1px 5px;
     }
 
     input[type="submit"] {
         padding: 10px 30px;
         background: $primary;
-        border: none;
         color: $white;
-        font-size: 14px;
-        height: 35px;
         line-height: 1;
 
         &:hover {

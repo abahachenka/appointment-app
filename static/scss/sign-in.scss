@@ -1,36 +1,30 @@
 .sign-in-form {
     width: 300px;
     box-shadow: $block-shadow;
-    display: flex;
-    flex-direction: column;
     padding: 20px;
-    margin: 100px auto 0;
+    margin: 100px auto;
+    text-align: center;
+
+    input {
+        height: $input-height;
+        font-size: $input-font-size;
+        width: 100%;
+    }
 
     input[type="text"],
     input[type="password"] {
-        margin-bottom: 20px;
-        height: 40px;
-        font-size: 16px;
-        border: 0;
-        box-shadow: $block-shadow;
         padding: 1px 5px;
+        margin-bottom: 20px;
     }
 
     input[type="submit"] {
-        height: 40px;
-        font-size: 16px;
         border: none;
-        background: $primary-color;
-        color: white;
-        margin-bottom: 20px;
+        background: $primary;
+        color: $white;
+        margin-bottom: 5px;
 
         &:hover {
-            background: $primary-color-hover;
+            background: $primary-hover;
         }
-    }
-
-    p,
-    a {
-        text-align: center;
     }
 }
