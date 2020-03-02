@@ -1,9 +1,14 @@
 module.exports = {
-    files: {
-        scss: {
-            src: './static/scss/index.scss',
-            dest: './static/dist/',
-            watch: './static/scss/**/*.scss'
-        }
+    common: {
+        dest: './public/'
+    },
+    js: {
+        src: './src/index.js',
+        output: 'bundle.js'
+    },
+    scss: {
+        src: './static/scss/index.scss',
+        dest: './public/',
+        watch: './static/scss/**/*.scss'
     }
 };
