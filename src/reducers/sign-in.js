@@ -1,8 +1,8 @@
 import { 
-    REGISTER_CLINIC_SUCCESS,
-    REGISTER_CLINIC_PENDING,
-    REGISTER_CLINIC_ERROR,
-    REGISTER_RESET_ERROR
+    SIGN_IN_SUCCESS,
+    SIGN_IN_PENDING,
+    SIGN_IN_ERROR,
+    SIGN_IN_RESET_ERROR
 } from '../constants/action-types';
 
 const initialState = {
@@ -11,36 +11,36 @@ const initialState = {
     error: null
 };
 
-const clinicRegistrationReducer = (state = initialState, action) => {
+const signInReducer = (state = initialState, action) => {
     switch (action.type) {
-        case REGISTER_CLINIC_SUCCESS:
+        case SIGN_IN_SUCCESS:
             return {
                 ...state,
                 isPending: false,
                 isCompleted: true
             };
 
-        case REGISTER_CLINIC_PENDING:
+        case SIGN_IN_PENDING:
             return {
                 ...state,
                 isPending: true
             };
 
-        case REGISTER_CLINIC_ERROR:
+        case SIGN_IN_ERROR:
             return {
                 ...state,
                 isPending: false,
                 error: action.payload.error
             }
 
-        case REGISTER_RESET_ERROR:
+        case SIGN_IN_RESET_ERROR:
             return {
                 ...state,
                 error: null
             }
         default: 
-          return state;
+           return state;
         }
 };
 
-export default clinicRegistrationReducer;
+export default signInReducer;

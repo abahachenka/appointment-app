@@ -271,7 +271,7 @@
     height: 35px;
     font-size: 16px;
     width: 100%; }
-  .sign-in-form input[type="text"],
+  .sign-in-form input[type="email"],
   .sign-in-form input[type="password"] {
     padding: 1px 5px;
     margin-bottom: 20px; }
@@ -280,8 +280,12 @@
     background: #4784EB;
     color: #fff;
     margin-bottom: 5px; }
-    .sign-in-form input[type="submit"]:hover {
-      background: #3e79dc; }
+    .sign-in-form input[type="submit"]:not([disabled]):hover {
+      background: #3e79dc;
+      cursor: pointer; }
+  .sign-in-form input[disabled] {
+    background: #f0f0f0;
+    color: #888; }
 
 .clinic-registration-form {
   width: 300px;

@@ -37060,7 +37060,67 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":112,"../utils/clinics-api":117}],105:[function(require,module,exports){
+},{"../constants/action-types":114,"../utils/clinics-api":120}],105:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+
+var _signInApi = require("../utils/sign-in-api");
+
+var _actionTypes = require("../constants/action-types");
+
+var signInPending = function signInPending() {
+  return {
+    type: _actionTypes.SIGN_IN_PENDING
+  };
+};
+
+exports.signInPending = signInPending;
+
+var signInSuccess = function signInSuccess() {
+  return {
+    type: _actionTypes.SIGN_IN_SUCCESS
+  };
+};
+
+exports.signInSuccess = signInSuccess;
+
+var signInError = function signInError(error) {
+  return {
+    type: _actionTypes.SIGN_IN_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.signInError = signInError;
+
+var resetSignInError = function resetSignInError() {
+  return {
+    type: _actionTypes.SIGN_IN_RESET_ERROR
+  };
+};
+
+exports.resetSignInError = resetSignInError;
+
+var requestUserSignIn = function requestUserSignIn(userData) {
+  return function (dispatch) {
+    dispatch(signInPending());
+    (0, _signInApi.requestSignIn)(userData).then(function (resp) {
+      dispatch(signInSuccess());
+    })["catch"](function (err) {
+      dispatch(signInError(err.message));
+    });
+  };
+};
+
+exports.requestUserSignIn = requestUserSignIn;
+
+},{"../constants/action-types":114,"../utils/sign-in-api":121}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37083,7 +37143,7 @@ var App = function App() {
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":107,"./Header":108,"./Main":110}],106:[function(require,module,exports){
+},{"./Footer":108,"./Header":109,"./Main":111}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37298,7 +37358,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/clinic-registration":104,"prop-types":46,"react-redux":68,"redux":87}],107:[function(require,module,exports){
+},{"../actions/clinic-registration":104,"prop-types":46,"react-redux":68,"redux":87}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37315,7 +37375,7 @@ var Footer = function Footer() {
 var _default = Footer;
 exports["default"] = _default;
 
-},{}],108:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37332,7 +37392,7 @@ var Header = function Header() {
 var _default = Header;
 exports["default"] = _default;
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37353,7 +37413,7 @@ var Home = function Home() {
 var _default = Home;
 exports["default"] = _default;
 
-},{}],110:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37367,6 +37427,8 @@ var _Home = _interopRequireDefault(require("./Home"));
 
 var _ClinicRegistration = _interopRequireDefault(require("./ClinicRegistration"));
 
+var _SignIn = _interopRequireDefault(require("./SignIn"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var Main = function Main() {
@@ -37377,13 +37439,205 @@ var Main = function Main() {
   }), React.createElement(_reactRouterDom.Route, {
     path: "/register",
     component: _ClinicRegistration["default"]
+  }), React.createElement(_reactRouterDom.Route, {
+    path: "/admin",
+    component: _SignIn["default"]
   }));
 };
 
 var _default = Main;
 exports["default"] = _default;
 
-},{"./ClinicRegistration":106,"./Home":109,"react-router-dom":79}],111:[function(require,module,exports){
+},{"./ClinicRegistration":107,"./Home":110,"./SignIn":112,"react-router-dom":79}],112:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _reactRedux = require("react-redux");
+
+var _redux = require("redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _reactRouterDom = require("react-router-dom");
+
+var _signIn = require("../actions/sign-in");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var initialState = {
+  userData: {
+    email: null,
+    password: null
+  },
+  isFormDisabled: true
+};
+
+var SignIn = /*#__PURE__*/function (_React$Component) {
+  _inherits(SignIn, _React$Component);
+
+  function SignIn(props) {
+    var _this;
+
+    _classCallCheck(this, SignIn);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SignIn).call(this));
+    _this.state = _objectSpread({}, initialState);
+    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
+    _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(SignIn, [{
+    key: "handleSubmit",
+    value: function handleSubmit(event) {
+      event.preventDefault();
+      var userData = this.state.userData;
+      this.props.requestSignIn(userData);
+    }
+  }, {
+    key: "resetForm",
+    value: function resetForm() {
+      this.signinForm.reset();
+    }
+  }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormIncomplete = false;
+
+      for (var prop in this.state.userData) {
+        if (!this.state.userData[prop]) {
+          isFormIncomplete = true;
+          return;
+        }
+      }
+
+      this.setState(function (prevState) {
+        return {
+          userData: _objectSpread({}, prevState.userData),
+          isFormDisabled: isFormIncomplete
+        };
+      });
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+
+      if (this.props.error) {
+        this.props.resetError();
+      }
+
+      this.setState(function (prevState) {
+        return {
+          userData: _objectSpread({}, prevState.userData, _defineProperty({}, name, value))
+        };
+      });
+      this.checkEmpty();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      var isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
+      return React.createElement("main", {
+        className: "page-container"
+      }, React.createElement("form", {
+        ref: function ref(el) {
+          return _this2.signinForm = el;
+        },
+        className: "sign-in-form",
+        onSubmit: this.handleSubmit
+      }, this.props.error ? React.createElement("p", {
+        className: "error"
+      }, this.props.error) : null, React.createElement("input", {
+        type: "email",
+        name: "email",
+        placeholder: "email",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "password",
+        name: "password",
+        placeholder: "password",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "submit",
+        value: "Sign-In",
+        disabled: isSubmitDisabled
+      }), React.createElement("p", null, "OR"), React.createElement(_reactRouterDom.Link, {
+        to: "/register"
+      }, "Register a new clinic account")));
+    }
+  }]);
+
+  return SignIn;
+}(React.Component);
+
+SignIn.propTypes = {
+  isPending: _propTypes["default"].bool,
+  isCompleted: _propTypes["default"].bool,
+  error: _propTypes["default"].string,
+  requestSignIn: _propTypes["default"].func.isRequired,
+  resetError: _propTypes["default"].func.isRequired
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var signIn = _ref.signIn;
+  return {
+    isPending: signIn.isPending,
+    isCompleted: signIn.isCompleted,
+    error: signIn.error
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    requestSignIn: function requestSignIn(userData) {
+      return (0, _signIn.requestUserSignIn)(userData);
+    },
+    resetError: function resetError() {
+      return (0, _signIn.resetSignInError)();
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(SignIn);
+
+exports["default"] = _default;
+
+},{"../actions/sign-in":105,"prop-types":46,"react-redux":68,"react-router-dom":79,"redux":87}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37393,13 +37647,13 @@ exports.API_URL = void 0;
 var API_URL = 'http://localhost:3000';
 exports.API_URL = API_URL;
 
-},{}],112:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -37408,8 +37662,16 @@ var REGISTER_CLINIC_ERROR = 'REGISTER_CLINIC_ERROR';
 exports.REGISTER_CLINIC_ERROR = REGISTER_CLINIC_ERROR;
 var REGISTER_RESET_ERROR = 'REGISTER_RESET_ERROR';
 exports.REGISTER_RESET_ERROR = REGISTER_RESET_ERROR;
+var SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS';
+exports.SIGN_IN_SUCCESS = SIGN_IN_SUCCESS;
+var SIGN_IN_PENDING = 'SIGN_IN_PENDING';
+exports.SIGN_IN_PENDING = SIGN_IN_PENDING;
+var SIGN_IN_ERROR = 'SIGN_IN_ERROR';
+exports.SIGN_IN_ERROR = SIGN_IN_ERROR;
+var SIGN_IN_RESET_ERROR = 'SIGN_IN_RESET_ERROR';
+exports.SIGN_IN_RESET_ERROR = SIGN_IN_RESET_ERROR;
 
-},{}],113:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -37428,7 +37690,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":105,"./store":116,"react-dom":50,"react-redux":68,"react-router-dom":79}],114:[function(require,module,exports){
+},{"./components/App":106,"./store":119,"react-dom":50,"react-redux":68,"react-router-dom":79}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37485,7 +37747,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":112}],115:[function(require,module,exports){
+},{"../constants/action-types":114}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37497,15 +37759,75 @@ var _redux = require("redux");
 
 var _clinicRegistration = _interopRequireDefault(require("./clinic-registration"));
 
+var _signIn = _interopRequireDefault(require("./sign-in"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var rootReducer = (0, _redux.combineReducers)({
-  clinicRegistration: _clinicRegistration["default"]
+  clinicRegistration: _clinicRegistration["default"],
+  signIn: _signIn["default"]
 });
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./clinic-registration":114,"redux":87}],116:[function(require,module,exports){
+},{"./clinic-registration":116,"./sign-in":118,"redux":87}],118:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _actionTypes = require("../constants/action-types");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var initialState = {
+  isPending: false,
+  isCompleted: false,
+  error: null
+};
+
+var signInReducer = function signInReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case _actionTypes.SIGN_IN_SUCCESS:
+      return _objectSpread({}, state, {
+        isPending: false,
+        isCompleted: true
+      });
+
+    case _actionTypes.SIGN_IN_PENDING:
+      return _objectSpread({}, state, {
+        isPending: true
+      });
+
+    case _actionTypes.SIGN_IN_ERROR:
+      return _objectSpread({}, state, {
+        isPending: false,
+        error: action.payload.error
+      });
+
+    case _actionTypes.SIGN_IN_RESET_ERROR:
+      return _objectSpread({}, state, {
+        error: null
+      });
+
+    default:
+      return state;
+  }
+};
+
+var _default = signInReducer;
+exports["default"] = _default;
+
+},{"../constants/action-types":114}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37525,7 +37847,7 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":115,"redux":87,"redux-thunk":86}],117:[function(require,module,exports){
+},{"./reducers/root":117,"redux":87,"redux-thunk":86}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37547,6 +37869,28 @@ var createClinic = function createClinic(clinic) {
 
 exports.createClinic = createClinic;
 
-},{"../config.js":111,"axios":7}]},{},[113])
+},{"../config.js":113,"axios":7}],121:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.requestSignIn = void 0;
+
+var _axios = _interopRequireDefault(require("axios"));
+
+var _config = require("../config.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var SIGNIN_API_URL = _config.API_URL + '/signin';
+
+var requestSignIn = function requestSignIn(userData) {
+  return _axios["default"].post(SIGNIN_API_URL, userData);
+};
+
+exports.requestSignIn = requestSignIn;
+
+},{"../config.js":113,"axios":7}]},{},[115])
 
 //# sourceMappingURL=bundle.js.map

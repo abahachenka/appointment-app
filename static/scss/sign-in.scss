@@ -11,7 +11,7 @@
         width: 100%;
     }
 
-    input[type="text"],
+    input[type="email"],
     input[type="password"] {
         padding: 1px 5px;
         margin-bottom: 20px;
@@ -23,8 +23,14 @@
         color: $white;
         margin-bottom: 5px;
 
-        &:hover {
+        &:not([disabled]):hover {
             background: $primary-hover;
+            cursor: pointer;
         }
+    }
+
+    input[disabled] {
+        background: $disabled;
+        color: $disabled-text;
     }
 }
