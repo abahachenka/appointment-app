@@ -1,44 +1,52 @@
 {
-  "name": "appointment-app",
+  "name": "appointment-app-ui",
   "version": "1.0.0",
-  "description": "",
+  "description": "Appointment App UI",
   "main": "index.html",
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^0.19.2",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2"
+  },
   "devDependencies": {
     "@babel/core": "^7.8.6",
     "@babel/preset-env": "^7.8.6",
     "@babel/preset-react": "^7.8.3",
-    "apollo-server-express": "^2.10.1",
     "autoprefixer": "^9.7.4",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
     "del": "^5.1.0",
-    "express": "^4.17.1",
-    "graphql": "^0.13.2",
+    "dotenv": "^8.2.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-cli": "^2.2.0",
     "gulp-postcss": "^8.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "nodemon": "^2.0.2",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-process-env": "^0.1.0",
+    "react-redux": "^7.2.0",
+    "react-router-dom": "^5.1.2",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
     "require-dir": "^1.2.0",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.11.1"
   },
   "scripts": {
-    "start": "nodemon -w server -e js,graphql server/server.js",
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abahachenka/appointment-app.git"
+    "url": "git+https://github.com/abahachenka/appointment-app-ui.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/abahachenka/appointment-app/issues"
+    "url": "https://github.com/abahachenka/appointment-app-ui/issues"
   },
-  "homepage": "https://github.com/abahachenka/appointment-app#readme"
+  "homepage": "https://github.com/abahachenka/appointment-app-ui#readme"
 }

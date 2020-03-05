@@ -5,7 +5,8 @@ function clean() {
         'public/bundle.js',
         'public/bundle.js.map',
         'public/index.css',
-        'public/index.css.map'
+        'public/index.css.map',
+        'public/index.html'
     ]);
 }
 

@@ -20,9 +20,14 @@
         color: $white;
         border: none;
 
-        &:hover {
+        &:not([disabled]):hover {
             background: $primary-hover;
             cursor: pointer;
         }
+    }
+
+    input[disabled] {
+        background: $disabled;
+        color: $disabled-text;
     }
 }

@@ -1,5 +1,6 @@
 module.exports = {
     common: {
+        entry: 'index.html',
         dest: './public/'
     },
     js: {

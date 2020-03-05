@@ -26,12 +26,6 @@ body {
     margin: 0;
 }
 
-.container {
-    width: 1140px;
-    box-sizing: border-box;
-    margin: 0 auto;
-}
-
 .page-wrapper {
     display: flex;
     flex-direction: column;
@@ -41,6 +35,9 @@ body {
 .page-container {
     flex: 1;
     padding: 30px;
+    width: 1140px;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
 .page-title {
@@ -53,6 +50,11 @@ body {
 .page-subtitle {
     font-size: 26px;
     font-weight: normal;
+}
+
+.error {
+    color: $danger;
+    margin-top: 0;
 }
 
 .doctor-specialisations-list {
