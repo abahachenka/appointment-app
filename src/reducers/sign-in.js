@@ -7,8 +7,9 @@ import {
 
 const initialState = {
     isPending: false,
-    isCompleted: false,
-    error: null
+    isAuthenticated: false,
+    error: null,
+    account: null
 };
 
 const signInReducer = (state = initialState, action) => {
@@ -17,7 +18,7 @@ const signInReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isPending: false,
-                isCompleted: true
+                isAuthenticated: true
             };
 
         case SIGN_IN_PENDING:
@@ -37,6 +38,11 @@ const signInReducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: null
+            }
+        case 'ACCOUNT_LOAD_SUCCESS':
+            return {
+                ...state,
+                account: action.payload.account
             }
         default: 
            return state;

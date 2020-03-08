@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import {requestUserSignIn, resetSignInError} from '../actions/sign-in';
+import {requestUserSignIn, resetSignInError} from '../actions/account';
 
 const initialState = {
     userData: {
@@ -22,6 +22,12 @@ class SignIn extends React.Component {
         this.onChange = this.onChange.bind(this);
         this.checkEmpty = this.checkEmpty.bind(this);
         this.resetForm = this.resetForm.bind(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.isAuthenticated) {
+            this.props.history.push('/clinic-account');
+        }
     }
 
     handleSubmit(event) {
@@ -84,7 +90,7 @@ class SignIn extends React.Component {
 
 SignIn.propTypes = {
     isPending: PropTypes.bool,
-    isCompleted: PropTypes.bool,
+    isAuthenticated: PropTypes.bool,
     error: PropTypes.string,
     requestSignIn: PropTypes.func.isRequired,
     resetError: PropTypes.func.isRequired
@@ -92,7 +98,7 @@ SignIn.propTypes = {
 
 const mapStateToProps = ({signIn}) => ({
     isPending: signIn.isPending,
-    isCompleted: signIn.isCompleted,
+    isAuthenticated: signIn.isAuthenticated,
     error: signIn.error
 });
 
