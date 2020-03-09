@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {createNewDoctorCategory} from '../actions/account';
@@ -43,28 +45,31 @@ class DoctorCategories extends React.Component {
     }
 
     render() {
+        const categories = this.props.categories;
+
         return (
             <React.Fragment>
                 <section className="doctor-specialisations">
                     <h2 className="page-subtitle">Doctor Specialisations</h2>
                     <button onClick={this.showModal}>Add New</button>
+                    
+                    <p className="error">{this.props.error}</p>
 
-                    <div className="doctor-specialisations-list">
-                        <ul>
-                            <li><a href="#">Neurologist</a></li>
-                            <li><a href="#">Therapist</a></li>
-                            <li><a href="#">Dentist</a></li>
-                        </ul>
-                        <ul>
-                            <li><a href="#">Gynecologist</a></li>
-                            <li><a href="#">Ophtalmologist</a></li>
-                            <li><a href="#">Urologist</a></li>
-                        </ul>
-                        <ul>
-                            <li><a href="#">Endocrynologist</a></li>
-                            <li><a href="#">Surgeon</a></li>
-                        </ul>
-                    </div>
+                    {categories && categories.length ? (
+                        <div className="doctor-specialisations-list">
+                            <ul>
+                                {categories.map((category, index) => {
+                                    const link = '/clinic-account/category/' + category.categoryName;
+
+                                    return (
+                                        <li key={index}>
+                                            <Link to={link}>{category.categoryName}</Link>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </div>
+                    ): null}
                 </section>
                 {this.state.isModalDisplayed ? (
                     <Modal title="Add New Doctors Category" onClose={this.closeModal}>
@@ -81,10 +86,14 @@ class DoctorCategories extends React.Component {
 }
 
 DoctorCategories.propTypes = {
-
+    createNewCategory: PropTypes.func,
+    categories: PropTypes.array,
+    error: PropTypes.string
 }
 
-const mapStateToProps = ({signIn}) => ({
+const mapStateToProps = ({doctorCategories}) => ({
+    categories: doctorCategories.categories,
+    error: doctorCategories.error
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

@@ -4,6 +4,27 @@
     .page-title {
         text-align: left;
     }
+
+    .doctor-specialisations-list {
+        display: block;
+        
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 20px 0;
+        }
+
+        a {
+            text-decoration: underline;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
 }
 
 .account-settings {
@@ -38,28 +59,6 @@
 
         &:hover {
             background: $primary-hover;
-        }
-    }
-}
-
-.doctor-specialisations-list {
-    display: flex;
-    
-    ul {
-        flex: 0 0 33%;
-        list-style: none;
-        padding: 0;
-    }
-
-    li {
-        margin: 20px 0;
-    }
-
-    a {
-        text-decoration: underline;
-
-        &:hover {
-            text-decoration: underline;
         }
     }
 }

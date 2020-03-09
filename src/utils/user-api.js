@@ -7,7 +7,7 @@ const token = Cookies.get('token');
 
 
 export const requestSignIn = userData => {
-    return axios.post(SIGNIN_API_URL, userData);
+    return axios.post(SIGNIN_API_URL + '/login', userData);
 }
 
 export const requestAccountData = () => {
