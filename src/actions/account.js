@@ -1,5 +1,5 @@
 import {requestSignIn, requestAccountData} from '../utils/user-api';
-import Cookies from 'js-cookie';
+import {addNewCategory} from '../utils/doctors-api';
 
 import { 
     SIGN_IN_SUCCESS,
@@ -57,11 +57,22 @@ export const loadAccountSuccess = (account) => ({
 
 export const loadAccount = () => {
     return dispatch => {
-        const token = Cookies.get('token');
-
-        requestAccountData(token)
+        requestAccountData()
             .then(resp => {
                 dispatch(loadAccountSuccess(resp.data))
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+}
+
+export const createNewDoctorCategory = (categoryName) => {
+    return dispatch => {
+        addNewCategory(categoryName)
+            .then(resp => {
+                console.log(resp);
+                // dispatch()
             })
             .catch(err => {
                 console.log(err);
