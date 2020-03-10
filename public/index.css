@@ -355,7 +355,8 @@
 .breadcrumbs {
   padding: 0; }
   .breadcrumbs li {
-    display: inline-block; }
+    display: inline-block;
+    text-transform: capitalize; }
   .breadcrumbs a {
     text-decoration: underline; }
   .breadcrumbs .separator {

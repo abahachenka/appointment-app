@@ -6,11 +6,17 @@ const DOCTOR_CATEGORIES_API_URL = API_URL + '/doctor-categories';
 const token = Cookies.get('token');
 
 export const addNewCategory = (categoryName) => {
-    return axios.post(DOCTOR_CATEGORIES_API_URL, {categoryName, token});
+    return axios.post(DOCTOR_CATEGORIES_API_URL, {categoryName}, {
+        headers: {
+            'x-access-token': token
+        }
+    });
 }
 
 export const getDoctorCategories = () => {
-    return axios.get(DOCTOR_CATEGORIES_API_URL, {params: {
-        'token': token
-    }});
+    return axios.get(DOCTOR_CATEGORIES_API_URL, {
+        headers: {
+            'x-access-token': token
+        }
+    });
 }

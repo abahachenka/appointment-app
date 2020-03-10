@@ -11,9 +11,9 @@ export const requestSignIn = userData => {
 }
 
 export const requestAccountData = () => {
-    return axios.post(SIGNIN_API_URL + '/account', {token}, /*{
+    return axios.post(SIGNIN_API_URL + '/account', {}, {
         headers: {
             'x-access-token': token
         }
-    }*/);
+    });
 }

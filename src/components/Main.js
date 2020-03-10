@@ -2,6 +2,7 @@ import { Switch, Route } from 'react-router-dom';
 import Home from './Home';
 import ClinicRegistration from './ClinicRegistration';
 import ClinicAccountPage from './ClinicAccountPage';
+import DoctorsCategory from './DoctorsCategory';
 import SignIn from './SignIn';
 
 const Main = () => (
@@ -9,7 +10,8 @@ const Main = () => (
         <Route exact path='/' component={Home}/>
         <Route path='/register' component={ClinicRegistration}/>
         <Route path='/admin' component={SignIn}/>
-        <Route path='/clinic-account' component={ClinicAccountPage}/>
+        <Route exact path='/clinic-account' component={ClinicAccountPage}/>
+        <Route path={`/clinic-account/category/:categoryName`} component={DoctorsCategory}/>
     </Switch>
 )
 

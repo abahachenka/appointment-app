@@ -8,7 +8,7 @@ import {
 const initialState = {
     isPending: false,
     isAuthenticated: false,
-    error: null,
+    error: '',
     account: null
 };
 
@@ -37,7 +37,7 @@ const signInReducer = (state = initialState, action) => {
         case SIGN_IN_RESET_ERROR:
             return {
                 ...state,
-                error: null
+                error: ''
             }
         case 'ACCOUNT_LOAD_SUCCESS':
             return {
