@@ -37171,7 +37171,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -37302,6 +37302,50 @@ var createNewDoctorCategoryError = function createNewDoctorCategoryError(error) 
 
 exports.createNewDoctorCategoryError = createNewDoctorCategoryError;
 
+var loadDoctorCategorySuccess = function loadDoctorCategorySuccess(category) {
+  return {
+    type: _actionTypes.LOAD_DOCTOR_CATEGORY_SUCCESS,
+    payload: {
+      category: category
+    }
+  };
+};
+
+exports.loadDoctorCategorySuccess = loadDoctorCategorySuccess;
+
+var loadDoctorCategoryError = function loadDoctorCategoryError(error) {
+  return {
+    type: _actionTypes.LOAD_DOCTOR_CATEGORY_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.loadDoctorCategoryError = loadDoctorCategoryError;
+
+var loadDoctorsSuccess = function loadDoctorsSuccess(doctors) {
+  return {
+    type: _actionTypes.LOAD_DOCTORS_SUCCESS,
+    payload: {
+      doctors: doctors
+    }
+  };
+};
+
+exports.loadDoctorsSuccess = loadDoctorsSuccess;
+
+var loadDoctorsError = function loadDoctorsError(error) {
+  return {
+    type: _actionTypes.LOAD_DOCTORS_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.loadDoctorsError = loadDoctorsError;
+
 var loadAccount = function loadAccount() {
   return function (dispatch) {
     (0, _userApi.requestAccountData)().then(function (resp) {
@@ -37339,6 +37383,33 @@ var loadDoctorCategories = function loadDoctorCategories() {
 };
 
 exports.loadDoctorCategories = loadDoctorCategories;
+
+var loadDoctors = function loadDoctors(categoryId) {
+  return function (dispatch) {
+    (0, _doctorsApi.getDoctors)(categoryId).then(function (resp) {
+      dispatch(loadDoctorsSuccess(resp.data));
+    })["catch"](function (err) {
+      dispatch(loadDoctorsError(err));
+    });
+  };
+};
+
+exports.loadDoctors = loadDoctors;
+
+var loadCategory = function loadCategory(alias) {
+  return function (dispatch) {
+    (0, _doctorsApi.getDoctorCategory)(alias).then(function (resp) {
+      var category = resp.data;
+      dispatch(loadDoctorCategorySuccess(category));
+      dispatch(loadDoctors(category._id));
+    })["catch"](function (err) {
+      console.log(err);
+      dispatch(loadDoctorCategoryError(err));
+    });
+  };
+};
+
+exports.loadCategory = loadCategory;
 
 },{"../constants/action-types":119,"../utils/doctors-api":127,"../utils/user-api":128,"js-cookie":38}],106:[function(require,module,exports){
 "use strict";
@@ -37841,7 +37912,7 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
       }, this.props.error), categories && categories.length ? React.createElement("div", {
         className: "doctor-specialisations-list"
       }, React.createElement("ul", null, categories.map(function (category, index) {
-        var link = '/clinic-account/category/' + category.categoryName;
+        var link = '/clinic-account/category/' + category.categoryAlias;
         return React.createElement("li", {
           key: index
         }, React.createElement(_reactRouterDom.Link, {
@@ -37908,6 +37979,8 @@ var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
 
+var _account = require("../actions/account");
+
 var _Modal = _interopRequireDefault(require("./Modal"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -37940,19 +38013,29 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
   }
 
   _createClass(DoctorsCategory, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.loadCategory(this.props.match.params.categoryAlias); // load account data
+
+      if (!this.props.clinicName) {
+        this.props.loadAccount();
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
-      var categoryName = this.props.match.params.categoryName;
+      var categoryName = this.props.activeCategory && this.props.activeCategory.categoryName;
+      var doctors = this.props.doctors;
       return React.createElement("main", {
         className: "account-page page-container"
       }, React.createElement("ul", {
         className: "breadcrumbs"
       }, React.createElement("li", null, React.createElement("a", {
-        href: "#"
+        href: "/clinic-account"
       }, this.props.clinicName), React.createElement("span", {
         className: "separator"
       }, ">")), React.createElement("li", null, React.createElement("a", {
-        href: "#"
+        href: "/clinic-account"
       }, "Doctor Specialisations"), React.createElement("span", {
         className: "separator"
       }, ">")), React.createElement("li", null, categoryName)), React.createElement("section", {
@@ -37963,15 +38046,15 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
         className: "data-section-title"
       }, categoryName), React.createElement("button", {
         className: "data-section-btn"
-      }, "Invite")), React.createElement("table", {
+      }, "Invite")), doctors && doctors.length ? React.createElement("table", {
         className: "data-table"
-      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Last Name"), React.createElement("th", null, "First Name"), React.createElement("th", null, "Title"), React.createElement("th", null, "Room"), React.createElement("th", null, "Email"), React.createElement("th", null, "Status"))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("td", null, "White"), React.createElement("td", null, "Anna"), React.createElement("td", null, "Mrs."), React.createElement("td", null, "234"), React.createElement("td", null, "anna.white@gmail.com"), React.createElement("td", null, "Active")), React.createElement("tr", null, React.createElement("td", null, "Kim"), React.createElement("td", null, "Paul"), React.createElement("td", null, "Mr."), React.createElement("td", null, "125"), React.createElement("td", null, "p.kim1990@yahoo.com"), React.createElement("td", null, "Active")), React.createElement("tr", null, React.createElement("td", null, "Rich"), React.createElement("td", null, "Johnatan"), React.createElement("td", null, "Mr."), React.createElement("td", null, "453"), React.createElement("td", null, "johnatan_rich86@gmail.com"), React.createElement("td", null, "Active")), React.createElement("tr", null, React.createElement("td", null, "Woods"), React.createElement("td", null, "Jane"), React.createElement("td", null, "Mrs."), React.createElement("td", null, "324"), React.createElement("td", null, "jane.woods@mail.com"), React.createElement("td", null, "Active")), React.createElement("tr", null, React.createElement("td", null, "Fog"), React.createElement("td", null, "Kate"), React.createElement("td", null, "Mrs."), React.createElement("td", null, "206"), React.createElement("td", null, "kate-fog@aol.co.uk"), React.createElement("td", null, "Active")), React.createElement("tr", {
-        className: "disabled"
-      }, React.createElement("td", null, "Lisa"), React.createElement("td", null, "McCormack"), React.createElement("td", null, "Mrs."), React.createElement("td", null, "310"), React.createElement("td", null, "mccormack_lisa@gmail.com"), React.createElement("td", null, "Invited")), React.createElement("tr", {
-        className: "disabled"
-      }, React.createElement("td", null, "Grunewald"), React.createElement("td", null, "Johanes"), React.createElement("td", null, "Mr."), React.createElement("td", null, "315"), React.createElement("td", null, "j.grunewald@web.de"), React.createElement("td", null, "Invited")), React.createElement("tr", {
-        className: "disabled"
-      }, React.createElement("td", null, "Orange"), React.createElement("td", null, "Helen"), React.createElement("td", null, "Mrs."), React.createElement("td", null, "110"), React.createElement("td", null, "helen.orange777@gmail.com"), React.createElement("td", null, "Invited"))))));
+      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Last Name"), React.createElement("th", null, "First Name"), React.createElement("th", null, "Title"), React.createElement("th", null, "Room"), React.createElement("th", null, "Email"), React.createElement("th", null, "Status"))), React.createElement("tbody", null, doctors.map(function (doctor, index) {
+        var isDisabled = doctor.status === 'invited';
+        return React.createElement("tr", {
+          key: index,
+          className: isDisabled ? "disabled" : null
+        }, React.createElement("td", null, doctor.lastName), React.createElement("td", null, doctor.firstName), React.createElement("td", null, doctor.title), React.createElement("td", null, doctor.room), React.createElement("td", null, doctor.email), React.createElement("td", null, doctor.status));
+      }))) : null));
     }
   }]);
 
@@ -37979,18 +38062,30 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
 }(React.Component);
 
 DoctorsCategory.propTypes = {
-  clinicName: _propTypes["default"].string
+  clinicName: _propTypes["default"].string,
+  activeCategory: _propTypes["default"].object,
+  activeCategoryError: _propTypes["default"].string,
+  doctors: _propTypes["default"].arrayOf(_propTypes["default"].object)
 };
 
 var mapStateToProps = function mapStateToProps(state) {
   return {
-    clinicName: state.signIn.account && state.signIn.account.name
+    clinicName: state.signIn.account && state.signIn.account.name,
+    activeCategory: state.doctorCategories.activeCategory,
+    activeCategoryError: state.doctorCategories.activeCategoryError,
+    doctors: state.doctorCategories.doctors
   };
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
-    createNewCategory: function createNewCategory() {}
+    createNewCategory: function createNewCategory() {},
+    loadAccount: function loadAccount() {
+      return (0, _account.loadAccount)();
+    },
+    loadCategory: function loadCategory(alias) {
+      return (0, _account.loadCategory)(alias);
+    }
   }, dispatch);
 };
 
@@ -37998,7 +38093,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"./Modal":116,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],112:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":116,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38091,7 +38186,7 @@ var Main = function Main() {
     path: "/clinic-account",
     component: _ClinicAccountPage["default"]
   }), React.createElement(_reactRouterDom.Route, {
-    path: "/clinic-account/category/:categoryName",
+    path: "/clinic-account/category/:categoryAlias",
     component: _DoctorsCategory["default"]
   }));
 };
@@ -38376,7 +38471,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -38405,6 +38500,14 @@ var CREATE_DOCTOR_CATEGORY_SUCCESS = 'CREATE_DOCTOR_CATEGORY_SUCCESS';
 exports.CREATE_DOCTOR_CATEGORY_SUCCESS = CREATE_DOCTOR_CATEGORY_SUCCESS;
 var CREATE_DOCTOR_CATEGORY_ERROR = 'CREATE_DOCTOR_CATEGORY_ERROR';
 exports.CREATE_DOCTOR_CATEGORY_ERROR = CREATE_DOCTOR_CATEGORY_ERROR;
+var LOAD_DOCTOR_CATEGORY_SUCCESS = 'LOAD_DOCTOR_CATEGORY_SUCCESS';
+exports.LOAD_DOCTOR_CATEGORY_SUCCESS = LOAD_DOCTOR_CATEGORY_SUCCESS;
+var LOAD_DOCTOR_CATEGORY_ERROR = 'LOAD_DOCTOR_CATEGORY_ERROR';
+exports.LOAD_DOCTOR_CATEGORY_ERROR = LOAD_DOCTOR_CATEGORY_ERROR;
+var LOAD_DOCTORS_SUCCESS = 'LOAD_DOCTORS_SUCCESS';
+exports.LOAD_DOCTORS_SUCCESS = LOAD_DOCTORS_SUCCESS;
+var LOAD_DOCTORS_ERROR = 'LOAD_DOCTORS_ERROR';
+exports.LOAD_DOCTORS_ERROR = LOAD_DOCTORS_ERROR;
 
 },{}],120:[function(require,module,exports){
 "use strict";
@@ -38501,7 +38604,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var initialState = {
   isPending: false,
   error: '',
-  categories: []
+  categories: [],
+  activeCategory: null,
+  activeCategoryError: '',
+  doctors: []
 };
 
 var doctorCategoriesReducer = function doctorCategoriesReducer() {
@@ -38524,6 +38630,26 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
       return state;
 
     case _actionTypes.CREATE_DOCTOR_CATEGORY_ERROR:
+      return _objectSpread({}, state, {
+        error: action.payload.error
+      });
+
+    case _actionTypes.LOAD_DOCTOR_CATEGORY_SUCCESS:
+      return _objectSpread({}, state, {
+        activeCategory: action.payload.category
+      });
+
+    case _actionTypes.LOAD_DOCTOR_CATEGORY_ERROR:
+      return _objectSpread({}, state, {
+        activeCategoryError: payload.error
+      });
+
+    case _actionTypes.LOAD_DOCTORS_SUCCESS:
+      return _objectSpread({}, state, {
+        doctors: action.payload.doctors
+      });
+
+    case _actionTypes.LOAD_DOCTORS_ERROR:
       return _objectSpread({}, state, {
         error: action.payload.error
       });
@@ -38673,7 +38799,7 @@ exports.createClinic = createClinic;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getDoctorCategories = exports.addNewCategory = void 0;
+exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -38708,6 +38834,26 @@ var getDoctorCategories = function getDoctorCategories() {
 };
 
 exports.getDoctorCategories = getDoctorCategories;
+
+var getDoctorCategory = function getDoctorCategory(alias) {
+  return _axios["default"].get(DOCTOR_CATEGORIES_API_URL + '/' + alias, {
+    headers: {
+      'x-access-token': token
+    }
+  });
+};
+
+exports.getDoctorCategory = getDoctorCategory;
+
+var getDoctors = function getDoctors(categoryId) {
+  return _axios["default"].get(DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors', {
+    headers: {
+      'x-access-token': token
+    }
+  });
+};
+
+exports.getDoctors = getDoctors;
 
 },{"../config.js":118,"axios":7,"js-cookie":38}],128:[function(require,module,exports){
 "use strict";

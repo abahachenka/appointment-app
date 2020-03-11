@@ -59,7 +59,7 @@ class DoctorCategories extends React.Component {
                         <div className="doctor-specialisations-list">
                             <ul>
                                 {categories.map((category, index) => {
-                                    const link = '/clinic-account/category/' + category.categoryName;
+                                    const link = '/clinic-account/category/' + category.categoryAlias;
 
                                     return (
                                         <li key={index}>

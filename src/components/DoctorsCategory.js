@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import {loadAccount, loadCategory} from '../actions/account';
 import Modal from './Modal';
 
 class DoctorsCategory extends React.Component {
@@ -9,18 +10,28 @@ class DoctorsCategory extends React.Component {
         super();
     }
 
+    componentDidMount() {
+        this.props.loadCategory(this.props.match.params.categoryAlias);
+
+        // load account data
+        if (!this.props.clinicName) {
+            this.props.loadAccount();
+        }
+    }
+
     render() {
-        const categoryName = this.props.match.params.categoryName;
+        const categoryName = this.props.activeCategory && this.props.activeCategory.categoryName;
+        const doctors = this.props.doctors;
 
         return (
             <main className="account-page page-container">
             <ul className="breadcrumbs">
                 <li>
-                    <a href="#">{this.props.clinicName}</a>
+                    <a href="/clinic-account">{this.props.clinicName}</a>
                     <span className="separator">></span>
                 </li>
                 <li>
-                    <a href="#">Doctor Specialisations</a>
+                    <a href="/clinic-account">Doctor Specialisations</a>
                     <span className="separator">></span>
                 </li>
                 <li>{categoryName}</li>
@@ -32,84 +43,37 @@ class DoctorsCategory extends React.Component {
                     <button className="data-section-btn">Invite</button>
                 </header>
 
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Last Name</th>
-                            <th>First Name</th>
-                            <th>Title</th>
-                            <th>Room</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>White</td>
-                            <td>Anna</td>
-                            <td>Mrs.</td>
-                            <td>234</td>
-                            <td>anna.white@gmail.com</td>
-                            <td>Active</td>
-                        </tr>
-                        <tr>
-                            <td>Kim</td>
-                            <td>Paul</td>
-                            <td>Mr.</td>
-                            <td>125</td>
-                            <td>p.kim1990@yahoo.com</td>
-                            <td>Active</td>
-                        </tr>
-                        <tr>
-                            <td>Rich</td>
-                            <td>Johnatan</td>
-                            <td>Mr.</td>
-                            <td>453</td>
-                            <td>johnatan_rich86@gmail.com</td>
-                            <td>Active</td>
-                        </tr>
-                        <tr>
-                            <td>Woods</td>
-                            <td>Jane</td>
-                            <td>Mrs.</td>
-                            <td>324</td>
-                            <td>jane.woods@mail.com</td>
-                            <td>Active</td>
-                        </tr>
-                        <tr>
-                            <td>Fog</td>
-                            <td>Kate</td>
-                            <td>Mrs.</td>
-                            <td>206</td>
-                            <td>kate-fog@aol.co.uk</td>
-                            <td>Active</td>
-                        </tr>
-                        <tr className="disabled">
-                            <td>Lisa</td>
-                            <td>McCormack</td>
-                            <td>Mrs.</td>
-                            <td>310</td>
-                            <td>mccormack_lisa@gmail.com</td>
-                            <td>Invited</td>
-                        </tr>
-                        <tr className="disabled">
-                            <td>Grunewald</td>
-                            <td>Johanes</td>
-                            <td>Mr.</td>
-                            <td>315</td>
-                            <td>j.grunewald@web.de</td>
-                            <td>Invited</td>
-                        </tr>
-                        <tr className="disabled">
-                            <td>Orange</td>
-                            <td>Helen</td>
-                            <td>Mrs.</td>
-                            <td>110</td>
-                            <td>helen.orange777@gmail.com</td>
-                            <td>Invited</td>
-                        </tr>
-                    </tbody>
-                </table>
+                {doctors && doctors.length ? (
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>Last Name</th>
+                                <th>First Name</th>
+                                <th>Title</th>
+                                <th>Room</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {doctors.map((doctor, index) => {
+                            const isDisabled = doctor.status === 'invited';
+
+                            return (
+                                <tr key={index} className={isDisabled ? "disabled": null}>
+                                    <td>{doctor.lastName}</td>
+                                    <td>{doctor.firstName}</td>
+                                    <td>{doctor.title}</td>
+                                    <td>{doctor.room}</td>
+                                    <td>{doctor.email}</td>
+                                    <td>{doctor.status}</td>
+                                </tr>
+                            )
+                        })}
+                        </tbody>
+                    </table>
+                ): null}
+                
             </section>
         </main>
         )
@@ -117,15 +81,23 @@ class DoctorsCategory extends React.Component {
 }
 
 DoctorsCategory.propTypes = {
-    clinicName: PropTypes.string
+    clinicName: PropTypes.string,
+    activeCategory: PropTypes.object,
+    activeCategoryError: PropTypes.string,
+    doctors: PropTypes.arrayOf(PropTypes.object)
 }
 
 const mapStateToProps = (state) => ({
-    clinicName: state.signIn.account && state.signIn.account.name
+    clinicName: state.signIn.account && state.signIn.account.name,
+    activeCategory: state.doctorCategories.activeCategory,
+    activeCategoryError: state.doctorCategories.activeCategoryError,
+    doctors: state.doctorCategories.doctors
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    createNewCategory: () => {}
+    createNewCategory: () => {},
+    loadAccount: () => loadAccount(),
+    loadCategory: (alias) => loadCategory(alias)
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(DoctorsCategory);

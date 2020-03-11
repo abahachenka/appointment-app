@@ -11,7 +11,7 @@ const Main = () => (
         <Route path='/register' component={ClinicRegistration}/>
         <Route path='/admin' component={SignIn}/>
         <Route exact path='/clinic-account' component={ClinicAccountPage}/>
-        <Route path={`/clinic-account/category/:categoryName`} component={DoctorsCategory}/>
+        <Route path={`/clinic-account/category/:categoryAlias`} component={DoctorsCategory}/>
     </Switch>
 )
 

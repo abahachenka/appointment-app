@@ -1,5 +1,10 @@
 import {requestSignIn, requestAccountData} from '../utils/user-api';
-import {addNewCategory, getDoctorCategories} from '../utils/doctors-api';
+import {
+    addNewCategory, 
+    getDoctorCategories, 
+    getDoctorCategory,
+    getDoctors
+} from '../utils/doctors-api';
 import Cookies from 'js-cookie';
 
 import { 
@@ -12,7 +17,11 @@ import {
     DOCTOR_CATEGORIES_LOAD_SUCCESS,
     DOCTOR_CATEGORIES_LOAD_ERROR,
     CREATE_DOCTOR_CATEGORY_SUCCESS,
-    CREATE_DOCTOR_CATEGORY_ERROR
+    CREATE_DOCTOR_CATEGORY_ERROR,
+    LOAD_DOCTOR_CATEGORY_SUCCESS,
+    LOAD_DOCTOR_CATEGORY_ERROR,
+    LOAD_DOCTORS_SUCCESS,
+    LOAD_DOCTORS_ERROR
 } from '../constants/action-types';
 
 export const signInPending = () => ({
@@ -94,6 +103,34 @@ export const createNewDoctorCategoryError = (error) => ({
     }
 });
 
+export const loadDoctorCategorySuccess = (category) => ({
+    type: LOAD_DOCTOR_CATEGORY_SUCCESS,
+    payload: {
+        category
+    }
+});
+
+export const loadDoctorCategoryError = (error) => ({
+    type: LOAD_DOCTOR_CATEGORY_ERROR,
+    payload: {
+        error
+    }
+});
+
+export const loadDoctorsSuccess = (doctors) => ({
+    type: LOAD_DOCTORS_SUCCESS,
+    payload: {
+        doctors
+    }
+});
+
+export const loadDoctorsError = (error) => ({
+    type: LOAD_DOCTORS_ERROR,
+    payload: {
+        error
+    }
+});
+
 export const loadAccount = () => {
     return dispatch => {
         requestAccountData()
@@ -128,6 +165,33 @@ export const loadDoctorCategories = () => {
             })
             .catch(err => {
                 dispatch(loadDoctorCategoriesError(err));
+            });
+    }
+}
+
+export const loadDoctors = (categoryId) => {
+    return dispatch => {
+        getDoctors(categoryId)
+            .then(resp => {
+                dispatch(loadDoctorsSuccess(resp.data));
+            })
+            .catch(err => {
+                dispatch(loadDoctorsError(err));
+            });
+    }
+}
+
+export const loadCategory = (alias) => {
+    return dispatch => {
+        getDoctorCategory(alias)
+            .then(resp => {
+                const category = resp.data;
+                dispatch(loadDoctorCategorySuccess(category));
+                dispatch(loadDoctors(category._id))
+            })
+            .catch(err => {
+                console.log(err);
+                dispatch(loadDoctorCategoryError(err))
             });
     }
 }

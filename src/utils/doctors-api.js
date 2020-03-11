@@ -20,3 +20,19 @@ export const getDoctorCategories = () => {
         }
     });
 }
+
+export const getDoctorCategory = (alias) => {
+    return axios.get(DOCTOR_CATEGORIES_API_URL + '/' + alias, {
+        headers: {
+            'x-access-token': token
+        }
+    });
+}
+
+export const getDoctors = (categoryId) => {
+    return axios.get(DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors', {
+        headers: {
+            'x-access-token': token
+        }
+    });
+}
