@@ -37171,7 +37171,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.resetInvitationError = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -37346,13 +37346,40 @@ var loadDoctorsError = function loadDoctorsError(error) {
 
 exports.loadDoctorsError = loadDoctorsError;
 
+var sendInvitationSuccess = function sendInvitationSuccess() {
+  return {
+    type: _actionTypes.SEND_INVITATION_SUCCESS
+  };
+};
+
+exports.sendInvitationSuccess = sendInvitationSuccess;
+
+var sendInvitationError = function sendInvitationError(error) {
+  return {
+    type: _actionTypes.SEND_INVITATION_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.sendInvitationError = sendInvitationError;
+
+var resetInvitationError = function resetInvitationError() {
+  return {
+    type: _actionTypes.SEND_INVITATION_ERROR_RESET
+  };
+};
+
+exports.resetInvitationError = resetInvitationError;
+
 var loadAccount = function loadAccount() {
   return function (dispatch) {
     (0, _userApi.requestAccountData)().then(function (resp) {
       dispatch(loadDoctorCategories());
       dispatch(loadAccountSuccess(resp.data));
     })["catch"](function (err) {
-      loadDoctorCategoriesError(err);
+      loadDoctorCategoriesError(err.message);
     });
   };
 };
@@ -37365,7 +37392,7 @@ var createNewDoctorCategory = function createNewDoctorCategory(categoryName) {
       dispatch(createNewDoctorCategorySuccess());
       dispatch(loadDoctorCategories());
     })["catch"](function (err) {
-      dispatch(createNewDoctorCategoryError(err));
+      dispatch(createNewDoctorCategoryError(err.message));
     });
   };
 };
@@ -37377,7 +37404,7 @@ var loadDoctorCategories = function loadDoctorCategories() {
     (0, _doctorsApi.getDoctorCategories)().then(function (resp) {
       dispatch(loadDoctorCategoriesSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoriesError(err));
+      dispatch(loadDoctorCategoriesError(err.message));
     });
   };
 };
@@ -37389,7 +37416,7 @@ var loadDoctors = function loadDoctors(categoryId) {
     (0, _doctorsApi.getDoctors)(categoryId).then(function (resp) {
       dispatch(loadDoctorsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorsError(err));
+      dispatch(loadDoctorsError(err.message));
     });
   };
 };
@@ -37403,13 +37430,25 @@ var loadCategory = function loadCategory(alias) {
       dispatch(loadDoctorCategorySuccess(category));
       dispatch(loadDoctors(category._id));
     })["catch"](function (err) {
-      console.log(err);
-      dispatch(loadDoctorCategoryError(err));
+      dispatch(loadDoctorCategoryError(err.message));
     });
   };
 };
 
 exports.loadCategory = loadCategory;
+
+var sendInvitation = function sendInvitation(categoryId, invitation) {
+  return function (dispatch) {
+    (0, _doctorsApi.sendDoctorInvitation)(categoryId, invitation).then(function (resp) {
+      dispatch(sendInvitationSuccess());
+      dispatch(loadDoctors(categoryId));
+    })["catch"](function (err) {
+      dispatch(sendInvitationError(err.message));
+    });
+  };
+};
+
+exports.sendInvitation = sendInvitation;
 
 },{"../constants/action-types":120,"../utils/doctors-api":128,"../utils/user-api":129,"js-cookie":38}],106:[function(require,module,exports){
 "use strict";
@@ -37989,6 +38028,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -37997,21 +38042,35 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var initialState = {
+  isInviteFormDisplayed: false,
+  invitation: null
+};
+
 var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorsCategory, _React$Component);
 
   function DoctorsCategory(props) {
+    var _this;
+
     _classCallCheck(this, DoctorsCategory);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(DoctorsCategory).call(this));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DoctorsCategory).call(this));
+    _this.state = _objectSpread({}, initialState);
+    _this.openInviteForm = _this.openInviteForm.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_this));
+    _this.inviteDoctor = _this.inviteDoctor.bind(_assertThisInitialized(_this));
+    _this.resetInvitationForm = _this.resetInvitationForm.bind(_assertThisInitialized(_this));
+    return _this;
   }
 
   _createClass(DoctorsCategory, [{
@@ -38024,8 +38083,57 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
       }
     }
   }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.props.isInvitationSent && this.props.isInvitationSent !== prevProps.isInvitationSent) {
+        this.setState(initialState);
+        this.resetInvitationForm();
+        this.props.resetInvitationError();
+      }
+    }
+  }, {
+    key: "resetInvitationForm",
+    value: function resetInvitationForm() {
+      this.invitationForm.reset();
+    }
+  }, {
+    key: "openInviteForm",
+    value: function openInviteForm() {
+      this.setState({
+        isInviteFormDisplayed: true
+      });
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          invitation: _objectSpread({}, prevState.invitation, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "closeModal",
+    value: function closeModal() {
+      this.setState({
+        invitation: null,
+        isInviteFormDisplayed: false
+      });
+    }
+  }, {
+    key: "inviteDoctor",
+    value: function inviteDoctor(event) {
+      event.preventDefault();
+      this.props.sendInvitation(this.props.activeCategory._id, this.state.invitation);
+    }
+  }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       var categoryName = this.props.activeCategory && this.props.activeCategory.categoryName;
       return React.createElement("main", {
         className: "account-page page-container"
@@ -38046,10 +38154,51 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
       }, React.createElement("h1", {
         className: "data-section-title"
       }, categoryName), React.createElement("button", {
-        className: "data-section-btn"
-      }, "Invite")), React.createElement(_DoctorsList["default"], {
+        className: "data-section-btn",
+        onClick: this.openInviteForm
+      }, "Invite")), React.createElement("p", {
+        className: "error"
+      }, this.props.activeCategoryError), React.createElement(_DoctorsList["default"], {
         items: this.props.doctors
-      })));
+      })), this.state.isInviteFormDisplayed ? React.createElement(_Modal["default"], {
+        title: "Add New Doctors Category",
+        onClose: this.closeModal
+      }, React.createElement("form", {
+        ref: function ref(el) {
+          return _this2.invitationForm = el;
+        },
+        onSubmit: this.inviteDoctor
+      }, React.createElement("p", {
+        className: "error"
+      }, this.props.invitationError), React.createElement("input", {
+        type: "text",
+        name: "title",
+        placeholder: "Title",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "text",
+        name: "firstName",
+        placeholder: "First Name",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "text",
+        name: "lastName",
+        placeholder: "Last Name",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "text",
+        name: "room",
+        placeholder: "Room",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "email",
+        name: "email",
+        placeholder: "Email",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "submit",
+        value: "Send Invitation"
+      }))) : null);
     }
   }]);
 
@@ -38059,8 +38208,15 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
 DoctorsCategory.propTypes = {
   clinicName: _propTypes["default"].string,
   activeCategory: _propTypes["default"].object,
-  activeCategoryError: _propTypes["default"].string,
-  doctors: _propTypes["default"].arrayOf(_propTypes["default"].object)
+  activeCategoryError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  doctors: _propTypes["default"].arrayOf(_propTypes["default"].object),
+  invitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  isInvitationSent: _propTypes["default"].bool,
+  createNewCategory: _propTypes["default"].func,
+  loadAccount: _propTypes["default"].func,
+  loadCategory: _propTypes["default"].func,
+  sendInvitation: _propTypes["default"].func,
+  resetInvitationError: _propTypes["default"].func
 };
 
 var mapStateToProps = function mapStateToProps(state) {
@@ -38068,7 +38224,9 @@ var mapStateToProps = function mapStateToProps(state) {
     clinicName: state.signIn.account && state.signIn.account.name,
     activeCategory: state.doctorCategories.activeCategory,
     activeCategoryError: state.doctorCategories.activeCategoryError,
-    doctors: state.doctorCategories.doctors
+    doctors: state.doctorCategories.doctors,
+    isInvitationSent: state.doctorCategories.isInvitationSent,
+    invitationError: state.doctorCategories.invitationError
   };
 };
 
@@ -38080,6 +38238,12 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     },
     loadCategory: function loadCategory(alias) {
       return (0, _account.loadCategory)(alias);
+    },
+    sendInvitation: function sendInvitation(categoryId, invitation) {
+      return (0, _account.sendInvitation)(categoryId, invitation);
+    },
+    resetInvitationError: function resetInvitationError() {
+      return (0, _account.resetInvitationError)();
     }
   }, dispatch);
 };
@@ -38530,7 +38694,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -38567,6 +38731,12 @@ var LOAD_DOCTORS_SUCCESS = 'LOAD_DOCTORS_SUCCESS';
 exports.LOAD_DOCTORS_SUCCESS = LOAD_DOCTORS_SUCCESS;
 var LOAD_DOCTORS_ERROR = 'LOAD_DOCTORS_ERROR';
 exports.LOAD_DOCTORS_ERROR = LOAD_DOCTORS_ERROR;
+var SEND_INVITATION_SUCCESS = 'SEND_INVITATION_SUCCESS';
+exports.SEND_INVITATION_SUCCESS = SEND_INVITATION_SUCCESS;
+var SEND_INVITATION_ERROR = 'SEND_INVITATION_ERROR';
+exports.SEND_INVITATION_ERROR = SEND_INVITATION_ERROR;
+var SEND_INVITATION_ERROR_RESET = 'SEND_INVITATION_ERROR_RESET';
+exports.SEND_INVITATION_ERROR_RESET = SEND_INVITATION_ERROR_RESET;
 
 },{}],121:[function(require,module,exports){
 "use strict";
@@ -38666,7 +38836,9 @@ var initialState = {
   categories: [],
   activeCategory: null,
   activeCategoryError: '',
-  doctors: []
+  doctors: [],
+  isInvitationSent: false,
+  invitationError: ''
 };
 
 var doctorCategoriesReducer = function doctorCategoriesReducer() {
@@ -38700,7 +38872,7 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 
     case _actionTypes.LOAD_DOCTOR_CATEGORY_ERROR:
       return _objectSpread({}, state, {
-        activeCategoryError: payload.error
+        activeCategoryError: action.payload.error
       });
 
     case _actionTypes.LOAD_DOCTORS_SUCCESS:
@@ -38711,6 +38883,21 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
     case _actionTypes.LOAD_DOCTORS_ERROR:
       return _objectSpread({}, state, {
         error: action.payload.error
+      });
+
+    case _actionTypes.SEND_INVITATION_SUCCESS:
+      return _objectSpread({}, state, {
+        isInvitationSent: true
+      });
+
+    case _actionTypes.SEND_INVITATION_ERROR:
+      return _objectSpread({}, state, {
+        invitationError: action.payload.error
+      });
+
+    case _actionTypes.SEND_INVITATION_ERROR_RESET:
+      return _objectSpread({}, state, {
+        invitationError: ''
       });
 
     default:
@@ -38858,7 +39045,7 @@ exports.createClinic = createClinic;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
+exports.sendDoctorInvitation = exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -38905,7 +39092,8 @@ var getDoctorCategory = function getDoctorCategory(alias) {
 exports.getDoctorCategory = getDoctorCategory;
 
 var getDoctors = function getDoctors(categoryId) {
-  return _axios["default"].get(DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors', {
+  var url = DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors';
+  return _axios["default"].get(url, {
     headers: {
       'x-access-token': token
     }
@@ -38913,6 +39101,17 @@ var getDoctors = function getDoctors(categoryId) {
 };
 
 exports.getDoctors = getDoctors;
+
+var sendDoctorInvitation = function sendDoctorInvitation(categoryId, invitation) {
+  var url = DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors/invite';
+  return _axios["default"].post(url, invitation, {
+    headers: {
+      'x-access-token': token
+    }
+  });
+};
+
+exports.sendDoctorInvitation = sendDoctorInvitation;
 
 },{"../config.js":119,"axios":7,"js-cookie":38}],129:[function(require,module,exports){
 "use strict";

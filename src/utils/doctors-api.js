@@ -30,7 +30,19 @@ export const getDoctorCategory = (alias) => {
 }
 
 export const getDoctors = (categoryId) => {
-    return axios.get(DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors', {
+    const url = DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors';
+    
+    return axios.get(url, {
+        headers: {
+            'x-access-token': token
+        }
+    });
+}
+
+export const sendDoctorInvitation = (categoryId, invitation) => {
+    const url = DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors/invite';
+
+    return axios.post(url, invitation, {
         headers: {
             'x-access-token': token
         }

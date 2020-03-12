@@ -6,7 +6,10 @@ import {
     LOAD_DOCTOR_CATEGORY_SUCCESS,
     LOAD_DOCTOR_CATEGORY_ERROR,
     LOAD_DOCTORS_SUCCESS,
-    LOAD_DOCTORS_ERROR
+    LOAD_DOCTORS_ERROR,
+    SEND_INVITATION_SUCCESS,
+    SEND_INVITATION_ERROR,
+    SEND_INVITATION_ERROR_RESET
 } from '../constants/action-types';
 
 const initialState = {
@@ -15,7 +18,9 @@ const initialState = {
     categories: [],
     activeCategory: null,
     activeCategoryError: '',
-    doctors: []
+    doctors: [],
+    isInvitationSent: false,
+    invitationError: ''
 };
 
 const doctorCategoriesReducer = (state = initialState, action) => {
@@ -49,7 +54,7 @@ const doctorCategoriesReducer = (state = initialState, action) => {
         case LOAD_DOCTOR_CATEGORY_ERROR:
             return {
                 ...state,
-                activeCategoryError: payload.error
+                activeCategoryError: action.payload.error
             };
         case  LOAD_DOCTORS_SUCCESS:
             return {
@@ -60,6 +65,22 @@ const doctorCategoriesReducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: action.payload.error
+            }
+        case  SEND_INVITATION_SUCCESS:
+            return {
+                ...state,
+                isInvitationSent: true
+            }
+        case  SEND_INVITATION_ERROR:
+            return {
+                ...state,
+                invitationError: action.payload.error
+            }
+
+        case SEND_INVITATION_ERROR_RESET:
+            return {
+                ...state,
+                invitationError: ''
             }
 
         default:

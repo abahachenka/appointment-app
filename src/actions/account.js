@@ -3,7 +3,8 @@ import {
     addNewCategory, 
     getDoctorCategories, 
     getDoctorCategory,
-    getDoctors
+    getDoctors,
+    sendDoctorInvitation
 } from '../utils/doctors-api';
 import Cookies from 'js-cookie';
 
@@ -21,7 +22,10 @@ import {
     LOAD_DOCTOR_CATEGORY_SUCCESS,
     LOAD_DOCTOR_CATEGORY_ERROR,
     LOAD_DOCTORS_SUCCESS,
-    LOAD_DOCTORS_ERROR
+    LOAD_DOCTORS_ERROR,
+    SEND_INVITATION_SUCCESS,
+    SEND_INVITATION_ERROR,
+    SEND_INVITATION_ERROR_RESET
 } from '../constants/action-types';
 
 export const signInPending = () => ({
@@ -131,6 +135,21 @@ export const loadDoctorsError = (error) => ({
     }
 });
 
+export const sendInvitationSuccess = () => ({
+    type: SEND_INVITATION_SUCCESS
+});
+
+export const sendInvitationError = (error) => ({
+    type: SEND_INVITATION_ERROR,
+    payload: {
+        error
+    }
+});
+
+export const resetInvitationError = () => ({
+    type: SEND_INVITATION_ERROR_RESET
+});
+
 export const loadAccount = () => {
     return dispatch => {
         requestAccountData()
@@ -139,7 +158,7 @@ export const loadAccount = () => {
                 dispatch(loadAccountSuccess(resp.data))
             })
             .catch(err => {
-                loadDoctorCategoriesError(err);
+                loadDoctorCategoriesError(err.message);
             });
     }
 }
@@ -152,7 +171,7 @@ export const createNewDoctorCategory = (categoryName) => {
                 dispatch(loadDoctorCategories());
             })
             .catch(err => {
-                dispatch(createNewDoctorCategoryError(err));
+                dispatch(createNewDoctorCategoryError(err.message));
             });
     }
 }
@@ -164,7 +183,7 @@ export const loadDoctorCategories = () => {
                 dispatch(loadDoctorCategoriesSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorCategoriesError(err));
+                dispatch(loadDoctorCategoriesError(err.message));
             });
     }
 }
@@ -176,7 +195,7 @@ export const loadDoctors = (categoryId) => {
                 dispatch(loadDoctorsSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorsError(err));
+                dispatch(loadDoctorsError(err.message));
             });
     }
 }
@@ -190,8 +209,20 @@ export const loadCategory = (alias) => {
                 dispatch(loadDoctors(category._id))
             })
             .catch(err => {
-                console.log(err);
-                dispatch(loadDoctorCategoryError(err))
+                dispatch(loadDoctorCategoryError(err.message))
+            });
+    }
+}
+
+export const sendInvitation = (categoryId, invitation) => {
+    return dispatch => {
+        sendDoctorInvitation(categoryId, invitation)
+            .then(resp => {
+                dispatch(sendInvitationSuccess());
+                dispatch(loadDoctors(categoryId));
+            })
+            .catch(err => {
+                dispatch(sendInvitationError(err.message));
             });
     }
 }
