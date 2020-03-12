@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {loadAccount, loadCategory} from '../actions/account';
 import Modal from './Modal';
+import DoctorsList from './DoctorsList';
 
 class DoctorsCategory extends React.Component {
     constructor(props) {
@@ -21,7 +22,6 @@ class DoctorsCategory extends React.Component {
 
     render() {
         const categoryName = this.props.activeCategory && this.props.activeCategory.categoryName;
-        const doctors = this.props.doctors;
 
         return (
             <main className="account-page page-container">
@@ -42,38 +42,7 @@ class DoctorsCategory extends React.Component {
                     <h1 className="data-section-title">{categoryName}</h1>
                     <button className="data-section-btn">Invite</button>
                 </header>
-
-                {doctors && doctors.length ? (
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Last Name</th>
-                                <th>First Name</th>
-                                <th>Title</th>
-                                <th>Room</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {doctors.map((doctor, index) => {
-                            const isDisabled = doctor.status === 'invited';
-
-                            return (
-                                <tr key={index} className={isDisabled ? "disabled": null}>
-                                    <td>{doctor.lastName}</td>
-                                    <td>{doctor.firstName}</td>
-                                    <td>{doctor.title}</td>
-                                    <td>{doctor.room}</td>
-                                    <td>{doctor.email}</td>
-                                    <td>{doctor.status}</td>
-                                </tr>
-                            )
-                        })}
-                        </tbody>
-                    </table>
-                ): null}
-                
+                <DoctorsList items={this.props.doctors} />
             </section>
         </main>
         )
