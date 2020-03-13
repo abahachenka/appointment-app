@@ -4,7 +4,9 @@ import {
     getDoctorCategories, 
     getDoctorCategory,
     getDoctors,
-    sendDoctorInvitation
+    sendDoctorInvitation,
+    updateDoctorsAccount,
+    requestInvitationTokenCheck
 } from '../utils/doctors-api';
 import Cookies from 'js-cookie';
 
@@ -25,7 +27,11 @@ import {
     LOAD_DOCTORS_ERROR,
     SEND_INVITATION_SUCCESS,
     SEND_INVITATION_ERROR,
-    SEND_INVITATION_ERROR_RESET
+    SEND_INVITATION_ERROR_RESET,
+    ACTIVATION_ACCOUNT_SUCCESS,
+    ACTIVATION_ACCOUNT_ERROR,
+    CHECK_INVITATION_TOKEN_SUCCESS,
+    CHECK_INVITATION_TOKEN_ERROR
 } from '../constants/action-types';
 
 export const signInPending = () => ({
@@ -150,6 +156,28 @@ export const resetInvitationError = () => ({
     type: SEND_INVITATION_ERROR_RESET
 });
 
+export const activateAccountSuccess = () => ({
+    type: ACTIVATION_ACCOUNT_SUCCESS
+});
+
+export const activateAccountError = (error) => ({
+    type: ACTIVATION_ACCOUNT_ERROR,
+    payload: {
+        error
+    }
+});
+
+export const checkInvitationTokenSuccess = () => ({
+    type: CHECK_INVITATION_TOKEN_SUCCESS
+});
+
+export const checkInvitationTokenError = (error) => ({
+    type: CHECK_INVITATION_TOKEN_ERROR,
+    payload: {
+        error
+    }
+});
+
 export const loadAccount = () => {
     return dispatch => {
         requestAccountData()
@@ -218,11 +246,36 @@ export const sendInvitation = (categoryId, invitation) => {
     return dispatch => {
         sendDoctorInvitation(categoryId, invitation)
             .then(resp => {
+                console.log(resp); // outputs email link
                 dispatch(sendInvitationSuccess());
                 dispatch(loadDoctors(categoryId));
             })
             .catch(err => {
                 dispatch(sendInvitationError(err.message));
+            });
+    }
+}
+
+export const checkInvitationToken = (token) => {
+    return dispatch => {
+        requestInvitationTokenCheck(token)
+            .then(resp => {
+                dispatch(checkInvitationTokenSuccess());
+            })
+            .catch(err => {
+                dispatch(checkInvitationTokenError(err));
+            });
+    }
+}
+
+export const activateAccount = (token, password) => {
+    return dispatch => {
+        updateDoctorsAccount(token, password)
+            .then(resp => {
+                dispatch(activateAccountSuccess());
+            })
+            .catch(err => {
+                dispatch(activateAccountSuccess(err));
             });
     }
 }

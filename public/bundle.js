@@ -37171,7 +37171,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.resetInvitationError = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -37373,6 +37373,44 @@ var resetInvitationError = function resetInvitationError() {
 
 exports.resetInvitationError = resetInvitationError;
 
+var activateAccountSuccess = function activateAccountSuccess() {
+  return {
+    type: _actionTypes.ACTIVATION_ACCOUNT_SUCCESS
+  };
+};
+
+exports.activateAccountSuccess = activateAccountSuccess;
+
+var activateAccountError = function activateAccountError(error) {
+  return {
+    type: _actionTypes.ACTIVATION_ACCOUNT_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.activateAccountError = activateAccountError;
+
+var checkInvitationTokenSuccess = function checkInvitationTokenSuccess() {
+  return {
+    type: _actionTypes.CHECK_INVITATION_TOKEN_SUCCESS
+  };
+};
+
+exports.checkInvitationTokenSuccess = checkInvitationTokenSuccess;
+
+var checkInvitationTokenError = function checkInvitationTokenError(error) {
+  return {
+    type: _actionTypes.CHECK_INVITATION_TOKEN_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.checkInvitationTokenError = checkInvitationTokenError;
+
 var loadAccount = function loadAccount() {
   return function (dispatch) {
     (0, _userApi.requestAccountData)().then(function (resp) {
@@ -37440,6 +37478,8 @@ exports.loadCategory = loadCategory;
 var sendInvitation = function sendInvitation(categoryId, invitation) {
   return function (dispatch) {
     (0, _doctorsApi.sendDoctorInvitation)(categoryId, invitation).then(function (resp) {
+      console.log(resp); // outputs email link
+
       dispatch(sendInvitationSuccess());
       dispatch(loadDoctors(categoryId));
     })["catch"](function (err) {
@@ -37450,7 +37490,31 @@ var sendInvitation = function sendInvitation(categoryId, invitation) {
 
 exports.sendInvitation = sendInvitation;
 
-},{"../constants/action-types":120,"../utils/doctors-api":128,"../utils/user-api":129,"js-cookie":38}],106:[function(require,module,exports){
+var checkInvitationToken = function checkInvitationToken(token) {
+  return function (dispatch) {
+    (0, _doctorsApi.requestInvitationTokenCheck)(token).then(function (resp) {
+      dispatch(checkInvitationTokenSuccess());
+    })["catch"](function (err) {
+      dispatch(checkInvitationTokenError(err));
+    });
+  };
+};
+
+exports.checkInvitationToken = checkInvitationToken;
+
+var activateAccount = function activateAccount(token, password) {
+  return function (dispatch) {
+    (0, _doctorsApi.updateDoctorsAccount)(token, password).then(function (resp) {
+      dispatch(activateAccountSuccess());
+    })["catch"](function (err) {
+      dispatch(activateAccountSuccess(err));
+    });
+  };
+};
+
+exports.activateAccount = activateAccount;
+
+},{"../constants/action-types":121,"../utils/doctors-api":129,"../utils/user-api":130,"js-cookie":38}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37510,7 +37574,191 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":120,"../utils/clinics-api":127}],107:[function(require,module,exports){
+},{"../constants/action-types":121,"../utils/clinics-api":128}],107:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _Modal = _interopRequireDefault(require("./Modal"));
+
+var _reactRouterDom = require("react-router-dom");
+
+var _account = require("../actions/account");
+
+var _redux = require("redux");
+
+var _reactRedux = require("react-redux");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var initialState = {
+  account: null,
+  isSuccessMessageDisplayed: false
+};
+
+var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
+  _inherits(AcceptInvitation, _React$Component);
+
+  function AcceptInvitation(props) {
+    var _this;
+
+    _classCallCheck(this, AcceptInvitation);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(AcceptInvitation).call(this));
+    _this.state = _objectSpread({}, initialState);
+    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(AcceptInvitation, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var token = this.props.match.params.token; //check token
+
+      this.props.checkInvitationToken(token);
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.props.isInvitationAccepted && this.props.isInvitationAccepted !== prevProps.isInvitationAccepted) {
+        this.setState({
+          isSuccessMessageDisplayed: true
+        });
+      }
+    }
+  }, {
+    key: "handleSubmit",
+    value: function handleSubmit(event) {
+      event.preventDefault();
+      var token = this.props.match.params.token;
+      var _this$state$account = this.state.account,
+          password = _this$state$account.password,
+          confirmPassword = _this$state$account.confirmPassword;
+
+      if (token && password === confirmPassword) {
+        this.props.activateAccount(token, password);
+      } else {
+        alert('Something went wrong');
+      }
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          account: _objectSpread({}, prevState.account, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      return React.createElement(React.Fragment, null, React.createElement("main", {
+        className: "home-page page-container"
+      }), React.createElement(_Modal["default"], {
+        title: "Accept Invitation"
+      }, !this.state.isSuccessMessageDisplayed && this.props.isTokenValid && React.createElement(React.Fragment, null, React.createElement("p", null, "You have been invited to create a doctors account. Please, finish your registration."), React.createElement("p", {
+        className: "error"
+      }, this.props.acceptInvitationError), React.createElement("form", {
+        ref: function ref(el) {
+          return _this2.acceptInvitationForm = el;
+        },
+        onSubmit: this.handleSubmit
+      }, React.createElement("input", {
+        type: "password",
+        name: "password",
+        placeholder: "Password",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "password",
+        name: "confirmPassword",
+        placeholder: "Confirm Password",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "submit",
+        value: "Register"
+      }))), this.state.isSuccessMessageDisplayed && React.createElement("div", {
+        className: "modal-success-message"
+      }, React.createElement("p", null, "Your account has been successfully activated. ", React.createElement("br", null), "Now you may sign-in."), React.createElement("p", null, React.createElement(_reactRouterDom.Link, {
+        to: "/admin",
+        className: "button"
+      }, "OK"))), this.props.isTokenValid === false && React.createElement("div", null, React.createElement("p", null, "The link is invalid!"), React.createElement("p", null, React.createElement(_reactRouterDom.Link, {
+        to: "/",
+        className: "button"
+      }, "Close")))));
+    }
+  }]);
+
+  return AcceptInvitation;
+}(React.Component);
+
+AcceptInvitation.propTypes = {
+  activateAccount: _propTypes["default"].func,
+  isInvitationAccepted: _propTypes["default"].bool,
+  acceptInvitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object])
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var doctorCategories = _ref.doctorCategories;
+  return {
+    isTokenValid: doctorCategories.isInvitationTokenValid,
+    isInvitationAccepted: doctorCategories.isInvitationAccepted,
+    acceptInvitationError: doctorCategories.acceptInvitationError,
+    error: doctorCategories.invitationTokenError
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    activateAccount: function activateAccount(token, password) {
+      return (0, _account.activateAccount)(token, password);
+    },
+    checkInvitationToken: function checkInvitationToken(token) {
+      return (0, _account.checkInvitationToken)(token);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(AcceptInvitation);
+
+exports["default"] = _default;
+
+},{"../actions/account":105,"./Modal":118,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37533,7 +37781,7 @@ var App = function App() {
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":113,"./Header":114,"./Main":116}],108:[function(require,module,exports){
+},{"./Footer":114,"./Header":115,"./Main":117}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37633,7 +37881,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./DoctorCategories":110,"prop-types":47,"react-redux":69,"redux":88}],109:[function(require,module,exports){
+},{"../actions/account":105,"./DoctorCategories":111,"prop-types":47,"react-redux":69,"redux":88}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37848,7 +38096,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/clinic-registration":106,"prop-types":47,"react-redux":69,"redux":88}],110:[function(require,module,exports){
+},{"../actions/clinic-registration":106,"prop-types":47,"react-redux":69,"redux":88}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38002,7 +38250,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":117,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],111:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":118,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38161,7 +38409,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
       }, this.props.activeCategoryError), React.createElement(_DoctorsList["default"], {
         items: this.props.doctors
       })), this.state.isInviteFormDisplayed ? React.createElement(_Modal["default"], {
-        title: "Add New Doctors Category",
+        title: "Invite a Doctor",
         onClose: this.closeModal
       }, React.createElement("form", {
         ref: function ref(el) {
@@ -38252,7 +38500,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./DoctorsList":112,"./Modal":117,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],112:[function(require,module,exports){
+},{"../actions/account":105,"./DoctorsList":113,"./Modal":118,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38316,7 +38564,7 @@ DoctorsList.propTypes = {
 var _default = DoctorsList;
 exports["default"] = _default;
 
-},{"prop-types":47}],113:[function(require,module,exports){
+},{"prop-types":47}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38333,7 +38581,7 @@ var Footer = function Footer() {
 var _default = Footer;
 exports["default"] = _default;
 
-},{}],114:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38350,7 +38598,7 @@ var Header = function Header() {
 var _default = Header;
 exports["default"] = _default;
 
-},{}],115:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38371,7 +38619,7 @@ var Home = function Home() {
 var _default = Home;
 exports["default"] = _default;
 
-},{}],116:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38390,6 +38638,8 @@ var _ClinicAccountPage = _interopRequireDefault(require("./ClinicAccountPage"));
 var _DoctorsCategory = _interopRequireDefault(require("./DoctorsCategory"));
 
 var _SignIn = _interopRequireDefault(require("./SignIn"));
+
+var _AcceptInvitation = _interopRequireDefault(require("./AcceptInvitation"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -38411,13 +38661,16 @@ var Main = function Main() {
   }), React.createElement(_reactRouterDom.Route, {
     path: "/clinic-account/category/:categoryAlias",
     component: _DoctorsCategory["default"]
+  }), React.createElement(_reactRouterDom.Route, {
+    path: '/accept-invitation/:token',
+    component: _AcceptInvitation["default"]
   }));
 };
 
 var _default = Main;
 exports["default"] = _default;
 
-},{"./ClinicAccountPage":108,"./ClinicRegistration":109,"./DoctorsCategory":111,"./Home":115,"./SignIn":118,"react-router-dom":80}],117:[function(require,module,exports){
+},{"./AcceptInvitation":107,"./ClinicAccountPage":109,"./ClinicRegistration":110,"./DoctorsCategory":112,"./Home":116,"./SignIn":119,"react-router-dom":80}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38465,9 +38718,9 @@ var Modal = /*#__PURE__*/function (_React$Component) {
         className: "modal"
       }, React.createElement("header", null, React.createElement("h3", {
         className: "modal-title"
-      }, this.props.title), React.createElement("button", {
+      }, this.props.title), this.props.onClose ? React.createElement("button", {
         onClick: this.props.onClose
-      }, "X")), this.props.children));
+      }, "X") : null), this.props.children));
     }
   }]);
 
@@ -38482,7 +38735,7 @@ Modal.propTypes = {
 var _default = Modal;
 exports["default"] = _default;
 
-},{"prop-types":47}],118:[function(require,module,exports){
+},{"prop-types":47}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38678,7 +38931,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],119:[function(require,module,exports){
+},{"../actions/account":105,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38688,13 +38941,13 @@ exports.API_URL = void 0;
 var API_URL = 'http://localhost:3000';
 exports.API_URL = API_URL;
 
-},{}],120:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -38737,8 +38990,16 @@ var SEND_INVITATION_ERROR = 'SEND_INVITATION_ERROR';
 exports.SEND_INVITATION_ERROR = SEND_INVITATION_ERROR;
 var SEND_INVITATION_ERROR_RESET = 'SEND_INVITATION_ERROR_RESET';
 exports.SEND_INVITATION_ERROR_RESET = SEND_INVITATION_ERROR_RESET;
+var ACTIVATION_ACCOUNT_SUCCESS = 'ACTIVATION_ACCOUNT_SUCCESS';
+exports.ACTIVATION_ACCOUNT_SUCCESS = ACTIVATION_ACCOUNT_SUCCESS;
+var ACTIVATION_ACCOUNT_ERROR = 'ACTIVATION_ACCOUNT_ERROR';
+exports.ACTIVATION_ACCOUNT_ERROR = ACTIVATION_ACCOUNT_ERROR;
+var CHECK_INVITATION_TOKEN_SUCCESS = 'CHECK_INVITATION_TOKEN_SUCCESS';
+exports.CHECK_INVITATION_TOKEN_SUCCESS = CHECK_INVITATION_TOKEN_SUCCESS;
+var CHECK_INVITATION_TOKEN_ERROR = 'CHECK_INVITATION_TOKEN_ERROR';
+exports.CHECK_INVITATION_TOKEN_ERROR = CHECK_INVITATION_TOKEN_ERROR;
 
-},{}],121:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -38757,7 +39018,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":107,"./store":126,"react-dom":51,"react-redux":69,"react-router-dom":80}],122:[function(require,module,exports){
+},{"./components/App":108,"./store":127,"react-dom":51,"react-redux":69,"react-router-dom":80}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38814,7 +39075,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":120}],123:[function(require,module,exports){
+},{"../constants/action-types":121}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38838,7 +39099,11 @@ var initialState = {
   activeCategoryError: '',
   doctors: [],
   isInvitationSent: false,
-  invitationError: ''
+  invitationError: '',
+  isInvitationAccepted: false,
+  acceptInvitationError: '',
+  isInvitationTokenValid: true,
+  invitationTokenError: ''
 };
 
 var doctorCategoriesReducer = function doctorCategoriesReducer() {
@@ -38900,6 +39165,27 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
         invitationError: ''
       });
 
+    case _actionTypes.ACTIVATION_ACCOUNT_SUCCESS:
+      return _objectSpread({}, state, {
+        isInvitationAccepted: true
+      });
+
+    case _actionTypes.ACTIVATION_ACCOUNT_ERROR:
+      return _objectSpread({}, state, {
+        acceptInvitationError: action.payload.error
+      });
+
+    case _actionTypes.CHECK_INVITATION_TOKEN_SUCCESS:
+      return _objectSpread({}, state, {
+        isInvitationTokenValid: true
+      });
+
+    case _actionTypes.CHECK_INVITATION_TOKEN_ERROR:
+      return _objectSpread({}, state, {
+        isInvitationTokenValid: false,
+        error: action.payload.error
+      });
+
     default:
       return state;
   }
@@ -38908,7 +39194,7 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 var _default = doctorCategoriesReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":120}],124:[function(require,module,exports){
+},{"../constants/action-types":121}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38934,7 +39220,7 @@ var rootReducer = (0, _redux.combineReducers)({
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./clinic-registration":122,"./doctor-categories":123,"./sign-in":125,"redux":88}],125:[function(require,module,exports){
+},{"./clinic-registration":123,"./doctor-categories":124,"./sign-in":126,"redux":88}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38997,7 +39283,7 @@ var signInReducer = function signInReducer() {
 var _default = signInReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":120}],126:[function(require,module,exports){
+},{"../constants/action-types":121}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39017,7 +39303,7 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":124,"redux":88,"redux-thunk":87}],127:[function(require,module,exports){
+},{"./reducers/root":125,"redux":88,"redux-thunk":87}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39039,13 +39325,13 @@ var createClinic = function createClinic(clinic) {
 
 exports.createClinic = createClinic;
 
-},{"../config.js":119,"axios":7}],128:[function(require,module,exports){
+},{"../config.js":120,"axios":7}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sendDoctorInvitation = exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
+exports.requestInvitationTokenCheck = exports.updateDoctorsAccount = exports.sendDoctorInvitation = exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -39113,7 +39399,26 @@ var sendDoctorInvitation = function sendDoctorInvitation(categoryId, invitation)
 
 exports.sendDoctorInvitation = sendDoctorInvitation;
 
-},{"../config.js":119,"axios":7,"js-cookie":38}],129:[function(require,module,exports){
+var updateDoctorsAccount = function updateDoctorsAccount(token, password) {
+  var url = _config.API_URL + '/auth/accept-invitation';
+  return _axios["default"].put(url, {
+    token: token,
+    password: password
+  });
+};
+
+exports.updateDoctorsAccount = updateDoctorsAccount;
+
+var requestInvitationTokenCheck = function requestInvitationTokenCheck(token) {
+  var url = _config.API_URL + '/auth/check-invitation-token';
+  return _axios["default"].post(url, {
+    token: token
+  });
+};
+
+exports.requestInvitationTokenCheck = requestInvitationTokenCheck;
+
+},{"../config.js":120,"axios":7,"js-cookie":38}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39149,6 +39454,6 @@ var requestAccountData = function requestAccountData() {
 
 exports.requestAccountData = requestAccountData;
 
-},{"../config.js":119,"axios":7,"js-cookie":38}]},{},[121])
+},{"../config.js":120,"axios":7,"js-cookie":38}]},{},[122])
 
 //# sourceMappingURL=bundle.js.map

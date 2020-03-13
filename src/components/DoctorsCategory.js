@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {loadAccount, loadCategory, sendInvitation, resetInvitationError} from '../actions/account';
+import { loadAccount, loadCategory, sendInvitation, resetInvitationError } from '../actions/account';
 import Modal from './Modal';
 import DoctorsList from './DoctorsList';
 
@@ -99,7 +99,7 @@ class DoctorsCategory extends React.Component {
             </section>
 
             {this.state.isInviteFormDisplayed ? (
-                <Modal title="Add New Doctors Category" onClose={this.closeModal}>
+                <Modal title="Invite a Doctor" onClose={this.closeModal}>
                     <form ref={(el) => this.invitationForm = el} onSubmit={this.inviteDoctor}>
                         <p className="error">{this.props.invitationError}</p>
                         <input type="text" name="title" placeholder="Title" onChange={this.onChange} />

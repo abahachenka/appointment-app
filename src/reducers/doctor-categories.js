@@ -9,7 +9,11 @@ import {
     LOAD_DOCTORS_ERROR,
     SEND_INVITATION_SUCCESS,
     SEND_INVITATION_ERROR,
-    SEND_INVITATION_ERROR_RESET
+    SEND_INVITATION_ERROR_RESET,
+    ACTIVATION_ACCOUNT_SUCCESS,
+    ACTIVATION_ACCOUNT_ERROR,
+    CHECK_INVITATION_TOKEN_SUCCESS,
+    CHECK_INVITATION_TOKEN_ERROR
 } from '../constants/action-types';
 
 const initialState = {
@@ -20,7 +24,11 @@ const initialState = {
     activeCategoryError: '',
     doctors: [],
     isInvitationSent: false,
-    invitationError: ''
+    invitationError: '',
+    isInvitationAccepted: false,
+    acceptInvitationError: '',
+    isInvitationTokenValid: true,
+    invitationTokenError: ''
 };
 
 const doctorCategoriesReducer = (state = initialState, action) => {
@@ -81,6 +89,29 @@ const doctorCategoriesReducer = (state = initialState, action) => {
             return {
                 ...state,
                 invitationError: ''
+            }
+        case ACTIVATION_ACCOUNT_SUCCESS:
+            return {
+                ...state,
+                isInvitationAccepted: true
+            }
+        case ACTIVATION_ACCOUNT_ERROR:
+            return {
+                ...state,
+                acceptInvitationError: action.payload.error
+            }
+
+        case CHECK_INVITATION_TOKEN_SUCCESS: 
+            return {
+                ...state,
+                isInvitationTokenValid: true
+            }
+
+        case CHECK_INVITATION_TOKEN_ERROR: 
+            return {
+                ...state,
+                isInvitationTokenValid: false,
+                error: action.payload.error
             }
 
         default:

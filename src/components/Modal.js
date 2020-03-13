@@ -12,9 +12,10 @@ class Modal extends React.Component {
                     <header>
                         <h3 className="modal-title">{this.props.title}</h3>
 
-                        <button onClick={this.props.onClose}>
-                            X
-                        </button>
+                        {this.props.onClose ? (
+                            <button onClick={this.props.onClose}>X</button>
+                        ): null}
+                        
                     </header>
                     {this.props.children}
                 </div>

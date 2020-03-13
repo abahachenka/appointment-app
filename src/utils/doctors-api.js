@@ -48,3 +48,15 @@ export const sendDoctorInvitation = (categoryId, invitation) => {
         }
     });
 }
+
+export const updateDoctorsAccount = (token, password) => {
+    const url = API_URL + '/auth/accept-invitation';
+
+    return axios.put(url, {token, password});
+}
+
+export const requestInvitationTokenCheck = (token) => {
+    const url = API_URL + '/auth/check-invitation-token';
+
+    return axios.post(url, {token});
+}

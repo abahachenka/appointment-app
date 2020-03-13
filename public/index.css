@@ -419,6 +419,19 @@
       background: #3e79dc;
       cursor: pointer; }
 
+.modal-success-message {
+  text-align: center; }
+  .modal-success-message p:last-child {
+    margin-bottom: 0; }
+  .modal-success-message .button {
+    text-decoration: none;
+    display: inline-block;
+    background: #4784EB;
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 10px 20px; }
+
 .data-table {
   width: 100%;
   border: 1px solid #dad8d8;
