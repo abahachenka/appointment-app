@@ -8,6 +8,7 @@ import {
     updateDoctorsAccount,
     requestInvitationTokenCheck
 } from '../utils/doctors-api';
+import {getClinicAddressCover} from '../utils/clinics-api';
 import Cookies from 'js-cookie';
 
 import { 
@@ -31,7 +32,9 @@ import {
     ACTIVATION_ACCOUNT_SUCCESS,
     ACTIVATION_ACCOUNT_ERROR,
     CHECK_INVITATION_TOKEN_SUCCESS,
-    CHECK_INVITATION_TOKEN_ERROR
+    CHECK_INVITATION_TOKEN_ERROR,
+    GET_ADDRESS_LIST_SUCCESS,
+    GET_ADDRESS_LIST_ERROR
 } from '../constants/action-types';
 
 export const signInPending = () => ({
@@ -147,6 +150,20 @@ export const sendInvitationSuccess = () => ({
 
 export const sendInvitationError = (error) => ({
     type: SEND_INVITATION_ERROR,
+    payload: {
+        error
+    }
+});
+
+export const getAddressListSuccess = (addressList) => ({
+    type: GET_ADDRESS_LIST_SUCCESS,
+    payload: {
+        addressList
+    }
+});
+
+export const getAddressListError = (error) => ({
+    type: GET_ADDRESS_LIST_ERROR,
     payload: {
         error
     }
@@ -276,6 +293,18 @@ export const activateAccount = (token, password) => {
             })
             .catch(err => {
                 dispatch(activateAccountSuccess(err));
+            });
+    }
+}
+
+export const getAddressList = () => {
+    return dispatch => {
+        getClinicAddressCover()
+            .then((resp) => {
+                dispatch(getAddressListSuccess(resp.data));
+            })
+            .catch(err => {
+                dispatch(getAddressListError(err));
             });
     }
 }

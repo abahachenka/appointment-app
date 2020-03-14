@@ -5,6 +5,7 @@ import ClinicAccountPage from './ClinicAccountPage';
 import DoctorsCategory from './DoctorsCategory';
 import SignIn from './SignIn';
 import AcceptInvitation from './AcceptInvitation';
+import ClinicSettings from './ClinicSettings';
 
 const Main = () => (
     <Switch>
@@ -13,6 +14,7 @@ const Main = () => (
         <Route path='/admin' component={SignIn} />
         <Route exact path='/clinic-account' component={ClinicAccountPage} />
         <Route path={`/clinic-account/category/:categoryAlias`} component={DoctorsCategory} />
+        <Route path={`/clinic-account/settings`} component={ClinicSettings} />
         <Route path={'/accept-invitation/:token'} component={AcceptInvitation} />
     </Switch>
 )

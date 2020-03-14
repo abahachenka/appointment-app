@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {loadAccount} from '../actions/account';
@@ -24,7 +25,7 @@ class ClinicAccountPage extends React.Component {
         return (
             <main className="account-page page-container">
                 <h1 className="page-title">{account && account.name}</h1>
-                <a href="#" className="account-settings">Settings</a>
+                <Link to="/clinic-account/settings" className="account-settings">Settings</Link>
                 <DoctorCategories />
             </main>
         )
