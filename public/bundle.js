@@ -37441,7 +37441,7 @@ var loadAccount = function loadAccount() {
       dispatch(loadDoctorCategories());
       dispatch(loadAccountSuccess(resp.data));
     })["catch"](function (err) {
-      loadDoctorCategoriesError(err.message);
+      dispatch(loadAccountError(err.message));
     });
   };
 };
@@ -37562,7 +37562,7 @@ var addNewAddress = function addNewAddress(details) {
 
 exports.addNewAddress = addNewAddress;
 
-},{"../constants/action-types":122,"../utils/clinics-api":130,"../utils/doctors-api":131,"../utils/user-api":132,"js-cookie":38}],106:[function(require,module,exports){
+},{"../constants/action-types":123,"../utils/clinics-api":131,"../utils/doctors-api":132,"../utils/user-api":133,"js-cookie":38}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37622,7 +37622,7 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":122,"../utils/clinics-api":130}],107:[function(require,module,exports){
+},{"../constants/action-types":123,"../utils/clinics-api":131}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37806,7 +37806,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Acc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":119,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],108:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":120,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37829,7 +37829,7 @@ var App = function App() {
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":115,"./Header":116,"./Main":118}],109:[function(require,module,exports){
+},{"./Footer":115,"./Header":116,"./Main":119}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37881,11 +37881,14 @@ var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
   _createClass(ClinicAccountPage, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      // if (!this.props.isAuthenticated) {
-      //     this.props.history.push('/admin');
-      //     return;
-      // }
       this.props.loadAccount();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      if (!this.props.account) {
+        this.props.history.push('/admin');
+      }
     }
   }, {
     key: "render",
@@ -37914,7 +37917,8 @@ var mapStateToProps = function mapStateToProps(_ref) {
   var signIn = _ref.signIn;
   return {
     isAuthenticated: signIn.isAuthenticated,
-    account: signIn.account
+    account: signIn.account,
+    error: signIn.error
   };
 };
 
@@ -38366,7 +38370,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":119,"prop-types":47,"react-redux":69,"redux":88}],112:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":120,"prop-types":47,"react-redux":69,"redux":88}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38520,7 +38524,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":119,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],113:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":120,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38770,7 +38774,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./DoctorsList":114,"./Modal":119,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],114:[function(require,module,exports){
+},{"../actions/account":105,"./DoctorsList":114,"./Modal":120,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38859,16 +38863,20 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _Logout = _interopRequireDefault(require("./Logout"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
 var Header = function Header() {
   return React.createElement("header", {
     className: "page-header"
-  }, "APPOINTMENT APP");
+  }, "APPOINTMENT APP", React.createElement(_Logout["default"], null));
 };
 
 var _default = Header;
 exports["default"] = _default;
 
-},{}],117:[function(require,module,exports){
+},{"./Logout":118}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38890,6 +38898,78 @@ var _default = Home;
 exports["default"] = _default;
 
 },{}],118:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
+
+var _reactRedux = require("react-redux");
+
+var _reactRouterDom = require("react-router-dom");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var Logout = /*#__PURE__*/function (_React$Component) {
+  _inherits(Logout, _React$Component);
+
+  function Logout(props) {
+    var _this;
+
+    _classCallCheck(this, Logout);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Logout).call(this, props));
+    _this.logout = _this.logout.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(Logout, [{
+    key: "logout",
+    value: function logout() {
+      _jsCookie["default"].remove('token');
+
+      this.props.history.push('/admin');
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var token = _jsCookie["default"].get('token');
+
+      return token ? React.createElement("button", {
+        onClick: this.logout
+      }, "Logout") : null;
+    }
+  }]);
+
+  return Logout;
+}(React.Component);
+
+var _default = (0, _reactRouterDom.withRouter)(Logout);
+
+exports["default"] = _default;
+
+},{"js-cookie":38,"react-redux":69,"react-router-dom":80}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38945,7 +39025,7 @@ var Main = function Main() {
 var _default = Main;
 exports["default"] = _default;
 
-},{"./AcceptInvitation":107,"./ClinicAccountPage":109,"./ClinicRegistration":110,"./ClinicSettings":111,"./DoctorsCategory":113,"./Home":117,"./SignIn":120,"react-router-dom":80}],119:[function(require,module,exports){
+},{"./AcceptInvitation":107,"./ClinicAccountPage":109,"./ClinicRegistration":110,"./ClinicSettings":111,"./DoctorsCategory":113,"./Home":117,"./SignIn":121,"react-router-dom":80}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39010,7 +39090,7 @@ Modal.propTypes = {
 var _default = Modal;
 exports["default"] = _default;
 
-},{"prop-types":47}],120:[function(require,module,exports){
+},{"prop-types":47}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39206,7 +39286,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],121:[function(require,module,exports){
+},{"../actions/account":105,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39216,7 +39296,7 @@ exports.API_URL = void 0;
 var API_URL = 'http://localhost:3000';
 exports.API_URL = API_URL;
 
-},{}],122:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39278,7 +39358,7 @@ exports.GET_ADDRESS_LIST_SUCCESS = GET_ADDRESS_LIST_SUCCESS;
 var GET_ADDRESS_LIST_ERROR = 'GET_ADDRESS_LIST_ERROR';
 exports.GET_ADDRESS_LIST_ERROR = GET_ADDRESS_LIST_ERROR;
 
-},{}],123:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -39297,7 +39377,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":108,"./store":129,"react-dom":51,"react-redux":69,"react-router-dom":80}],124:[function(require,module,exports){
+},{"./components/App":108,"./store":130,"react-dom":51,"react-redux":69,"react-router-dom":80}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39354,7 +39434,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":122}],125:[function(require,module,exports){
+},{"../constants/action-types":123}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39398,7 +39478,7 @@ var clinicSettingsReducer = function clinicSettingsReducer() {
 var _default = clinicSettingsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":122}],126:[function(require,module,exports){
+},{"../constants/action-types":123}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39517,7 +39597,7 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 var _default = doctorCategoriesReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":122}],127:[function(require,module,exports){
+},{"../constants/action-types":123}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39546,7 +39626,7 @@ var rootReducer = (0, _redux.combineReducers)({
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./clinic-registration":124,"./clinic-settings":125,"./doctor-categories":126,"./sign-in":128,"redux":88}],128:[function(require,module,exports){
+},{"./clinic-registration":125,"./clinic-settings":126,"./doctor-categories":127,"./sign-in":129,"redux":88}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39596,10 +39676,17 @@ var signInReducer = function signInReducer() {
         error: ''
       });
 
-    case 'ACCOUNT_LOAD_SUCCESS':
+    case _actionTypes.ACCOUNT_LOAD_SUCCESS:
       return _objectSpread({}, state, {
         account: action.payload.account
       });
+
+    case _actionTypes.ACCOUNT_LOAD_ERROR:
+      {
+        return _objectSpread({}, state, {
+          error: action.payload.error
+        });
+      }
 
     default:
       return state;
@@ -39609,7 +39696,7 @@ var signInReducer = function signInReducer() {
 var _default = signInReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":122}],129:[function(require,module,exports){
+},{"../constants/action-types":123}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39629,7 +39716,7 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":127,"redux":88,"redux-thunk":87}],130:[function(require,module,exports){
+},{"./reducers/root":128,"redux":88,"redux-thunk":87}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39653,7 +39740,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var CLINICS_API_URL = _config.API_URL + '/clinics';
 
-var token = _jsCookie["default"].get('token');
+var getAuthToken = function getAuthToken() {
+  return _jsCookie["default"].get('token');
+};
 
 var createClinic = function createClinic(clinic) {
   return _axios["default"].post(CLINICS_API_URL, clinic);
@@ -39664,7 +39753,7 @@ exports.createClinic = createClinic;
 var getClinicAddressCover = function getClinicAddressCover() {
   return _axios["default"].get(_config.API_URL + '/address-cover', {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
@@ -39674,14 +39763,14 @@ exports.getClinicAddressCover = getClinicAddressCover;
 var addNewClinicAddress = function addNewClinicAddress(details) {
   return _axios["default"].post(_config.API_URL + '/address-cover', _objectSpread({}, details), {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
 
 exports.addNewClinicAddress = addNewClinicAddress;
 
-},{"../config.js":121,"axios":7,"js-cookie":38}],131:[function(require,module,exports){
+},{"../config.js":122,"axios":7,"js-cookie":38}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39699,14 +39788,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var DOCTOR_CATEGORIES_API_URL = _config.API_URL + '/doctor-categories';
 
-var token = _jsCookie["default"].get('token');
+var getAuthToken = function getAuthToken() {
+  return _jsCookie["default"].get('token');
+};
 
 var addNewCategory = function addNewCategory(categoryName) {
   return _axios["default"].post(DOCTOR_CATEGORIES_API_URL, {
     categoryName: categoryName
   }, {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
@@ -39716,7 +39807,7 @@ exports.addNewCategory = addNewCategory;
 var getDoctorCategories = function getDoctorCategories() {
   return _axios["default"].get(DOCTOR_CATEGORIES_API_URL, {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
@@ -39726,7 +39817,7 @@ exports.getDoctorCategories = getDoctorCategories;
 var getDoctorCategory = function getDoctorCategory(alias) {
   return _axios["default"].get(DOCTOR_CATEGORIES_API_URL + '/' + alias, {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
@@ -39737,7 +39828,7 @@ var getDoctors = function getDoctors(categoryId) {
   var url = DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors';
   return _axios["default"].get(url, {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
@@ -39748,7 +39839,7 @@ var sendDoctorInvitation = function sendDoctorInvitation(categoryId, invitation)
   var url = DOCTOR_CATEGORIES_API_URL + '/' + categoryId + '/doctors/invite';
   return _axios["default"].post(url, invitation, {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
@@ -39774,7 +39865,7 @@ var requestInvitationTokenCheck = function requestInvitationTokenCheck(token) {
 
 exports.requestInvitationTokenCheck = requestInvitationTokenCheck;
 
-},{"../config.js":121,"axios":7,"js-cookie":38}],132:[function(require,module,exports){
+},{"../config.js":122,"axios":7,"js-cookie":38}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39792,7 +39883,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var SIGNIN_API_URL = _config.API_URL + '/auth';
 
-var token = _jsCookie["default"].get('token');
+var getAuthToken = function getAuthToken() {
+  return _jsCookie["default"].get('token');
+};
 
 var requestSignIn = function requestSignIn(userData) {
   return _axios["default"].post(SIGNIN_API_URL + '/login', userData);
@@ -39803,13 +39896,13 @@ exports.requestSignIn = requestSignIn;
 var requestAccountData = function requestAccountData() {
   return _axios["default"].post(SIGNIN_API_URL + '/account', {}, {
     headers: {
-      'x-access-token': token
+      'x-access-token': getAuthToken()
     }
   });
 };
 
 exports.requestAccountData = requestAccountData;
 
-},{"../config.js":121,"axios":7,"js-cookie":38}]},{},[123])
+},{"../config.js":122,"axios":7,"js-cookie":38}]},{},[124])
 
 //# sourceMappingURL=bundle.js.map

@@ -206,7 +206,7 @@ export const loadAccount = () => {
                 dispatch(loadAccountSuccess(resp.data))
             })
             .catch(err => {
-                loadDoctorCategoriesError(err.message);
+                dispatch(loadAccountError(err.message));
             });
     }
 }

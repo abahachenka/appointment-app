@@ -11,12 +11,13 @@ class ClinicAccountPage extends React.Component {
     }
 
     componentDidMount() {
-        // if (!this.props.isAuthenticated) {
-        //     this.props.history.push('/admin');
-        //     return;
-        // }
-
         this.props.loadAccount();
+    }
+
+    componentDidUpdate() {
+        if (!this.props.account) {
+            this.props.history.push('/admin');
+        }
     }
 
     render() {
@@ -39,7 +40,8 @@ ClinicAccountPage.propTypes = {
 
 const mapStateToProps = ({signIn}) => ({
     isAuthenticated: signIn.isAuthenticated,
-    account: signIn.account
+    account: signIn.account,
+    error: signIn.error
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

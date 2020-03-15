@@ -2,7 +2,9 @@ import {
     SIGN_IN_SUCCESS,
     SIGN_IN_PENDING,
     SIGN_IN_ERROR,
-    SIGN_IN_RESET_ERROR
+    SIGN_IN_RESET_ERROR,
+    ACCOUNT_LOAD_SUCCESS,
+    ACCOUNT_LOAD_ERROR
 } from '../constants/action-types';
 
 const initialState = {
@@ -39,11 +41,17 @@ const signInReducer = (state = initialState, action) => {
                 ...state,
                 error: ''
             }
-        case 'ACCOUNT_LOAD_SUCCESS':
+        case ACCOUNT_LOAD_SUCCESS:
             return {
                 ...state,
                 account: action.payload.account
             }
+        case ACCOUNT_LOAD_ERROR: {
+            return {
+                ...state,
+                error: action.payload.error
+            }
+        }
         default: 
            return state;
         }

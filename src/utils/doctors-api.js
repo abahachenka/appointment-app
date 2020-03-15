@@ -3,12 +3,15 @@ import { API_URL } from '../config.js';
 import Cookies from 'js-cookie';
 
 const DOCTOR_CATEGORIES_API_URL = API_URL + '/doctor-categories';
-const token = Cookies.get('token');
+
+const getAuthToken = () => {
+    return Cookies.get('token');
+}
 
 export const addNewCategory = (categoryName) => {
     return axios.post(DOCTOR_CATEGORIES_API_URL, {categoryName}, {
         headers: {
-            'x-access-token': token
+            'x-access-token': getAuthToken()
         }
     });
 }
@@ -16,7 +19,7 @@ export const addNewCategory = (categoryName) => {
 export const getDoctorCategories = () => {
     return axios.get(DOCTOR_CATEGORIES_API_URL, {
         headers: {
-            'x-access-token': token
+            'x-access-token': getAuthToken()
         }
     });
 }
@@ -24,7 +27,7 @@ export const getDoctorCategories = () => {
 export const getDoctorCategory = (alias) => {
     return axios.get(DOCTOR_CATEGORIES_API_URL + '/' + alias, {
         headers: {
-            'x-access-token': token
+            'x-access-token': getAuthToken()
         }
     });
 }
@@ -34,7 +37,7 @@ export const getDoctors = (categoryId) => {
     
     return axios.get(url, {
         headers: {
-            'x-access-token': token
+            'x-access-token': getAuthToken()
         }
     });
 }
@@ -44,7 +47,7 @@ export const sendDoctorInvitation = (categoryId, invitation) => {
 
     return axios.post(url, invitation, {
         headers: {
-            'x-access-token': token
+            'x-access-token': getAuthToken()
         }
     });
 }
