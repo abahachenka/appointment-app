@@ -8,7 +8,10 @@ import {
     updateDoctorsAccount,
     requestInvitationTokenCheck
 } from '../utils/doctors-api';
-import {getClinicAddressCover} from '../utils/clinics-api';
+import {
+    getClinicAddressCover,
+    addNewClinicAddress
+} from '../utils/clinics-api';
 import Cookies from 'js-cookie';
 
 import { 
@@ -305,6 +308,18 @@ export const getAddressList = () => {
             })
             .catch(err => {
                 dispatch(getAddressListError(err));
+            });
+    }
+}
+
+export const addNewAddress = (details) => {
+    return dispatch => {
+        addNewClinicAddress(details)
+            .then((resp) => {
+                dispatch(getAddressList());
+            })
+            .catch(err => {
+                console.log(err);
             });
     }
 }

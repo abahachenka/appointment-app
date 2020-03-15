@@ -16,3 +16,11 @@ export const getClinicAddressCover = () => {
         }
     });
 }
+
+export const addNewClinicAddress = (details) => {
+    return axios.post(API_URL + '/address-cover', {...details}, {
+        headers: {
+            'x-access-token': token
+        }
+    });
+}

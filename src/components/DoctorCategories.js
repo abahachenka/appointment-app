@@ -12,7 +12,7 @@ class DoctorCategories extends React.Component {
         this.state = {
             isModalDisplayed: false,
             newCategory: null
-        }
+        };
 
         this.showModal = this.showModal.bind(this);
         this.onChange = this.onChange.bind(this);
