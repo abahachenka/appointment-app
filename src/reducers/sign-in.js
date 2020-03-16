@@ -11,7 +11,8 @@ const initialState = {
     isPending: false,
     isAuthenticated: false,
     error: '',
-    account: null
+    account: null,
+    accountType: 'clinic' // 'clinic' || 'doctor'
 };
 
 const signInReducer = (state = initialState, action) => {
@@ -20,7 +21,8 @@ const signInReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isPending: false,
-                isAuthenticated: true
+                isAuthenticated: true,
+                accountType: action.payload.accountType
             };
 
         case SIGN_IN_PENDING:

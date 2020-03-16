@@ -44,8 +44,11 @@ export const signInPending = () => ({
     type: SIGN_IN_PENDING
 });
 
-export const signInSuccess = () => ({
-    type: SIGN_IN_SUCCESS
+export const signInSuccess = (accountType) => ({
+    type: SIGN_IN_SUCCESS,
+    payload: {
+        accountType
+    }
 });
 
 export const signInError = error => ({
@@ -69,7 +72,7 @@ export const requestUserSignIn = (accountData) => {
 
                 if (token) {
                     Cookies.set('token', token);
-                    dispatch(signInSuccess());
+                    dispatch(signInSuccess(resp.data.accountType));
                 } else {
                     dispatch(signInError('Something went wrong'));
                 }
@@ -202,7 +205,11 @@ export const loadAccount = () => {
     return dispatch => {
         requestAccountData()
             .then(resp => {
-                dispatch(loadDoctorCategories());
+                if (resp.data && resp.data.categoryName) {
+                    // load doctor appointment
+                } else {
+                    dispatch(loadDoctorCategories());
+                }
                 dispatch(loadAccountSuccess(resp.data))
             })
             .catch(err => {

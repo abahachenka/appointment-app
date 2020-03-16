@@ -37193,9 +37193,12 @@ var signInPending = function signInPending() {
 
 exports.signInPending = signInPending;
 
-var signInSuccess = function signInSuccess() {
+var signInSuccess = function signInSuccess(accountType) {
   return {
-    type: _actionTypes.SIGN_IN_SUCCESS
+    type: _actionTypes.SIGN_IN_SUCCESS,
+    payload: {
+      accountType: accountType
+    }
   };
 };
 
@@ -37229,7 +37232,7 @@ var requestUserSignIn = function requestUserSignIn(accountData) {
       if (token) {
         _jsCookie["default"].set('token', token);
 
-        dispatch(signInSuccess());
+        dispatch(signInSuccess(resp.data.accountType));
       } else {
         dispatch(signInError('Something went wrong'));
       }
@@ -37438,7 +37441,11 @@ exports.checkInvitationTokenError = checkInvitationTokenError;
 var loadAccount = function loadAccount() {
   return function (dispatch) {
     (0, _userApi.requestAccountData)().then(function (resp) {
-      dispatch(loadDoctorCategories());
+      if (resp.data && resp.data.categoryName) {// load doctor appointment
+      } else {
+        dispatch(loadDoctorCategories());
+      }
+
       dispatch(loadAccountSuccess(resp.data));
     })["catch"](function (err) {
       dispatch(loadAccountError(err.message));
@@ -37562,7 +37569,7 @@ var addNewAddress = function addNewAddress(details) {
 
 exports.addNewAddress = addNewAddress;
 
-},{"../constants/action-types":123,"../utils/clinics-api":131,"../utils/doctors-api":132,"../utils/user-api":133,"js-cookie":38}],106:[function(require,module,exports){
+},{"../constants/action-types":124,"../utils/clinics-api":132,"../utils/doctors-api":133,"../utils/user-api":134,"js-cookie":38}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37622,7 +37629,7 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":123,"../utils/clinics-api":131}],107:[function(require,module,exports){
+},{"../constants/action-types":124,"../utils/clinics-api":132}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37806,7 +37813,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Acc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":120,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],108:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":121,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37829,7 +37836,7 @@ var App = function App() {
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":115,"./Header":116,"./Main":119}],109:[function(require,module,exports){
+},{"./Footer":116,"./Header":117,"./Main":120}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37935,7 +37942,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./DoctorCategories":112,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],110:[function(require,module,exports){
+},{"../actions/account":105,"./DoctorCategories":113,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38370,7 +38377,110 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":120,"prop-types":47,"react-redux":69,"redux":88}],112:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":121,"prop-types":47,"react-redux":69,"redux":88}],112:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _account = require("../actions/account");
+
+var _redux = require("redux");
+
+var _reactRedux = require("react-redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var DoctorAccount = /*#__PURE__*/function (_React$Component) {
+  _inherits(DoctorAccount, _React$Component);
+
+  function DoctorAccount(props) {
+    _classCallCheck(this, DoctorAccount);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DoctorAccount).call(this));
+  }
+
+  _createClass(DoctorAccount, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.loadAccount();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var account = this.props.account;
+      return React.createElement("main", {
+        className: "doctor-account-page account-page page-container"
+      }, React.createElement("p", null, this.props.error), account ? React.createElement(React.Fragment, null, React.createElement("h1", {
+        className: "page-title"
+      }, account.title, ". ", account.firstName, " ", account.lastName), React.createElement("div", {
+        className: "doctor-details"
+      }, React.createElement("p", null, "Specialisation: ", account.categoryName), React.createElement("p", null, "Room: ", account.room))) : null, React.createElement("section", {
+        className: "data-section"
+      }, React.createElement("header", {
+        className: "data-section-header"
+      }, React.createElement("h2", {
+        className: "data-section-title"
+      }, "Appointments"), React.createElement("button", {
+        className: "data-section-btn"
+      }, "Add New")), React.createElement("table", {
+        className: "data-table"
+      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Date"), React.createElement("th", null, "Time"), React.createElement("th", null, "Patient"))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("td", null, "Feb 3"), React.createElement("td", null, "12:00"), React.createElement("td", null, "Alexandr Smirnov")), React.createElement("tr", null, React.createElement("td", null, "Feb 4"), React.createElement("td", null, "15:00"), React.createElement("td", null, "Anna Kuzmina")), React.createElement("tr", null, React.createElement("td", null, "Feb 13"), React.createElement("td", null, "09:00"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("td", null, "Feb 13"), React.createElement("td", null, "09:20"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("td", null, "Feb 13"), React.createElement("td", null, "09:40"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("td", null, "Feb 13"), React.createElement("td", null, "10:00"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("td", null, "Feb 13"), React.createElement("td", null, "10:20"), React.createElement("td", null))))));
+    }
+  }]);
+
+  return DoctorAccount;
+}(React.Component);
+
+DoctorAccount.propTypes = {
+  account: _propTypes["default"].object,
+  error: _propTypes["default"].string,
+  loadAccount: _propTypes["default"].func
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var signIn = _ref.signIn;
+  return {
+    account: signIn.account,
+    error: signIn.error
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    loadAccount: function loadAccount() {
+      return (0, _account.loadAccount)();
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(DoctorAccount);
+
+exports["default"] = _default;
+
+},{"../actions/account":105,"prop-types":47,"react-redux":69,"redux":88}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38524,7 +38634,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./Modal":120,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],113:[function(require,module,exports){
+},{"../actions/account":105,"./Modal":121,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38774,7 +38884,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"./DoctorsList":114,"./Modal":120,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],114:[function(require,module,exports){
+},{"../actions/account":105,"./DoctorsList":115,"./Modal":121,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38838,7 +38948,7 @@ DoctorsList.propTypes = {
 var _default = DoctorsList;
 exports["default"] = _default;
 
-},{"prop-types":47}],115:[function(require,module,exports){
+},{"prop-types":47}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38855,7 +38965,7 @@ var Footer = function Footer() {
 var _default = Footer;
 exports["default"] = _default;
 
-},{}],116:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38876,7 +38986,7 @@ var Header = function Header() {
 var _default = Header;
 exports["default"] = _default;
 
-},{"./Logout":118}],117:[function(require,module,exports){
+},{"./Logout":119}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38897,7 +39007,7 @@ var Home = function Home() {
 var _default = Home;
 exports["default"] = _default;
 
-},{}],118:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38969,7 +39079,7 @@ var _default = (0, _reactRouterDom.withRouter)(Logout);
 
 exports["default"] = _default;
 
-},{"js-cookie":38,"react-redux":69,"react-router-dom":80}],119:[function(require,module,exports){
+},{"js-cookie":38,"react-redux":69,"react-router-dom":80}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38984,6 +39094,8 @@ var _Home = _interopRequireDefault(require("./Home"));
 var _ClinicRegistration = _interopRequireDefault(require("./ClinicRegistration"));
 
 var _ClinicAccountPage = _interopRequireDefault(require("./ClinicAccountPage"));
+
+var _DoctorAccount = _interopRequireDefault(require("./DoctorAccount"));
 
 var _DoctorsCategory = _interopRequireDefault(require("./DoctorsCategory"));
 
@@ -39019,13 +39131,17 @@ var Main = function Main() {
   }), React.createElement(_reactRouterDom.Route, {
     path: '/accept-invitation/:token',
     component: _AcceptInvitation["default"]
+  }), React.createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/doctor-account",
+    component: _DoctorAccount["default"]
   }));
 };
 
 var _default = Main;
 exports["default"] = _default;
 
-},{"./AcceptInvitation":107,"./ClinicAccountPage":109,"./ClinicRegistration":110,"./ClinicSettings":111,"./DoctorsCategory":113,"./Home":117,"./SignIn":121,"react-router-dom":80}],120:[function(require,module,exports){
+},{"./AcceptInvitation":107,"./ClinicAccountPage":109,"./ClinicRegistration":110,"./ClinicSettings":111,"./DoctorAccount":112,"./DoctorsCategory":114,"./Home":118,"./SignIn":122,"react-router-dom":80}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39090,7 +39206,7 @@ Modal.propTypes = {
 var _default = Modal;
 exports["default"] = _default;
 
-},{"prop-types":47}],121:[function(require,module,exports){
+},{"prop-types":47}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39163,7 +39279,8 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps) {
       if (this.props.isAuthenticated) {
-        this.props.history.push('/clinic-account');
+        var url = this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
+        this.props.history.push(url);
       }
     }
   }, {
@@ -39267,7 +39384,8 @@ var mapStateToProps = function mapStateToProps(_ref) {
   return {
     isPending: signIn.isPending,
     isAuthenticated: signIn.isAuthenticated,
-    error: signIn.error
+    error: signIn.error,
+    accountType: signIn.accountType
   };
 };
 
@@ -39286,7 +39404,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":105,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],122:[function(require,module,exports){
+},{"../actions/account":105,"prop-types":47,"react-redux":69,"react-router-dom":80,"redux":88}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39296,7 +39414,7 @@ exports.API_URL = void 0;
 var API_URL = 'http://localhost:3000';
 exports.API_URL = API_URL;
 
-},{}],123:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39358,7 +39476,7 @@ exports.GET_ADDRESS_LIST_SUCCESS = GET_ADDRESS_LIST_SUCCESS;
 var GET_ADDRESS_LIST_ERROR = 'GET_ADDRESS_LIST_ERROR';
 exports.GET_ADDRESS_LIST_ERROR = GET_ADDRESS_LIST_ERROR;
 
-},{}],124:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -39377,7 +39495,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":108,"./store":130,"react-dom":51,"react-redux":69,"react-router-dom":80}],125:[function(require,module,exports){
+},{"./components/App":108,"./store":131,"react-dom":51,"react-redux":69,"react-router-dom":80}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39434,7 +39552,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":123}],126:[function(require,module,exports){
+},{"../constants/action-types":124}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39478,7 +39596,7 @@ var clinicSettingsReducer = function clinicSettingsReducer() {
 var _default = clinicSettingsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":123}],127:[function(require,module,exports){
+},{"../constants/action-types":124}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39597,7 +39715,7 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 var _default = doctorCategoriesReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":123}],128:[function(require,module,exports){
+},{"../constants/action-types":124}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39626,7 +39744,7 @@ var rootReducer = (0, _redux.combineReducers)({
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./clinic-registration":125,"./clinic-settings":126,"./doctor-categories":127,"./sign-in":129,"redux":88}],129:[function(require,module,exports){
+},{"./clinic-registration":126,"./clinic-settings":127,"./doctor-categories":128,"./sign-in":130,"redux":88}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39646,7 +39764,9 @@ var initialState = {
   isPending: false,
   isAuthenticated: false,
   error: '',
-  account: null
+  account: null,
+  accountType: 'clinic' // 'clinic' || 'doctor'
+
 };
 
 var signInReducer = function signInReducer() {
@@ -39657,7 +39777,8 @@ var signInReducer = function signInReducer() {
     case _actionTypes.SIGN_IN_SUCCESS:
       return _objectSpread({}, state, {
         isPending: false,
-        isAuthenticated: true
+        isAuthenticated: true,
+        accountType: action.payload.accountType
       });
 
     case _actionTypes.SIGN_IN_PENDING:
@@ -39696,7 +39817,7 @@ var signInReducer = function signInReducer() {
 var _default = signInReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":123}],130:[function(require,module,exports){
+},{"../constants/action-types":124}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39716,7 +39837,7 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":128,"redux":88,"redux-thunk":87}],131:[function(require,module,exports){
+},{"./reducers/root":129,"redux":88,"redux-thunk":87}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39770,7 +39891,7 @@ var addNewClinicAddress = function addNewClinicAddress(details) {
 
 exports.addNewClinicAddress = addNewClinicAddress;
 
-},{"../config.js":122,"axios":7,"js-cookie":38}],132:[function(require,module,exports){
+},{"../config.js":123,"axios":7,"js-cookie":38}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39865,7 +39986,7 @@ var requestInvitationTokenCheck = function requestInvitationTokenCheck(token) {
 
 exports.requestInvitationTokenCheck = requestInvitationTokenCheck;
 
-},{"../config.js":122,"axios":7,"js-cookie":38}],133:[function(require,module,exports){
+},{"../config.js":123,"axios":7,"js-cookie":38}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39903,6 +40024,6 @@ var requestAccountData = function requestAccountData() {
 
 exports.requestAccountData = requestAccountData;
 
-},{"../config.js":122,"axios":7,"js-cookie":38}]},{},[124])
+},{"../config.js":123,"axios":7,"js-cookie":38}]},{},[125])
 
 //# sourceMappingURL=bundle.js.map

@@ -6,6 +6,7 @@ const CLINICS_API_URL = API_URL + '/clinics';
 const getAuthToken = () => {
     return Cookies.get('token');
 } 
+
 export const createClinic = clinic => {
     return axios.post(CLINICS_API_URL, clinic);
 }

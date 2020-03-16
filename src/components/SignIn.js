@@ -26,7 +26,9 @@ class SignIn extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.isAuthenticated) {
-            this.props.history.push('/clinic-account');
+            const url = this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
+            
+            this.props.history.push(url);
         }
     }
 
@@ -99,7 +101,8 @@ SignIn.propTypes = {
 const mapStateToProps = ({signIn}) => ({
     isPending: signIn.isPending,
     isAuthenticated: signIn.isAuthenticated,
-    error: signIn.error
+    error: signIn.error,
+    accountType: signIn.accountType
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

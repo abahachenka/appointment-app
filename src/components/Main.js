@@ -2,6 +2,7 @@ import { Switch, Route } from 'react-router-dom';
 import Home from './Home';
 import ClinicRegistration from './ClinicRegistration';
 import ClinicAccountPage from './ClinicAccountPage';
+import DoctorAccount from './DoctorAccount';
 import DoctorsCategory from './DoctorsCategory';
 import SignIn from './SignIn';
 import AcceptInvitation from './AcceptInvitation';
@@ -16,6 +17,7 @@ const Main = () => (
         <Route path={`/clinic-account/category/:categoryAlias`} component={DoctorsCategory} />
         <Route path={`/clinic-account/settings`} component={ClinicSettings} />
         <Route path={'/accept-invitation/:token'} component={AcceptInvitation} />
+        <Route exact path='/doctor-account' component={DoctorAccount} />
     </Switch>
 )
 
