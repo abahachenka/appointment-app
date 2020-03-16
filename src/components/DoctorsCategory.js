@@ -76,42 +76,42 @@ class DoctorsCategory extends React.Component {
 
         return (
             <main className="account-page page-container">
-            <ul className="breadcrumbs">
-                <li>
-                    <a href="/clinic-account">{this.props.clinicName}</a>
-                    <span className="separator">></span>
-                </li>
-                <li>
-                    <a href="/clinic-account">Doctor Specialisations</a>
-                    <span className="separator">></span>
-                </li>
-                <li>{categoryName}</li>
-            </ul>
+                <ul className="breadcrumbs">
+                    <li>
+                        <a href="/clinic-account">{this.props.clinicName}</a>
+                        <span className="separator">></span>
+                    </li>
+                    <li>
+                        <a href="/clinic-account">Doctor Specialisations</a>
+                        <span className="separator">></span>
+                    </li>
+                    <li>{categoryName}</li>
+                </ul>
 
-            <section className="doctors data-section">
-                <header className="data-section-header">
-                    <h1 className="data-section-title">{categoryName}</h1>
-                    <button className="data-section-btn" 
-                        onClick={this.openInviteForm}>Invite</button>
-                </header>
-                <p className="error">{this.props.activeCategoryError}</p>
-                <DoctorsList items={this.props.doctors} />
-            </section>
+                <section className="doctors data-section">
+                    <header className="data-section-header">
+                        <h1 className="data-section-title">{categoryName}</h1>
+                        <button className="data-section-btn" 
+                            onClick={this.openInviteForm}>Invite</button>
+                    </header>
+                    <p className="error">{this.props.activeCategoryError}</p>
+                    <DoctorsList items={this.props.doctors} />
+                </section>
 
-            {this.state.isInviteFormDisplayed ? (
-                <Modal title="Invite a Doctor" onClose={this.closeModal}>
-                    <form ref={(el) => this.invitationForm = el} onSubmit={this.inviteDoctor}>
-                        <p className="error">{this.props.invitationError}</p>
-                        <input type="text" name="title" placeholder="Title" onChange={this.onChange} />
-                        <input type="text" name="firstName" placeholder="First Name" onChange={this.onChange} />
-                        <input type="text" name="lastName" placeholder="Last Name" onChange={this.onChange} />
-                        <input type="text" name="room" placeholder="Room" onChange={this.onChange} />
-                        <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
-                        <input type="submit" value="Send Invitation" />
-                    </form>
-                </Modal>
-            ): null}
-        </main>
+                {this.state.isInviteFormDisplayed ? (
+                    <Modal title="Invite a Doctor" onClose={this.closeModal}>
+                        <form ref={(el) => this.invitationForm = el} onSubmit={this.inviteDoctor}>
+                            <p className="error">{this.props.invitationError}</p>
+                            <input type="text" name="title" placeholder="Title" onChange={this.onChange} />
+                            <input type="text" name="firstName" placeholder="First Name" onChange={this.onChange} />
+                            <input type="text" name="lastName" placeholder="Last Name" onChange={this.onChange} />
+                            <input type="text" name="room" placeholder="Room" onChange={this.onChange} />
+                            <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
+                            <input type="submit" value="Send Invitation" />
+                        </form>
+                    </Modal>
+                ): null}
+            </main>
         )
     }
 }

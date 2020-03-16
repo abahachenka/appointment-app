@@ -63,3 +63,19 @@ export const requestInvitationTokenCheck = (token) => {
 
     return axios.post(url, {token});
 }
+
+export const getDoctorAppointments = () => {
+    return axios.get(API_URL + '/appointments', {
+        headers: {
+            'x-access-token': getAuthToken()
+        }
+    });
+}
+
+export const addNewAppointment = (appointment) => {
+    return axios.post(API_URL + '/appointments', {...appointment}, {
+        headers: {
+            'x-access-token': getAuthToken()
+        }
+    });
+}

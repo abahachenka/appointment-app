@@ -1,4 +1,5 @@
 import {requestSignIn, requestAccountData} from '../utils/user-api';
+import Cookies from 'js-cookie';
 import {
     addNewCategory, 
     getDoctorCategories, 
@@ -6,13 +7,15 @@ import {
     getDoctors,
     sendDoctorInvitation,
     updateDoctorsAccount,
-    requestInvitationTokenCheck
+    requestInvitationTokenCheck,
+    getDoctorAppointments,
+    addNewAppointment
 } from '../utils/doctors-api';
+
 import {
     getClinicAddressCover,
     addNewClinicAddress
 } from '../utils/clinics-api';
-import Cookies from 'js-cookie';
 
 import { 
     SIGN_IN_SUCCESS,
@@ -37,7 +40,9 @@ import {
     CHECK_INVITATION_TOKEN_SUCCESS,
     CHECK_INVITATION_TOKEN_ERROR,
     GET_ADDRESS_LIST_SUCCESS,
-    GET_ADDRESS_LIST_ERROR
+    GET_ADDRESS_LIST_ERROR,
+    LOAD_DOCTOR_APPOINTMENT_SUCCESS,
+    LOAD_DOCTOR_APPOINTMENT_ERROR
 } from '../constants/action-types';
 
 export const signInPending = () => ({
@@ -201,12 +206,38 @@ export const checkInvitationTokenError = (error) => ({
     }
 });
 
+export const loadDoctorAppointmentsSuccess = (appointments) => ({
+    type: LOAD_DOCTOR_APPOINTMENT_SUCCESS,
+    payload: {
+        appointments
+    }
+});
+
+export const loadDoctorAppointmentsError = (error) => ({
+    type: LOAD_DOCTOR_APPOINTMENT_ERROR,
+    payload: {
+        error
+    }
+});
+
+export const loadDoctorAppointments = () => {
+    return dispatch => {
+        getDoctorAppointments()
+            .then(resp => {
+                dispatch(loadDoctorAppointmentsSuccess(resp.data));
+            })
+            .catch(err => {
+                dispatch(loadDoctorAppointmentsError(err));
+            });
+    }
+};
+
 export const loadAccount = () => {
     return dispatch => {
         requestAccountData()
             .then(resp => {
                 if (resp.data && resp.data.categoryName) {
-                    // load doctor appointment
+                    dispatch(loadDoctorAppointments());
                 } else {
                     dispatch(loadDoctorCategories());
                 }
@@ -324,6 +355,18 @@ export const addNewAddress = (details) => {
         addNewClinicAddress(details)
             .then((resp) => {
                 dispatch(getAddressList());
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+}
+
+export const createNewAppointment = (appointment) => {
+    return dispatch => {
+        addNewAppointment(appointment)
+            .then((resp) => {
+                dispatch(loadDoctorAppointments());
             })
             .catch(err => {
                 console.log(err);
