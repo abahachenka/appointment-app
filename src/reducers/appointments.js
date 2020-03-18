@@ -1,31 +1,29 @@
-import { 
-    LOAD_DOCTOR_APPOINTMENT_SUCCESS,
-    LOAD_DOCTOR_APPOINTMENT_ERROR
+import {
+    SEARCH_CLINIC_SUCCESS, 
+    SEARCH_CLINIC_ERROR
 } from '../constants/action-types';
 
 const initialState = {
-    items: [],
-    error: null,
-    isAppointmentCreated: false
+    clinics: [],
+    error: null
 };
 
 const appointmentsReducer = (state = initialState, action) => {
     switch (action.type) {
-        case LOAD_DOCTOR_APPOINTMENT_SUCCESS:
+        case SEARCH_CLINIC_SUCCESS: 
             return {
                 ...state,
-                items: action.payload.appointments
-            };
+                clinics: action.payload.clinics
+            }
 
-        case LOAD_DOCTOR_APPOINTMENT_ERROR:
+        case SEARCH_CLINIC_ERROR:
             return {
                 ...state,
                 error: action.payload.error
-            };
-        
+            }
         
         default:
-          return state;
+            return state;
         }
 };
 

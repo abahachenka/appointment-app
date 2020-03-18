@@ -138,10 +138,10 @@ DoctorAccount.propTypes = {
     loadAccount: PropTypes.func
 }
 
-const mapStateToProps = ({signIn, appointments}) => ({
+const mapStateToProps = ({signIn, doctorAppointments}) => ({
     account: signIn.account,
     error: signIn.error,
-    appointments: appointments.items
+    appointments: doctorAppointments.items
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

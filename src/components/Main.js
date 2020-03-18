@@ -7,10 +7,14 @@ import DoctorsCategory from './DoctorsCategory';
 import SignIn from './SignIn';
 import AcceptInvitation from './AcceptInvitation';
 import ClinicSettings from './ClinicSettings';
+import NewAppointment from './NewAppointment';
+import CancelAppointment from './CancelAppointment';
 
 const Main = () => (
     <Switch>
         <Route exact path='/' component={Home}/>
+        <Route exact path='/new-appointment' component={NewAppointment}/>
+        <Route exact path='/cancel-appointment' component={CancelAppointment}/>
         <Route path='/register' component={ClinicRegistration}/>
         <Route path='/admin' component={SignIn} />
         <Route exact path='/clinic-account' component={ClinicAccountPage} />
