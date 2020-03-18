@@ -85,6 +85,7 @@ class ClinicRegistration extends React.Component {
                     <p className="error">{this.props.error}</p>
                     <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} />
                     <input type="tel" name="phoneNumber" placeholder="Contact number" onChange={this.onChange} />
+                    <input type="text" name="address" placeholder="Address" onChange={this.onChange} />
                     <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
                     <input type="password" name="password" placeholder="Password" onChange={this.onChange} />
                     <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} />
