@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {searchClinic} from '../actions/appointments';
+import {searchClinic, saveClinic} from '../actions/appointments';
 
 class NewAppointment extends React.Component {
     constructor(props) {
@@ -30,6 +30,10 @@ class NewAppointment extends React.Component {
         }));
     }
 
+    memorizeClinic(event, clinicId) {
+        this.props.saveClinic(clinicId);
+    }
+
     render() {
         return (
             <main className="page-container">
@@ -50,11 +54,11 @@ class NewAppointment extends React.Component {
                         <h2 className="page-subtitle">Search results</h2>
                         <ul className="search-results-list category-list">
                             {this.props.clinics.map((clinic, index) => {
-                                const url = '/clinic/' + clinic.alias; // change to alias
+                                const url = '/new-appointment/clinic/' + clinic.alias; // change to alias
 
                                 return (
                                     <li key={index}>
-                                        <Link to={url}>{clinic.name}</Link>
+                                        <Link to={url} onClick={this.memorizeClinic.bind(this, event, clinic._id)}>{clinic.name}</Link>
                                         {clinic.address && (<p>Address: {clinic.address}</p>)} 
                                         {clinic.phoneNumber && (<p>Phone Number: {clinic.phoneNumber}</p>)}
                                     </li>
@@ -81,7 +85,8 @@ const mapStateToProps = ({appointments}) => ({
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    searchClinic: (params) => searchClinic(params)
+    searchClinic: (params) => searchClinic(params),
+    saveClinic: (clinicId) => saveClinic(clinicId)
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewAppointment);

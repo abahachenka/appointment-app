@@ -11,6 +11,10 @@ export const createClinic = clinic => {
     return axios.post(CLINICS_API_URL, clinic);
 }
 
+export const searchClinicByHomeAddress = (params) => {
+    return axios.get(CLINICS_API_URL, {params});
+}
+
 export const getClinicAddressCover = () => {
     return axios.get(API_URL + '/address-cover', {
         headers: {

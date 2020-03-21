@@ -7,10 +7,13 @@ import {
     getDoctors,
     sendDoctorInvitation,
     updateDoctorsAccount,
-    requestInvitationTokenCheck,
+    requestInvitationTokenCheck
+} from '../utils/doctors-api';
+
+import {
     getDoctorAppointments,
     addNewAppointment
-} from '../utils/doctors-api';
+} from '../utils/appointments-api';
 
 import {
     getClinicAddressCover,

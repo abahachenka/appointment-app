@@ -16,12 +16,20 @@ export const addNewCategory = (categoryName) => {
     });
 }
 
-export const getDoctorCategories = () => {
-    return axios.get(DOCTOR_CATEGORIES_API_URL, {
-        headers: {
-            'x-access-token': getAuthToken()
-        }
-    });
+export const getDoctorCategories = (clinicId) => {
+    let options = {
+            headers: {
+                'x-access-token': getAuthToken()
+            }
+        };
+
+    if (clinicId) {
+        options.params = {
+            clinicId
+        };
+    }
+
+    return axios.get(DOCTOR_CATEGORIES_API_URL, options);
 }
 
 export const getDoctorCategory = (alias) => {
@@ -62,20 +70,4 @@ export const requestInvitationTokenCheck = (token) => {
     const url = API_URL + '/auth/check-invitation-token';
 
     return axios.post(url, {token});
-}
-
-export const getDoctorAppointments = () => {
-    return axios.get(API_URL + '/appointments', {
-        headers: {
-            'x-access-token': getAuthToken()
-        }
-    });
-}
-
-export const addNewAppointment = (appointment) => {
-    return axios.post(API_URL + '/appointments', {...appointment}, {
-        headers: {
-            'x-access-token': getAuthToken()
-        }
-    });
 }

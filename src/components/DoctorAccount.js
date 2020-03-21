@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Modal from './Modal';
+import moment from 'moment';
 
 const initialState = {
     isModalDisplayed: false,
@@ -86,10 +87,14 @@ class DoctorAccount extends React.Component {
                             </thead>
                             <tbody>
                                 {appointments.map((appointment, index) => {
+                                    const datetime = moment(appointment.datetime);
+                                    const date = datetime.format('DD/MMM/YYYY');
+                                    const time = datetime.format('HH:mm');
+                                    
                                     return (
                                         <tr key={index}>
-                                            <td>{appointment.date}</td>
-                                            <td>{appointment.time}</td>
+                                            <td>{date}</td>
+                                            <td>{time}</td>
                                             <td>{appointment.patient}</td>
                                         </tr>
                                     )
