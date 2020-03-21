@@ -11,13 +11,15 @@ import NewAppointment from './NewAppointment';
 import CancelAppointment from './CancelAppointment';
 import ClinicDoctorCategories from './ClinicDoctorCategories';
 import AvailableAppointments from './AvailableAppointments';
+import NewAppointmentComplete from './NewAppointmentComplete';
 
 const Main = () => (
     <Switch>
         <Route exact path='/' component={Home}/>
         <Route exact path='/new-appointment' component={NewAppointment}/>
         <Route exact path='/new-appointment/clinic/:clinicAlias' component={ClinicDoctorCategories}/>
-        <Route path='/new-appointment/clinic/:clinicAlias/:categoryAlias' component={AvailableAppointments}/>
+        <Route exact path='/new-appointment/clinic/:clinicAlias/:categoryAlias' component={AvailableAppointments}/>
+        <Route exact path='/new-appointment/clinic/:clinicAlias/:categoryAlias/complete' component={NewAppointmentComplete}/>
         <Route exact path='/cancel-appointment' component={CancelAppointment}/>
         <Route path='/register' component={ClinicRegistration}/>
         <Route path='/admin' component={SignIn} />

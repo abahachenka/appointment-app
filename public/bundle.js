@@ -42222,13 +42222,13 @@ var createNewAppointment = function createNewAppointment(appointment) {
 
 exports.createNewAppointment = createNewAppointment;
 
-},{"../constants/action-types":130,"../utils/appointments-api":140,"../utils/clinics-api":141,"../utils/doctors-api":142,"../utils/user-api":143,"js-cookie":38}],107:[function(require,module,exports){
+},{"../constants/action-types":131,"../utils/appointments-api":141,"../utils/clinics-api":142,"../utils/doctors-api":143,"../utils/user-api":144,"js-cookie":38}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
+exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
 
 var _jsCookie = _interopRequireDefault(require("js-cookie"));
 
@@ -42308,6 +42308,39 @@ var loadAppointmentsError = function loadAppointmentsError(err) {
 
 exports.loadAppointmentsError = loadAppointmentsError;
 
+var saveAppointment = function saveAppointment(id) {
+  return {
+    type: _actionTypes.SAVE_SELECTED_APPOINTMENT,
+    payload: {
+      id: id
+    }
+  };
+};
+
+exports.saveAppointment = saveAppointment;
+
+var registrationSuccess = function registrationSuccess(code) {
+  return {
+    type: _actionTypes.APPOINTMENT_REGISTRATION_SUCCESS,
+    payload: {
+      code: code
+    }
+  };
+};
+
+exports.registrationSuccess = registrationSuccess;
+
+var registrationError = function registrationError(error) {
+  return {
+    type: _actionTypes.APPOINTMENT_REGISTRATION_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.registrationError = registrationError;
+
 var saveUserHomeAddress = function saveUserHomeAddress(address) {
   _jsCookie["default"].set('userAddress', address.place + ',' + address.street + ',' + address.building);
 };
@@ -42371,7 +42404,19 @@ var loadAppointments = function loadAppointments() {
 
 exports.loadAppointments = loadAppointments;
 
-},{"../constants/action-types":130,"../utils/appointments-api":140,"../utils/clinics-api":141,"../utils/doctors-api":142,"js-cookie":38}],108:[function(require,module,exports){
+var completeRegistration = function completeRegistration(patient, appointment) {
+  return function (dispatch) {
+    (0, _appointmentsApi.registerAppointment)(patient, appointment).then(function (resp) {
+      dispatch(registrationSuccess(resp.data.orderNumber));
+    })["catch"](function (err) {
+      dispatch(registrationError(err));
+    });
+  };
+};
+
+exports.completeRegistration = completeRegistration;
+
+},{"../constants/action-types":131,"../utils/appointments-api":141,"../utils/clinics-api":142,"../utils/doctors-api":143,"js-cookie":38}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42431,7 +42476,7 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":130,"../utils/clinics-api":141}],109:[function(require,module,exports){
+},{"../constants/action-types":131,"../utils/clinics-api":142}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42730,13 +42775,20 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       });
     }
   }, {
+    key: "saveAppointment",
+    value: function saveAppointment(appointment) {
+      this.props.saveAppointment(appointment);
+      this.props.history.push(this.props.location.pathname + '/complete');
+    }
+  }, {
     key: "drawAppointment",
     value: function drawAppointment(appointment, index) {
       var time = (0, _moment["default"])(appointment.datetime).format('hh:mm');
       var doctor = appointment.doctor;
       var doctorName = doctor.title + '. ' + doctor.firstName + ' ' + doctor.lastName;
       return React.createElement("li", {
-        key: index
+        key: index,
+        onClick: this.saveAppointment.bind(this, appointment)
       }, React.createElement("div", {
         className: "time"
       }, time), React.createElement("p", {
@@ -42829,6 +42881,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
     loadAppointments: function loadAppointments() {
       return (0, _appointments.loadAppointments)();
+    },
+    saveAppointment: function saveAppointment(appointment) {
+      return (0, _appointments.saveAppointment)(appointment);
     }
   }, dispatch);
 };
@@ -44403,6 +44458,8 @@ var _ClinicDoctorCategories = _interopRequireDefault(require("./ClinicDoctorCate
 
 var _AvailableAppointments = _interopRequireDefault(require("./AvailableAppointments"));
 
+var _NewAppointmentComplete = _interopRequireDefault(require("./NewAppointmentComplete"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var Main = function Main() {
@@ -44419,8 +44476,13 @@ var Main = function Main() {
     path: "/new-appointment/clinic/:clinicAlias",
     component: _ClinicDoctorCategories["default"]
   }), React.createElement(_reactRouterDom.Route, {
+    exact: true,
     path: "/new-appointment/clinic/:clinicAlias/:categoryAlias",
     component: _AvailableAppointments["default"]
+  }), React.createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/new-appointment/clinic/:clinicAlias/:categoryAlias/complete",
+    component: _NewAppointmentComplete["default"]
   }), React.createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/cancel-appointment",
@@ -44454,7 +44516,7 @@ var Main = function Main() {
 var _default = Main;
 exports["default"] = _default;
 
-},{"./AcceptInvitation":109,"./AvailableAppointments":111,"./CancelAppointment":112,"./ClinicAccountPage":113,"./ClinicDoctorCategories":114,"./ClinicRegistration":115,"./ClinicSettings":116,"./DoctorAccount":117,"./DoctorsCategory":119,"./Home":123,"./NewAppointment":127,"./SignIn":128,"react-router-dom":81}],126:[function(require,module,exports){
+},{"./AcceptInvitation":109,"./AvailableAppointments":111,"./CancelAppointment":112,"./ClinicAccountPage":113,"./ClinicDoctorCategories":114,"./ClinicRegistration":115,"./ClinicSettings":116,"./DoctorAccount":117,"./DoctorsCategory":119,"./Home":123,"./NewAppointment":127,"./NewAppointmentComplete":128,"./SignIn":129,"react-router-dom":81}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44695,6 +44757,182 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _redux = require("redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _reactRedux = require("react-redux");
+
+var _appointments = require("../actions/appointments");
+
+var _moment = _interopRequireDefault(require("moment"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
+  _inherits(NewAppointmentComplete, _React$Component);
+
+  function NewAppointmentComplete(props) {
+    var _this;
+
+    _classCallCheck(this, NewAppointmentComplete);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(NewAppointmentComplete).call(this));
+    _this.state = {
+      patient: null
+    };
+    _this.drawSelectedAppointment = _this.drawSelectedAppointment.bind(_assertThisInitialized(_this));
+    _this.completeRegistration = _this.completeRegistration.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(NewAppointmentComplete, [{
+    key: "drawSelectedAppointment",
+    value: function drawSelectedAppointment() {
+      var date = (0, _moment["default"])(this.props.selectedAppointment.datetime);
+      var month = date.format('MMMM');
+      var time = date.format('hh:mm');
+      var day = date.format('DD');
+      var weekday = date.format('ddd');
+      var doctor = this.props.selectedAppointment.doctor;
+      var doctorLabel = "".concat(doctor.title, ". ").concat(doctor.firstName, " ").concat(doctor.lastName, ", room: ").concat(doctor.room);
+      return React.createElement("div", {
+        className: "patient-selection-info"
+      }, React.createElement("div", {
+        className: "patient-selection-date"
+      }, month, React.createElement("span", {
+        className: "day"
+      }, day), weekday), React.createElement("div", {
+        className: "patient-selection-time"
+      }, time), React.createElement("div", {
+        className: "patient-selection-doctor"
+      }, doctorLabel));
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          patient: _objectSpread({}, prevState.patient, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "completeRegistration",
+    value: function completeRegistration(event) {
+      event.preventDefault();
+      this.props.completeRegistration(this.state.patient, this.props.selectedAppointment);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var appointment = this.props.selectedAppointment;
+      return React.createElement("main", {
+        className: "page-container"
+      }, this.props.registrationCode ? React.createElement(React.Fragment, null, React.createElement("h1", {
+        className: "page-title"
+      }, "Success!"), React.createElement("p", {
+        className: "appointment-notification"
+      }, "We have sent you an SMS with the details of your appointment."), React.createElement("div", {
+        className: "appointment-receipt"
+      }, React.createElement("p", {
+        className: "order-number"
+      }, "Order #", React.createElement("span", null, this.props.registrationCode)), React.createElement("p", {
+        className: "order-datetime"
+      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), React.createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), React.createElement("p", null, "Room: ", appointment.doctor.room), React.createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName))) : React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "patient-selection"
+      }, React.createElement("h1", {
+        className: "patient-selection-label page-title"
+      }, "Your Selection:"), this.props.selectedAppointment && this.drawSelectedAppointment()), React.createElement("h2", {
+        className: "patient-details-form-title page-subtitle"
+      }, "Please, enter your details to finish registration"), React.createElement("p", {
+        className: "error"
+      }, this.props.error), React.createElement("form", {
+        action: "#",
+        className: "patient-details-form",
+        onSubmit: this.completeRegistration
+      }, React.createElement("input", {
+        type: "text",
+        name: "firstName",
+        placeholder: "First Name",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "text",
+        name: "lastName",
+        placeholder: "Last Name",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "tel",
+        name: "contactNumber",
+        placeholder: "Contact Number",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "submit",
+        value: "Register"
+      }))));
+    }
+  }]);
+
+  return NewAppointmentComplete;
+}(React.Component);
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var appointments = _ref.appointments;
+  return {
+    selectedAppointment: appointments.selectedAppointment,
+    registrationCode: appointments.registrationCode,
+    error: appointments.registrationError
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    completeRegistration: function completeRegistration(patient, appointment) {
+      return (0, _appointments.completeRegistration)(patient, appointment);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NewAppointmentComplete);
+
+exports["default"] = _default;
+
+},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"redux":89}],129:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
 var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
@@ -44885,7 +45123,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],129:[function(require,module,exports){
+},{"../actions/account":106,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44895,13 +45133,13 @@ exports.API_URL = void 0;
 var API_URL = 'http://localhost:3000';
 exports.API_URL = API_URL;
 
-},{}],130:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_ADDRESS_LIST_ERROR = exports.GET_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_ADDRESS_LIST_ERROR = exports.GET_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -44972,8 +45210,14 @@ var LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = 'LOAD_AVAILABLE_APPOINTMENTS_SUCCESS';
 exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = LOAD_AVAILABLE_APPOINTMENTS_SUCCESS;
 var LOAD_AVAILABLE_APPOINTMENTS_ERROR = 'LOAD_AVAILABLE_APPOINTMENTS_ERROR';
 exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = LOAD_AVAILABLE_APPOINTMENTS_ERROR;
+var SAVE_SELECTED_APPOINTMENT = 'SAVE_SELECTED_APPOINTMENT';
+exports.SAVE_SELECTED_APPOINTMENT = SAVE_SELECTED_APPOINTMENT;
+var APPOINTMENT_REGISTRATION_SUCCESS = 'APPOINTMENT_REGISTRATION_SUCCESS';
+exports.APPOINTMENT_REGISTRATION_SUCCESS = APPOINTMENT_REGISTRATION_SUCCESS;
+var APPOINTMENT_REGISTRATION_ERROR = 'APPOINTMENT_REGISTRATION_ERROR';
+exports.APPOINTMENT_REGISTRATION_ERROR = APPOINTMENT_REGISTRATION_ERROR;
 
-},{}],131:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -44992,7 +45236,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":110,"./store":139,"react-dom":52,"react-redux":70,"react-router-dom":81}],132:[function(require,module,exports){
+},{"./components/App":110,"./store":140,"react-dom":52,"react-redux":70,"react-router-dom":81}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45014,7 +45258,10 @@ var initialState = {
   error: '',
   doctorCategoriesError: '',
   doctorAppointments: [],
-  doctorAppointmentsError: ''
+  doctorAppointmentsError: '',
+  selectedAppointment: null,
+  registrationCode: '',
+  registrationError: ''
 };
 
 var appointmentsReducer = function appointmentsReducer() {
@@ -45052,6 +45299,21 @@ var appointmentsReducer = function appointmentsReducer() {
         doctorAppointmentsError: action.payload.error
       });
 
+    case _actionTypes.SAVE_SELECTED_APPOINTMENT:
+      return _objectSpread({}, state, {
+        selectedAppointment: action.payload.id
+      });
+
+    case _actionTypes.APPOINTMENT_REGISTRATION_SUCCESS:
+      return _objectSpread({}, state, {
+        registrationCode: action.payload.code
+      });
+
+    case _actionTypes.APPOINTMENT_REGISTRATION_ERROR:
+      return _objectSpread({}, state, {
+        registrationError: action.payload.error
+      });
+
     default:
       return state;
   }
@@ -45060,7 +45322,7 @@ var appointmentsReducer = function appointmentsReducer() {
 var _default = appointmentsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":130}],133:[function(require,module,exports){
+},{"../constants/action-types":131}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45117,7 +45379,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":130}],134:[function(require,module,exports){
+},{"../constants/action-types":131}],135:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45161,7 +45423,7 @@ var clinicSettingsReducer = function clinicSettingsReducer() {
 var _default = clinicSettingsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":130}],135:[function(require,module,exports){
+},{"../constants/action-types":131}],136:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45206,7 +45468,7 @@ var doctorAppointmentsReducer = function doctorAppointmentsReducer() {
 var _default = doctorAppointmentsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":130}],136:[function(require,module,exports){
+},{"../constants/action-types":131}],137:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45325,7 +45587,7 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 var _default = doctorCategoriesReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":130}],137:[function(require,module,exports){
+},{"../constants/action-types":131}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45360,7 +45622,7 @@ var rootReducer = (0, _redux.combineReducers)({
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./appointments":132,"./clinic-registration":133,"./clinic-settings":134,"./doctor-appointments":135,"./doctor-categories":136,"./sign-in":138,"redux":89}],138:[function(require,module,exports){
+},{"./appointments":133,"./clinic-registration":134,"./clinic-settings":135,"./doctor-appointments":136,"./doctor-categories":137,"./sign-in":139,"redux":89}],139:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45433,7 +45695,7 @@ var signInReducer = function signInReducer() {
 var _default = signInReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":130}],139:[function(require,module,exports){
+},{"../constants/action-types":131}],140:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45453,13 +45715,13 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":137,"redux":89,"redux-thunk":88}],140:[function(require,module,exports){
+},{"./reducers/root":138,"redux":89,"redux-thunk":88}],141:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.addNewAppointment = exports.getDoctorAppointments = void 0;
+exports.registerAppointment = exports.addNewAppointment = exports.getDoctorAppointments = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -45474,6 +45736,8 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var APPOINTMENTS_URL = _config.API_URL + '/appointments';
 
 var getAuthToken = function getAuthToken() {
   return _jsCookie["default"].get('token');
@@ -45492,13 +45756,13 @@ var getDoctorAppointments = function getDoctorAppointments(categoryId) {
     };
   }
 
-  return _axios["default"].get(_config.API_URL + '/appointments', options);
+  return _axios["default"].get(APPOINTMENTS_URL, options);
 };
 
 exports.getDoctorAppointments = getDoctorAppointments;
 
 var addNewAppointment = function addNewAppointment(appointment) {
-  return _axios["default"].post(_config.API_URL + '/appointments', _objectSpread({}, appointment), {
+  return _axios["default"].post(APPOINTMENTS_URL, _objectSpread({}, appointment), {
     headers: {
       'x-access-token': getAuthToken()
     }
@@ -45507,7 +45771,13 @@ var addNewAppointment = function addNewAppointment(appointment) {
 
 exports.addNewAppointment = addNewAppointment;
 
-},{"../config.js":129,"axios":7,"js-cookie":38}],141:[function(require,module,exports){
+var registerAppointment = function registerAppointment(patient, appointment) {
+  return _axios["default"].put(APPOINTMENTS_URL + '/' + appointment._id, _objectSpread({}, patient));
+};
+
+exports.registerAppointment = registerAppointment;
+
+},{"../config.js":130,"axios":7,"js-cookie":38}],142:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45569,7 +45839,7 @@ var addNewClinicAddress = function addNewClinicAddress(details) {
 
 exports.addNewClinicAddress = addNewClinicAddress;
 
-},{"../config.js":129,"axios":7,"js-cookie":38}],142:[function(require,module,exports){
+},{"../config.js":130,"axios":7,"js-cookie":38}],143:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45672,7 +45942,7 @@ var requestInvitationTokenCheck = function requestInvitationTokenCheck(token) {
 
 exports.requestInvitationTokenCheck = requestInvitationTokenCheck;
 
-},{"../config.js":129,"axios":7,"js-cookie":38}],143:[function(require,module,exports){
+},{"../config.js":130,"axios":7,"js-cookie":38}],144:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45710,6 +45980,6 @@ var requestAccountData = function requestAccountData() {
 
 exports.requestAccountData = requestAccountData;
 
-},{"../config.js":129,"axios":7,"js-cookie":38}]},{},[131])
+},{"../config.js":130,"axios":7,"js-cookie":38}]},{},[132])
 
 //# sourceMappingURL=bundle.js.map

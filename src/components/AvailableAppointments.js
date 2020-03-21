@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {loadAppointments} from '../actions/appointments';
+import {loadAppointments, saveAppointment} from '../actions/appointments';
 import moment from 'moment';
 
 class AvailableAppointments extends React.Component {
@@ -48,13 +48,18 @@ class AvailableAppointments extends React.Component {
         });
     }
 
+    saveAppointment(appointment) {
+        this.props.saveAppointment(appointment);
+        this.props.history.push(this.props.location.pathname + '/complete');
+    }
+
     drawAppointment(appointment, index) {
         const time = moment(appointment.datetime).format('hh:mm');
         const doctor = appointment.doctor;
         const doctorName = doctor.title + '. ' + doctor.firstName + ' ' + doctor.lastName;
 
         return (
-            <li key={index}>
+            <li key={index} onClick={this.saveAppointment.bind(this, appointment)}>
                 <div className="time">{time}</div>
                 <p className="doctor-info">{doctorName}, room: {doctor.room}</p>
             </li>
@@ -143,7 +148,8 @@ const mapStateToProps = ({appointments}) => ({
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    loadAppointments: () => loadAppointments()
+    loadAppointments: () => loadAppointments(),
+    saveAppointment: (appointment) => saveAppointment(appointment)
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AvailableAppointments);

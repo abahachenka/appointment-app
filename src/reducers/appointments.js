@@ -4,7 +4,10 @@ import {
     LOAD_DOCTOR_CATEGORIES_SUCCESS,
     LOAD_DOCTOR_CATEGORIES_ERROR,
     LOAD_AVAILABLE_APPOINTMENTS_SUCCESS,
-    LOAD_AVAILABLE_APPOINTMENTS_ERROR
+    LOAD_AVAILABLE_APPOINTMENTS_ERROR,
+    SAVE_SELECTED_APPOINTMENT,
+    APPOINTMENT_REGISTRATION_SUCCESS,
+    APPOINTMENT_REGISTRATION_ERROR
 } from '../constants/action-types';
 
 const initialState = {
@@ -13,7 +16,10 @@ const initialState = {
     error: '',
     doctorCategoriesError: '',
     doctorAppointments: [],
-    doctorAppointmentsError: ''
+    doctorAppointmentsError: '',
+    selectedAppointment: null,
+    registrationCode: '',
+    registrationError: ''
 };
 
 const appointmentsReducer = (state = initialState, action) => {
@@ -53,7 +59,24 @@ const appointmentsReducer = (state = initialState, action) => {
                 ...state,
                 doctorAppointmentsError: action.payload.error
             }
+
+        case SAVE_SELECTED_APPOINTMENT: 
+            return {
+                ...state,
+                selectedAppointment: action.payload.id
+            }
+
+        case APPOINTMENT_REGISTRATION_SUCCESS: 
+            return {
+                ...state,
+                registrationCode: action.payload.code
+            }
         
+        case APPOINTMENT_REGISTRATION_ERROR: 
+            return {
+                ...state,
+                registrationError: action.payload.error
+            }
         default:
             return state;
         }

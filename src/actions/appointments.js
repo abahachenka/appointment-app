@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import {getDoctorAppointments} from '../utils/appointments-api';
+import {getDoctorAppointments, registerAppointment} from '../utils/appointments-api';
 import {searchClinicByHomeAddress} from '../utils/clinics-api';
 import {getDoctorCategories} from '../utils/doctors-api';
 
@@ -10,7 +10,10 @@ import {
     LOAD_DOCTOR_CATEGORIES_SUCCESS,
     LOAD_DOCTOR_CATEGORIES_ERROR,
     LOAD_AVAILABLE_APPOINTMENTS_SUCCESS,
-    LOAD_AVAILABLE_APPOINTMENTS_ERROR
+    LOAD_AVAILABLE_APPOINTMENTS_ERROR,
+    SAVE_SELECTED_APPOINTMENT,
+    APPOINTMENT_REGISTRATION_SUCCESS,
+    APPOINTMENT_REGISTRATION_ERROR
 } from '../constants/action-types';
 
 export const searchClinicSuccess = clinics => ({
@@ -54,6 +57,28 @@ export const loadAppointmentsError = err => ({
         err
     }
 });
+
+export const saveAppointment = id => ({
+    type: SAVE_SELECTED_APPOINTMENT,
+    payload: {
+        id
+    }
+});
+
+export const registrationSuccess = (code) => ({
+    type: APPOINTMENT_REGISTRATION_SUCCESS,
+    payload: {
+        code
+    }
+});
+
+export const registrationError = error => ({
+    type: APPOINTMENT_REGISTRATION_ERROR,
+    payload: {
+        error
+    }
+});
+
 
 export const saveUserHomeAddress = address => {
     Cookies.set('userAddress', address.place + ',' + address.street + ',' + address.building);
@@ -110,3 +135,16 @@ export const loadAppointments = () => {
             });
     }
 }
+
+export const completeRegistration = (patient, appointment) => {
+    return dispatch => {
+        registerAppointment(patient, appointment)
+            .then(resp => {
+                dispatch(registrationSuccess(resp.data.orderNumber));
+            })
+            .catch(err => {
+                dispatch(registrationError(err));
+            });
+    }
+}
+
