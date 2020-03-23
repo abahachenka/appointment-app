@@ -42228,7 +42228,7 @@ exports.createNewAppointment = createNewAppointment;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
+exports.cancelAppointment = exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.cancelAppointmentError = exports.cancelAppointmentSuccess = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
 
 var _jsCookie = _interopRequireDefault(require("js-cookie"));
 
@@ -42341,6 +42341,25 @@ var registrationError = function registrationError(error) {
 
 exports.registrationError = registrationError;
 
+var cancelAppointmentSuccess = function cancelAppointmentSuccess() {
+  return {
+    type: _actionTypes.CANCEL_APPOINTMENT_SUCCESS
+  };
+};
+
+exports.cancelAppointmentSuccess = cancelAppointmentSuccess;
+
+var cancelAppointmentError = function cancelAppointmentError(error) {
+  return {
+    type: _actionTypes.CANCEL_APPOINTMENT_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.cancelAppointmentError = cancelAppointmentError;
+
 var saveUserHomeAddress = function saveUserHomeAddress(address) {
   _jsCookie["default"].set('userAddress', address.place + ',' + address.street + ',' + address.building);
 };
@@ -42415,6 +42434,18 @@ var completeRegistration = function completeRegistration(patient, appointment) {
 };
 
 exports.completeRegistration = completeRegistration;
+
+var cancelAppointment = function cancelAppointment(orderNumber) {
+  return function (dispatch) {
+    (0, _appointmentsApi.requestCancelAppointment)(orderNumber).then(function (resp) {
+      dispatch(cancelAppointmentSuccess());
+    })["catch"](function (err) {
+      dispatch(cancelAppointmentError(err.message));
+    });
+  };
+};
+
+exports.cancelAppointment = cancelAppointment;
 
 },{"../constants/action-types":131,"../utils/appointments-api":141,"../utils/clinics-api":142,"../utils/doctors-api":143,"js-cookie":38}],108:[function(require,module,exports){
 "use strict";
@@ -42900,32 +42931,138 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var CancelAppointment = function CancelAppointment() {
-  return React.createElement("main", {
-    className: "page-container container"
-  }, React.createElement("h1", {
-    className: "page-title"
-  }, "Please, enter your order number"), React.createElement("form", {
-    action: "#",
-    className: "cancel-appointment-form"
-  }, React.createElement("input", {
-    type: "text",
-    placeholder: "Order Number"
-  }), React.createElement("input", {
-    type: "submit",
-    value: "Cancel Appointment"
-  })), React.createElement("div", {
-    className: "cancel-sample"
-  }, React.createElement("img", {
-    src: "img/cancel-sample.png",
-    alt: ""
-  })));
+var _redux = require("redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _reactRedux = require("react-redux");
+
+var _appointments = require("../actions/appointments");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var CancelAppointment = /*#__PURE__*/function (_React$Component) {
+  _inherits(CancelAppointment, _React$Component);
+
+  function CancelAppointment(props) {
+    var _this;
+
+    _classCallCheck(this, CancelAppointment);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(CancelAppointment).call(this));
+    _this.state = {
+      orderNumber: null
+    };
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.cancelAppointment = _this.cancelAppointment.bind(_assertThisInitialized(_this));
+    _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(CancelAppointment, [{
+    key: "onChange",
+    value: function onChange(event) {
+      this.state.orderNumber = event.target.value;
+    }
+  }, {
+    key: "cancelAppointment",
+    value: function cancelAppointment(event) {
+      event.preventDefault();
+      this.props.cancelAppointment(this.state.orderNumber);
+    }
+  }, {
+    key: "resetForm",
+    value: function resetForm() {
+      this.cancelForm.reset();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      if (this.props.isCancelled) {
+        alert('Your appointment has been successfully cancelled!');
+        this.resetForm();
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      return React.createElement("main", {
+        className: "page-container container"
+      }, React.createElement("h1", {
+        className: "page-title"
+      }, "Please, enter your order number"), React.createElement("p", {
+        className: "error"
+      }, this.props.error), React.createElement("form", {
+        ref: function ref(el) {
+          return _this2.cancelForm = el;
+        },
+        className: "cancel-appointment-form",
+        onSubmit: this.cancelAppointment
+      }, React.createElement("input", {
+        type: "text",
+        placeholder: "Order Number",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "submit",
+        value: "Cancel Appointment"
+      })), React.createElement("div", {
+        className: "cancel-sample"
+      }, React.createElement("img", {
+        src: "img/cancel-sample.png",
+        alt: ""
+      })));
+    }
+  }]);
+
+  return CancelAppointment;
+}(React.Component);
+
+CancelAppointment.propTypes = {
+  error: _propTypes["default"].string,
+  cancelAppointment: _propTypes["default"].func
 };
 
-var _default = CancelAppointment;
+var mapStateToProps = function mapStateToProps(_ref) {
+  var appointments = _ref.appointments;
+  return {
+    isCancelled: appointments.isAppointmentCancelled,
+    error: appointments.cancelError
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    cancelAppointment: function cancelAppointment(orderNumber) {
+      return (0, _appointments.cancelAppointment)(orderNumber);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(CancelAppointment);
+
 exports["default"] = _default;
 
-},{}],113:[function(require,module,exports){
+},{"../actions/appointments":107,"prop-types":48,"react-redux":70,"redux":89}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45139,7 +45276,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_ADDRESS_LIST_ERROR = exports.GET_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_ADDRESS_LIST_ERROR = exports.GET_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -45216,6 +45353,10 @@ var APPOINTMENT_REGISTRATION_SUCCESS = 'APPOINTMENT_REGISTRATION_SUCCESS';
 exports.APPOINTMENT_REGISTRATION_SUCCESS = APPOINTMENT_REGISTRATION_SUCCESS;
 var APPOINTMENT_REGISTRATION_ERROR = 'APPOINTMENT_REGISTRATION_ERROR';
 exports.APPOINTMENT_REGISTRATION_ERROR = APPOINTMENT_REGISTRATION_ERROR;
+var CANCEL_APPOINTMENT_SUCCESS = 'CANCEL_APPOINTMENT_SUCCESS';
+exports.CANCEL_APPOINTMENT_SUCCESS = CANCEL_APPOINTMENT_SUCCESS;
+var CANCEL_APPOINTMENT_ERROR = 'CANCEL_APPOINTMENT_ERROR';
+exports.CANCEL_APPOINTMENT_ERROR = CANCEL_APPOINTMENT_ERROR;
 
 },{}],132:[function(require,module,exports){
 "use strict";
@@ -45261,7 +45402,9 @@ var initialState = {
   doctorAppointmentsError: '',
   selectedAppointment: null,
   registrationCode: '',
-  registrationError: ''
+  registrationError: '',
+  cancelError: '',
+  isAppointmentCancelled: false
 };
 
 var appointmentsReducer = function appointmentsReducer() {
@@ -45312,6 +45455,17 @@ var appointmentsReducer = function appointmentsReducer() {
     case _actionTypes.APPOINTMENT_REGISTRATION_ERROR:
       return _objectSpread({}, state, {
         registrationError: action.payload.error
+      });
+
+    case _actionTypes.CANCEL_APPOINTMENT_SUCCESS:
+      return _objectSpread({}, state, {
+        isAppointmentCancelled: true
+      });
+
+    case _actionTypes.CANCEL_APPOINTMENT_ERROR:
+      return _objectSpread({}, state, {
+        isAppointmentCancelled: false,
+        cancelError: action.payload.error
       });
 
     default:
@@ -45721,7 +45875,7 @@ exports["default"] = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.registerAppointment = exports.addNewAppointment = exports.getDoctorAppointments = void 0;
+exports.requestCancelAppointment = exports.registerAppointment = exports.addNewAppointment = exports.getDoctorAppointments = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -45776,6 +45930,14 @@ var registerAppointment = function registerAppointment(patient, appointment) {
 };
 
 exports.registerAppointment = registerAppointment;
+
+var requestCancelAppointment = function requestCancelAppointment(orderNumber) {
+  return _axios["default"].post(APPOINTMENTS_URL + '/cancel', {
+    orderNumber: orderNumber
+  });
+};
+
+exports.requestCancelAppointment = requestCancelAppointment;
 
 },{"../config.js":130,"axios":7,"js-cookie":38}],142:[function(require,module,exports){
 "use strict";

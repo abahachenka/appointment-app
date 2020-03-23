@@ -1,6 +1,10 @@
 import Cookies from 'js-cookie';
 
-import {getDoctorAppointments, registerAppointment} from '../utils/appointments-api';
+import {
+    getDoctorAppointments, 
+    registerAppointment,
+    requestCancelAppointment
+} from '../utils/appointments-api';
 import {searchClinicByHomeAddress} from '../utils/clinics-api';
 import {getDoctorCategories} from '../utils/doctors-api';
 
@@ -13,7 +17,9 @@ import {
     LOAD_AVAILABLE_APPOINTMENTS_ERROR,
     SAVE_SELECTED_APPOINTMENT,
     APPOINTMENT_REGISTRATION_SUCCESS,
-    APPOINTMENT_REGISTRATION_ERROR
+    APPOINTMENT_REGISTRATION_ERROR,
+    CANCEL_APPOINTMENT_SUCCESS,
+    CANCEL_APPOINTMENT_ERROR
 } from '../constants/action-types';
 
 export const searchClinicSuccess = clinics => ({
@@ -79,6 +85,16 @@ export const registrationError = error => ({
     }
 });
 
+export const cancelAppointmentSuccess = () => ({
+    type: CANCEL_APPOINTMENT_SUCCESS
+});
+
+export const cancelAppointmentError = (error) => ({
+    type: CANCEL_APPOINTMENT_ERROR,
+    payload: {
+        error
+    }
+});
 
 export const saveUserHomeAddress = address => {
     Cookies.set('userAddress', address.place + ',' + address.street + ',' + address.building);
@@ -144,6 +160,18 @@ export const completeRegistration = (patient, appointment) => {
             })
             .catch(err => {
                 dispatch(registrationError(err));
+            });
+    }
+}
+
+export const cancelAppointment = orderNumber => {
+    return dispatch => {
+        requestCancelAppointment(orderNumber)
+            .then(resp => {
+                dispatch(cancelAppointmentSuccess());
+            })
+            .catch(err => {
+                dispatch(cancelAppointmentError(err.message));
             });
     }
 }

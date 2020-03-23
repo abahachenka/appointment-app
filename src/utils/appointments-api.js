@@ -33,3 +33,7 @@ export const addNewAppointment = (appointment) => {
 export const registerAppointment = (patient, appointment) => {
     return axios.put(APPOINTMENTS_URL + '/' + appointment._id, {...patient});
 }
+
+export const requestCancelAppointment = (orderNumber) => {
+    return axios.post(APPOINTMENTS_URL + '/cancel', {orderNumber});
+}

@@ -7,7 +7,9 @@ import {
     LOAD_AVAILABLE_APPOINTMENTS_ERROR,
     SAVE_SELECTED_APPOINTMENT,
     APPOINTMENT_REGISTRATION_SUCCESS,
-    APPOINTMENT_REGISTRATION_ERROR
+    APPOINTMENT_REGISTRATION_ERROR,
+    CANCEL_APPOINTMENT_SUCCESS,
+    CANCEL_APPOINTMENT_ERROR
 } from '../constants/action-types';
 
 const initialState = {
@@ -19,7 +21,9 @@ const initialState = {
     doctorAppointmentsError: '',
     selectedAppointment: null,
     registrationCode: '',
-    registrationError: ''
+    registrationError: '',
+    cancelError: '',
+    isAppointmentCancelled: false
 };
 
 const appointmentsReducer = (state = initialState, action) => {
@@ -77,6 +81,20 @@ const appointmentsReducer = (state = initialState, action) => {
                 ...state,
                 registrationError: action.payload.error
             }
+
+        case CANCEL_APPOINTMENT_SUCCESS:
+            return {
+                ...state,
+                isAppointmentCancelled: true
+            }
+
+        case CANCEL_APPOINTMENT_ERROR: 
+            return {
+                ...state,
+                isAppointmentCancelled: false,
+                cancelError: action.payload.error
+            }
+            
         default:
             return state;
         }
