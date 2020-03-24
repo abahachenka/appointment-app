@@ -1,1 +1,1 @@
-export const API_URL = process.env.REACT_APP_STAGE === 'prod' ? 'https://appointment-by-api.herokuapp.com/' : 'http://localhost:3000';
+export const API_URL = 'https://appointment-by-api.herokuapp.com/';

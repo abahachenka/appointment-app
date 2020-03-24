@@ -45261,19 +45261,16 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 exports["default"] = _default;
 
 },{"../actions/account":106,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],130:[function(require,module,exports){
-(function (process){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.API_URL = void 0;
-var API_URL = process.env.REACT_APP_STAGE === 'prod' ? 'https://appointment-by-api.herokuapp.com/' : 'http://localhost:3000';
+var API_URL = 'https://appointment-by-api.herokuapp.com/';
 exports.API_URL = API_URL;
 
-}).call(this,require('_process'))
-
-},{"_process":44}],131:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
