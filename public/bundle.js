@@ -45267,7 +45267,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.API_URL = void 0;
-var API_URL = 'https://appointment-by-api.herokuapp.com/';
+var API_URL = 'https://appointment-by-api.herokuapp.com';
 exports.API_URL = API_URL;
 
 },{}],131:[function(require,module,exports){
