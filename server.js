@@ -4,7 +4,7 @@ const app = express();
 
 require('dotenv').config();
 
-const port = process.env.UI_SERVER_PORT || 8000;
+const port = process.env.PORT || 8000;
 
 app.use(express.static('public'));
 
@@ -14,5 +14,5 @@ app.get('*', (req,res) =>{
 });
 
 app.listen(port, function () {
-  console.log(`UI started on port ${port}`);
+    console.log(`UI started on port ${port}`);
 });
