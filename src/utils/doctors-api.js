@@ -4,9 +4,7 @@ import Cookies from 'js-cookie';
 
 const DOCTOR_CATEGORIES_API_URL = API_URL + '/doctor-categories';
 
-const getAuthToken = () => {
-    return Cookies.get('token');
-}
+const getAuthToken = () => Cookies.get('token');
 
 export const addNewCategory = (categoryName) => {
     return axios.post(DOCTOR_CATEGORIES_API_URL, {categoryName}, {
@@ -70,4 +68,20 @@ export const requestInvitationTokenCheck = (token) => {
     const url = API_URL + '/auth/check-invitation-token';
 
     return axios.post(url, {token});
+}
+
+export const getDoctorAddressCover = () => {
+    return axios.get(API_URL + '/doctor-address-cover', {
+        headers: {
+            'x-access-token': getAuthToken()
+        }
+    });
+}
+
+export const addNewDoctorAddressCover = (details) => {
+    return axios.post(API_URL + '/doctor-address-cover', {...details}, {
+        headers: {
+            'x-access-token': getAuthToken()
+        }
+    });
 }

@@ -1,5 +1,6 @@
 import {loadAccount, createNewAppointment} from '../actions/account';
 import { bindActionCreators } from 'redux';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Modal from './Modal';
@@ -63,6 +64,7 @@ class DoctorAccount extends React.Component {
                 {account ? (
                     <React.Fragment>
                         <h1 className="page-title">{account.title}. {account.firstName} {account.lastName}</h1>
+                        <Link to="/doctor-account/settings" className="account-settings">Settings</Link>
                         <div className="doctor-details">
                             <p>Specialisation: {account.categoryName}</p>
                             <p>Room: {account.room}</p>

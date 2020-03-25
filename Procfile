@@ -1,0 +1,1 @@
+web: REACT_APP_STAGE=prod node server.js

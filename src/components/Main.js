@@ -7,6 +7,7 @@ import DoctorsCategory from './DoctorsCategory';
 import SignIn from './SignIn';
 import AcceptInvitation from './AcceptInvitation';
 import ClinicSettings from './ClinicSettings';
+import DoctorSettings from './DoctorSettings';
 import NewAppointment from './NewAppointment';
 import CancelAppointment from './CancelAppointment';
 import ClinicDoctorCategories from './ClinicDoctorCategories';
@@ -28,6 +29,7 @@ const Main = () => (
         <Route path={`/clinic-account/settings`} component={ClinicSettings} />
         <Route path={'/accept-invitation/:token'} component={AcceptInvitation} />
         <Route exact path='/doctor-account' component={DoctorAccount} />
+        <Route path={'/doctor-account/settings'} component={DoctorSettings} />
     </Switch>
 )
 

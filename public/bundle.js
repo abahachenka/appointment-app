@@ -41775,7 +41775,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createNewAppointment = exports.addNewAddress = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -41978,7 +41978,7 @@ exports.sendInvitationError = sendInvitationError;
 
 var getAddressListSuccess = function getAddressListSuccess(addressList) {
   return {
-    type: _actionTypes.GET_ADDRESS_LIST_SUCCESS,
+    type: _actionTypes.GET_CLINIC_ADDRESS_LIST_SUCCESS,
     payload: {
       addressList: addressList
     }
@@ -41989,7 +41989,7 @@ exports.getAddressListSuccess = getAddressListSuccess;
 
 var getAddressListError = function getAddressListError(error) {
   return {
-    type: _actionTypes.GET_ADDRESS_LIST_ERROR,
+    type: _actionTypes.GET_CLINIC_ADDRESS_LIST_ERROR,
     payload: {
       error: error
     }
@@ -41997,6 +41997,28 @@ var getAddressListError = function getAddressListError(error) {
 };
 
 exports.getAddressListError = getAddressListError;
+
+var getDoctorAddressListSuccess = function getDoctorAddressListSuccess(addressList) {
+  return {
+    type: _actionTypes.GET_DOCTOR_ADDRESS_LIST_SUCCESS,
+    payload: {
+      addressList: addressList
+    }
+  };
+};
+
+exports.getDoctorAddressListSuccess = getDoctorAddressListSuccess;
+
+var getDoctorAddressListError = function getDoctorAddressListError(error) {
+  return {
+    type: _actionTypes.GET_DOCTOR_ADDRESS_LIST_ERROR,
+    payload: {
+      error: error
+    }
+  };
+};
+
+exports.getDoctorAddressListError = getDoctorAddressListError;
 
 var resetInvitationError = function resetInvitationError() {
   return {
@@ -42198,6 +42220,18 @@ var getAddressList = function getAddressList() {
 
 exports.getAddressList = getAddressList;
 
+var getDoctorAddressList = function getDoctorAddressList() {
+  return function (dispatch) {
+    (0, _doctorsApi.getDoctorAddressCover)().then(function (resp) {
+      dispatch(getDoctorAddressListSuccess(resp.data));
+    })["catch"](function (err) {
+      dispatch(getDoctorAddressListError(err));
+    });
+  };
+};
+
+exports.getDoctorAddressList = getDoctorAddressList;
+
 var addNewAddress = function addNewAddress(details) {
   return function (dispatch) {
     (0, _clinicsApi.addNewClinicAddress)(details).then(function (resp) {
@@ -42209,6 +42243,18 @@ var addNewAddress = function addNewAddress(details) {
 };
 
 exports.addNewAddress = addNewAddress;
+
+var addNewDoctorAddress = function addNewDoctorAddress(details) {
+  return function (dispatch) {
+    (0, _doctorsApi.addNewDoctorAddressCover)(details).then(function (resp) {
+      dispatch(getDoctorAddressList());
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  };
+};
+
+exports.addNewDoctorAddress = addNewDoctorAddress;
 
 var createNewAppointment = function createNewAppointment(appointment) {
   return function (dispatch) {
@@ -42222,7 +42268,7 @@ var createNewAppointment = function createNewAppointment(appointment) {
 
 exports.createNewAppointment = createNewAppointment;
 
-},{"../constants/action-types":131,"../utils/appointments-api":141,"../utils/clinics-api":142,"../utils/doctors-api":143,"../utils/user-api":144,"js-cookie":38}],107:[function(require,module,exports){
+},{"../constants/action-types":132,"../utils/appointments-api":143,"../utils/clinics-api":144,"../utils/doctors-api":145,"../utils/user-api":146,"js-cookie":38}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42447,7 +42493,7 @@ var cancelAppointment = function cancelAppointment(orderNumber) {
 
 exports.cancelAppointment = cancelAppointment;
 
-},{"../constants/action-types":131,"../utils/appointments-api":141,"../utils/clinics-api":142,"../utils/doctors-api":143,"js-cookie":38}],108:[function(require,module,exports){
+},{"../constants/action-types":132,"../utils/appointments-api":143,"../utils/clinics-api":144,"../utils/doctors-api":145,"js-cookie":38}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42507,7 +42553,7 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":131,"../utils/clinics-api":142}],109:[function(require,module,exports){
+},{"../constants/action-types":132,"../utils/clinics-api":144}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42691,7 +42737,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Acc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":126,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],110:[function(require,module,exports){
+},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42714,7 +42760,7 @@ var App = function App() {
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":121,"./Header":122,"./Main":125}],111:[function(require,module,exports){
+},{"./Footer":122,"./Header":123,"./Main":126}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43720,7 +43766,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":126,"prop-types":48,"react-redux":70,"redux":89}],117:[function(require,module,exports){
+},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"redux":89}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43731,6 +43777,8 @@ exports["default"] = void 0;
 var _account = require("../actions/account");
 
 var _redux = require("redux");
+
+var _reactRouterDom = require("react-router-dom");
 
 var _reactRedux = require("react-redux");
 
@@ -43842,7 +43890,10 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         className: "doctor-account-page account-page page-container"
       }, React.createElement("p", null, this.props.error), account ? React.createElement(React.Fragment, null, React.createElement("h1", {
         className: "page-title"
-      }, account.title, ". ", account.firstName, " ", account.lastName), React.createElement("div", {
+      }, account.title, ". ", account.firstName, " ", account.lastName), React.createElement(_reactRouterDom.Link, {
+        to: "/doctor-account/settings",
+        className: "account-settings"
+      }, "Settings"), React.createElement("div", {
         className: "doctor-details"
       }, React.createElement("p", null, "Specialisation: ", account.categoryName), React.createElement("p", null, "Room: ", account.room))) : null, React.createElement("section", {
         className: "data-section"
@@ -43954,7 +44005,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":126,"moment":40,"prop-types":48,"react-redux":70,"redux":89}],118:[function(require,module,exports){
+},{"../actions/account":106,"./Modal":127,"moment":40,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44108,7 +44159,228 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":126,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],119:[function(require,module,exports){
+},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],119:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _account = require("../actions/account");
+
+var _redux = require("redux");
+
+var _reactRedux = require("react-redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _Modal = _interopRequireDefault(require("./Modal"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var DoctorSettings = /*#__PURE__*/function (_React$Component) {
+  _inherits(DoctorSettings, _React$Component);
+
+  function DoctorSettings(props) {
+    var _this;
+
+    _classCallCheck(this, DoctorSettings);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DoctorSettings).call(this));
+    _this.state = {
+      isModalDisplayed: false,
+      newAddress: null
+    };
+    _this.addNewAddress = _this.addNewAddress.bind(_assertThisInitialized(_this));
+    _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_this));
+    _this.openAddNewAddressModal = _this.openAddNewAddressModal.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(DoctorSettings, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.getAddressList(); // load account data
+
+      if (!this.props.clinicName) {
+        this.props.loadAccount();
+      }
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.state.isModalDisplayed && this.props.addressList.length !== prevProps.addressList.length) {
+        this.closeModal();
+      }
+    }
+  }, {
+    key: "openAddNewAddressModal",
+    value: function openAddNewAddressModal() {
+      this.setState({
+        isModalDisplayed: true
+      });
+    }
+  }, {
+    key: "addNewAddress",
+    value: function addNewAddress(event) {
+      event.preventDefault();
+      this.props.addNewAddress(this.state.newAddress);
+    }
+  }, {
+    key: "closeModal",
+    value: function closeModal() {
+      this.setState({
+        newAddress: null,
+        isModalDisplayed: false
+      });
+      this.resetForm();
+    }
+  }, {
+    key: "resetForm",
+    value: function resetForm() {
+      this.addNewAddressForm.reset();
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          newAddress: _objectSpread({}, prevState.newAddress, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      var account = this.props.account;
+      var doctorName = account && "".concat(account.title, ". ").concat(account.firstName, " ").concat(account.lastName);
+      return React.createElement("main", {
+        className: "account-page page-container"
+      }, React.createElement("ul", {
+        className: "breadcrumbs"
+      }, React.createElement("li", null, React.createElement("a", {
+        href: "/doctor-account"
+      }, doctorName), React.createElement("span", {
+        className: "separator"
+      }, ">")), React.createElement("li", null, "Settings")), React.createElement("h1", {
+        className: "page-title"
+      }, "Settings"), React.createElement("section", {
+        className: "address-cover data-section"
+      }, React.createElement("header", {
+        className: "data-section-header"
+      }, React.createElement("h2", {
+        className: "data-section-title"
+      }, "Address Cover"), React.createElement("button", {
+        className: "data-section-btn",
+        onClick: this.openAddNewAddressModal
+      }, "Add")), React.createElement("p", {
+        className: "error"
+      }, this.props.error), this.props.addressList && this.props.addressList.length && React.createElement("table", {
+        className: "data-table"
+      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Place"), React.createElement("th", null, "Street"), React.createElement("th", null, "Buildings"))), React.createElement("tbody", null, this.props.addressList.map(function (address, index) {
+        return React.createElement("tr", {
+          key: index
+        }, React.createElement("td", null, address.place), React.createElement("td", null, address.street), React.createElement("td", null, address.buildings));
+      })))), this.state.isModalDisplayed ? React.createElement(_Modal["default"], {
+        title: "Add New Address",
+        onClose: this.closeModal
+      }, React.createElement("p", null, "Please add the details of doctor's service address. Several buildings can be separated with a comma."), React.createElement("form", {
+        ref: function ref(el) {
+          return _this2.addNewAddressForm = el;
+        },
+        onSubmit: this.addNewAddress
+      }, React.createElement("input", {
+        type: "text",
+        name: "place",
+        placeholder: "Place",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "text",
+        name: "street",
+        placeholder: "Street",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "text",
+        name: "buildings",
+        placeholder: "Buildings",
+        onChange: this.onChange
+      }), React.createElement("input", {
+        type: "submit",
+        value: "Add"
+      }))) : null);
+    }
+  }]);
+
+  return DoctorSettings;
+}(React.Component);
+
+DoctorSettings.propTypes = {
+  addressList: _propTypes["default"].arrayOf(_propTypes["default"].object),
+  getAddressList: _propTypes["default"].func,
+  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object])
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var signIn = _ref.signIn,
+      doctorSettings = _ref.doctorSettings;
+  return {
+    account: signIn.account,
+    addressList: doctorSettings.addressList,
+    error: doctorSettings.error
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    getAddressList: function getAddressList() {
+      return (0, _account.getDoctorAddressList)();
+    },
+    loadAccount: function loadAccount() {
+      return (0, _account.loadAccount)();
+    },
+    addNewAddress: function addNewAddress(details) {
+      return (0, _account.addNewDoctorAddress)(details);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(DoctorSettings);
+
+exports["default"] = _default;
+
+},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"redux":89}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44358,7 +44630,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./DoctorsList":120,"./Modal":126,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],120:[function(require,module,exports){
+},{"../actions/account":106,"./DoctorsList":121,"./Modal":127,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44422,7 +44694,7 @@ DoctorsList.propTypes = {
 var _default = DoctorsList;
 exports["default"] = _default;
 
-},{"prop-types":48}],121:[function(require,module,exports){
+},{"prop-types":48}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44439,7 +44711,7 @@ var Footer = function Footer() {
 var _default = Footer;
 exports["default"] = _default;
 
-},{}],122:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44460,7 +44732,7 @@ var Header = function Header() {
 var _default = Header;
 exports["default"] = _default;
 
-},{"./Logout":124}],123:[function(require,module,exports){
+},{"./Logout":125}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44489,7 +44761,7 @@ var Home = function Home() {
 var _default = Home;
 exports["default"] = _default;
 
-},{"react-router-dom":81}],124:[function(require,module,exports){
+},{"react-router-dom":81}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44561,7 +44833,7 @@ var _default = (0, _reactRouterDom.withRouter)(Logout);
 
 exports["default"] = _default;
 
-},{"js-cookie":38,"react-redux":70,"react-router-dom":81}],125:[function(require,module,exports){
+},{"js-cookie":38,"react-redux":70,"react-router-dom":81}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44586,6 +44858,8 @@ var _SignIn = _interopRequireDefault(require("./SignIn"));
 var _AcceptInvitation = _interopRequireDefault(require("./AcceptInvitation"));
 
 var _ClinicSettings = _interopRequireDefault(require("./ClinicSettings"));
+
+var _DoctorSettings = _interopRequireDefault(require("./DoctorSettings"));
 
 var _NewAppointment = _interopRequireDefault(require("./NewAppointment"));
 
@@ -44647,13 +44921,16 @@ var Main = function Main() {
     exact: true,
     path: "/doctor-account",
     component: _DoctorAccount["default"]
+  }), React.createElement(_reactRouterDom.Route, {
+    path: '/doctor-account/settings',
+    component: _DoctorSettings["default"]
   }));
 };
 
 var _default = Main;
 exports["default"] = _default;
 
-},{"./AcceptInvitation":109,"./AvailableAppointments":111,"./CancelAppointment":112,"./ClinicAccountPage":113,"./ClinicDoctorCategories":114,"./ClinicRegistration":115,"./ClinicSettings":116,"./DoctorAccount":117,"./DoctorsCategory":119,"./Home":123,"./NewAppointment":127,"./NewAppointmentComplete":128,"./SignIn":129,"react-router-dom":81}],126:[function(require,module,exports){
+},{"./AcceptInvitation":109,"./AvailableAppointments":111,"./CancelAppointment":112,"./ClinicAccountPage":113,"./ClinicDoctorCategories":114,"./ClinicRegistration":115,"./ClinicSettings":116,"./DoctorAccount":117,"./DoctorSettings":119,"./DoctorsCategory":120,"./Home":124,"./NewAppointment":128,"./NewAppointmentComplete":129,"./SignIn":130,"react-router-dom":81}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44718,7 +44995,7 @@ Modal.propTypes = {
 var _default = Modal;
 exports["default"] = _default;
 
-},{"prop-types":48}],127:[function(require,module,exports){
+},{"prop-types":48}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44886,7 +45163,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(New
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],128:[function(require,module,exports){
+},{"../actions/appointments":107,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45062,7 +45339,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(New
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"redux":89}],129:[function(require,module,exports){
+},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"redux":89}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45260,23 +45537,26 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],130:[function(require,module,exports){
+},{"../actions/account":106,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],131:[function(require,module,exports){
+(function (process){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.API_URL = void 0;
-var API_URL = 'https://appointment-by-api.herokuapp.com';
+var API_URL = process.env.REACT_APP_STAGE === 'prod' ? 'https://appointment-by-api.herokuapp.com' : 'http://localhost:3000';
 exports.API_URL = API_URL;
 
-},{}],131:[function(require,module,exports){
+}).call(this,require('_process'))
+
+},{"_process":44}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_ADDRESS_LIST_ERROR = exports.GET_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -45327,10 +45607,14 @@ var CHECK_INVITATION_TOKEN_SUCCESS = 'CHECK_INVITATION_TOKEN_SUCCESS';
 exports.CHECK_INVITATION_TOKEN_SUCCESS = CHECK_INVITATION_TOKEN_SUCCESS;
 var CHECK_INVITATION_TOKEN_ERROR = 'CHECK_INVITATION_TOKEN_ERROR';
 exports.CHECK_INVITATION_TOKEN_ERROR = CHECK_INVITATION_TOKEN_ERROR;
-var GET_ADDRESS_LIST_SUCCESS = 'GET_ADDRESS_LIST_SUCCESS';
-exports.GET_ADDRESS_LIST_SUCCESS = GET_ADDRESS_LIST_SUCCESS;
-var GET_ADDRESS_LIST_ERROR = 'GET_ADDRESS_LIST_ERROR';
-exports.GET_ADDRESS_LIST_ERROR = GET_ADDRESS_LIST_ERROR;
+var GET_CLINIC_ADDRESS_LIST_SUCCESS = 'GET_CLINIC_ADDRESS_LIST_SUCCESS';
+exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = GET_CLINIC_ADDRESS_LIST_SUCCESS;
+var GET_CLINIC_ADDRESS_LIST_ERROR = 'GET_CLINIC_ADDRESS_LIST_ERROR';
+exports.GET_CLINIC_ADDRESS_LIST_ERROR = GET_CLINIC_ADDRESS_LIST_ERROR;
+var GET_DOCTOR_ADDRESS_LIST_SUCCESS = 'GET_DOCTOR_ADDRESS_LIST_SUCCESS';
+exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = GET_DOCTOR_ADDRESS_LIST_SUCCESS;
+var GET_DOCTOR_ADDRESS_LIST_ERROR = 'GET_DOCTOR_ADDRESS_LIST_ERROR';
+exports.GET_DOCTOR_ADDRESS_LIST_ERROR = GET_DOCTOR_ADDRESS_LIST_ERROR;
 var LOAD_DOCTOR_APPOINTMENT_SUCCESS = 'LOAD_DOCTOR_APPOINTMENT_SUCCESS';
 exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = LOAD_DOCTOR_APPOINTMENT_SUCCESS;
 var LOAD_DOCTOR_APPOINTMENT_ERROR = 'LOAD_DOCTOR_APPOINTMENT_ERROR';
@@ -45358,7 +45642,7 @@ exports.CANCEL_APPOINTMENT_SUCCESS = CANCEL_APPOINTMENT_SUCCESS;
 var CANCEL_APPOINTMENT_ERROR = 'CANCEL_APPOINTMENT_ERROR';
 exports.CANCEL_APPOINTMENT_ERROR = CANCEL_APPOINTMENT_ERROR;
 
-},{}],132:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -45377,7 +45661,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":110,"./store":140,"react-dom":52,"react-redux":70,"react-router-dom":81}],133:[function(require,module,exports){
+},{"./components/App":110,"./store":142,"react-dom":52,"react-redux":70,"react-router-dom":81}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45476,7 +45760,7 @@ var appointmentsReducer = function appointmentsReducer() {
 var _default = appointmentsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":131}],134:[function(require,module,exports){
+},{"../constants/action-types":132}],135:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45533,7 +45817,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":131}],135:[function(require,module,exports){
+},{"../constants/action-types":132}],136:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45559,12 +45843,12 @@ var clinicSettingsReducer = function clinicSettingsReducer() {
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
-    case _actionTypes.GET_ADDRESS_LIST_SUCCESS:
+    case _actionTypes.GET_CLINIC_ADDRESS_LIST_SUCCESS:
       return _objectSpread({}, state, {
         addressList: action.payload.addressList
       });
 
-    case _actionTypes.GET_ADDRESS_LIST_ERROR:
+    case _actionTypes.GET_CLINIC_ADDRESS_LIST_ERROR:
       return _objectSpread({}, state, {
         error: action.payload.error
       });
@@ -45577,7 +45861,7 @@ var clinicSettingsReducer = function clinicSettingsReducer() {
 var _default = clinicSettingsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":131}],136:[function(require,module,exports){
+},{"../constants/action-types":132}],137:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45622,7 +45906,7 @@ var doctorAppointmentsReducer = function doctorAppointmentsReducer() {
 var _default = doctorAppointmentsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":131}],137:[function(require,module,exports){
+},{"../constants/action-types":132}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45741,7 +46025,51 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 var _default = doctorCategoriesReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":131}],138:[function(require,module,exports){
+},{"../constants/action-types":132}],139:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _actionTypes = require("../constants/action-types");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var initialState = {
+  error: '',
+  addressList: []
+};
+
+var doctorSettingsReducer = function doctorSettingsReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case _actionTypes.GET_DOCTOR_ADDRESS_LIST_SUCCESS:
+      return _objectSpread({}, state, {
+        addressList: action.payload.addressList
+      });
+
+    case _actionTypes.GET_DOCTOR_ADDRESS_LIST_ERROR:
+      return _objectSpread({}, state, {
+        error: action.payload.error
+      });
+
+    default:
+      return state;
+  }
+};
+
+var _default = doctorSettingsReducer;
+exports["default"] = _default;
+
+},{"../constants/action-types":132}],140:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45759,6 +46087,8 @@ var _doctorCategories = _interopRequireDefault(require("./doctor-categories"));
 
 var _clinicSettings = _interopRequireDefault(require("./clinic-settings"));
 
+var _doctorSettings = _interopRequireDefault(require("./doctor-settings"));
+
 var _doctorAppointments = _interopRequireDefault(require("./doctor-appointments"));
 
 var _appointments = _interopRequireDefault(require("./appointments"));
@@ -45770,13 +46100,14 @@ var rootReducer = (0, _redux.combineReducers)({
   signIn: _signIn["default"],
   doctorCategories: _doctorCategories["default"],
   clinicSettings: _clinicSettings["default"],
+  doctorSettings: _doctorSettings["default"],
   doctorAppointments: _doctorAppointments["default"],
   appointments: _appointments["default"]
 });
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./appointments":133,"./clinic-registration":134,"./clinic-settings":135,"./doctor-appointments":136,"./doctor-categories":137,"./sign-in":139,"redux":89}],139:[function(require,module,exports){
+},{"./appointments":134,"./clinic-registration":135,"./clinic-settings":136,"./doctor-appointments":137,"./doctor-categories":138,"./doctor-settings":139,"./sign-in":141,"redux":89}],141:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45849,7 +46180,7 @@ var signInReducer = function signInReducer() {
 var _default = signInReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":131}],140:[function(require,module,exports){
+},{"../constants/action-types":132}],142:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45869,7 +46200,7 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":138,"redux":89,"redux-thunk":88}],141:[function(require,module,exports){
+},{"./reducers/root":140,"redux":89,"redux-thunk":88}],143:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45939,7 +46270,7 @@ var requestCancelAppointment = function requestCancelAppointment(orderNumber) {
 
 exports.requestCancelAppointment = requestCancelAppointment;
 
-},{"../config.js":130,"axios":7,"js-cookie":38}],142:[function(require,module,exports){
+},{"../config.js":131,"axios":7,"js-cookie":38}],144:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45982,7 +46313,7 @@ var searchClinicByHomeAddress = function searchClinicByHomeAddress(params) {
 exports.searchClinicByHomeAddress = searchClinicByHomeAddress;
 
 var getClinicAddressCover = function getClinicAddressCover() {
-  return _axios["default"].get(_config.API_URL + '/address-cover', {
+  return _axios["default"].get(_config.API_URL + '/clnic-address-cover', {
     headers: {
       'x-access-token': getAuthToken()
     }
@@ -45992,7 +46323,7 @@ var getClinicAddressCover = function getClinicAddressCover() {
 exports.getClinicAddressCover = getClinicAddressCover;
 
 var addNewClinicAddress = function addNewClinicAddress(details) {
-  return _axios["default"].post(_config.API_URL + '/address-cover', _objectSpread({}, details), {
+  return _axios["default"].post(_config.API_URL + '/clinic-address-cover', _objectSpread({}, details), {
     headers: {
       'x-access-token': getAuthToken()
     }
@@ -46001,13 +46332,13 @@ var addNewClinicAddress = function addNewClinicAddress(details) {
 
 exports.addNewClinicAddress = addNewClinicAddress;
 
-},{"../config.js":130,"axios":7,"js-cookie":38}],143:[function(require,module,exports){
+},{"../config.js":131,"axios":7,"js-cookie":38}],145:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.requestInvitationTokenCheck = exports.updateDoctorsAccount = exports.sendDoctorInvitation = exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
+exports.addNewDoctorAddressCover = exports.getDoctorAddressCover = exports.requestInvitationTokenCheck = exports.updateDoctorsAccount = exports.sendDoctorInvitation = exports.getDoctors = exports.getDoctorCategory = exports.getDoctorCategories = exports.addNewCategory = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -46016,6 +46347,12 @@ var _config = require("../config.js");
 var _jsCookie = _interopRequireDefault(require("js-cookie"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var DOCTOR_CATEGORIES_API_URL = _config.API_URL + '/doctor-categories';
 
@@ -46104,7 +46441,27 @@ var requestInvitationTokenCheck = function requestInvitationTokenCheck(token) {
 
 exports.requestInvitationTokenCheck = requestInvitationTokenCheck;
 
-},{"../config.js":130,"axios":7,"js-cookie":38}],144:[function(require,module,exports){
+var getDoctorAddressCover = function getDoctorAddressCover() {
+  return _axios["default"].get(_config.API_URL + '/doctor-address-cover', {
+    headers: {
+      'x-access-token': getAuthToken()
+    }
+  });
+};
+
+exports.getDoctorAddressCover = getDoctorAddressCover;
+
+var addNewDoctorAddressCover = function addNewDoctorAddressCover(details) {
+  return _axios["default"].post(_config.API_URL + '/doctor-address-cover', _objectSpread({}, details), {
+    headers: {
+      'x-access-token': getAuthToken()
+    }
+  });
+};
+
+exports.addNewDoctorAddressCover = addNewDoctorAddressCover;
+
+},{"../config.js":131,"axios":7,"js-cookie":38}],146:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46142,6 +46499,6 @@ var requestAccountData = function requestAccountData() {
 
 exports.requestAccountData = requestAccountData;
 
-},{"../config.js":130,"axios":7,"js-cookie":38}]},{},[132])
+},{"../config.js":131,"axios":7,"js-cookie":38}]},{},[133])
 
 //# sourceMappingURL=bundle.js.map

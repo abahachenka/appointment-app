@@ -5,9 +5,11 @@ import {
     getDoctorCategories, 
     getDoctorCategory,
     getDoctors,
+    getDoctorAddressCover,
     sendDoctorInvitation,
     updateDoctorsAccount,
-    requestInvitationTokenCheck
+    requestInvitationTokenCheck,
+    addNewDoctorAddressCover
 } from '../utils/doctors-api';
 
 import {
@@ -42,8 +44,10 @@ import {
     ACTIVATION_ACCOUNT_ERROR,
     CHECK_INVITATION_TOKEN_SUCCESS,
     CHECK_INVITATION_TOKEN_ERROR,
-    GET_ADDRESS_LIST_SUCCESS,
-    GET_ADDRESS_LIST_ERROR,
+    GET_CLINIC_ADDRESS_LIST_SUCCESS,
+    GET_CLINIC_ADDRESS_LIST_ERROR,
+    GET_DOCTOR_ADDRESS_LIST_SUCCESS,
+    GET_DOCTOR_ADDRESS_LIST_ERROR,
     LOAD_DOCTOR_APPOINTMENT_SUCCESS,
     LOAD_DOCTOR_APPOINTMENT_ERROR
 } from '../constants/action-types';
@@ -170,14 +174,28 @@ export const sendInvitationError = (error) => ({
 });
 
 export const getAddressListSuccess = (addressList) => ({
-    type: GET_ADDRESS_LIST_SUCCESS,
+    type: GET_CLINIC_ADDRESS_LIST_SUCCESS,
     payload: {
         addressList
     }
 });
 
 export const getAddressListError = (error) => ({
-    type: GET_ADDRESS_LIST_ERROR,
+    type: GET_CLINIC_ADDRESS_LIST_ERROR,
+    payload: {
+        error
+    }
+});
+
+export const getDoctorAddressListSuccess = (addressList) => ({
+    type: GET_DOCTOR_ADDRESS_LIST_SUCCESS,
+    payload: {
+        addressList
+    }
+});
+
+export const getDoctorAddressListError = (error) => ({
+    type: GET_DOCTOR_ADDRESS_LIST_ERROR,
     payload: {
         error
     }
@@ -353,11 +371,35 @@ export const getAddressList = () => {
     }
 }
 
+export const getDoctorAddressList = () => {
+    return dispatch => {
+        getDoctorAddressCover()
+            .then(resp => {
+                dispatch(getDoctorAddressListSuccess(resp.data));
+            })
+            .catch(err => {
+                dispatch(getDoctorAddressListError(err));
+            });
+    }
+}
+
 export const addNewAddress = (details) => {
     return dispatch => {
         addNewClinicAddress(details)
             .then((resp) => {
                 dispatch(getAddressList());
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+}
+
+export const addNewDoctorAddress = (details) => {
+    return dispatch => {
+        addNewDoctorAddressCover(details)
+            .then((resp) => {
+                dispatch(getDoctorAddressList());
             })
             .catch(err => {
                 console.log(err);
