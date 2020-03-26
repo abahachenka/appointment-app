@@ -13,6 +13,9 @@ class AvailableAppointments extends React.Component {
         this.getDays = this.getDays.bind(this);
         this.drawAppointment = this.drawAppointment.bind(this);
         this.drawAppointmentsList = this.drawAppointmentsList.bind(this);
+        this.drawFilters = this.drawFilters.bind(this);
+        this.showDistrictDoctorAppointments = this.showDistrictDoctorAppointments.bind(this);
+        this.showAllAppointments = this.showAllAppointments.bind(this);
     }
 
     componentDidMount() {
@@ -100,7 +103,34 @@ class AvailableAppointments extends React.Component {
 
         return html;
     }
- 
+
+    showDistrictDoctorAppointments() {
+        this.props.loadAppointments({district: true});
+    }
+
+    showAllAppointments() {
+        this.props.loadAppointments();
+    }
+
+    drawFilters() {
+        return (
+            <div className="doctor-filters-wrapper">
+                <div className="doctor-filter">
+                    <label>
+                        <input type="radio" name="doctorFilter" defaultChecked onClick={this.showAllAppointments} />All Doctors
+                    </label>
+                </div>
+
+                <div className="doctor-filter">
+                    <label>
+                        <input type="radio" name="doctorFilter" onClick={this.showDistrictDoctorAppointments} />My District Doctor
+                    </label>
+                    <p className="doctor-filter-hint">Your district doctor is automatically determined according to your home address</p>
+                </div>
+            </div>
+        )
+    } 
+
     drawCalendar() {
         const years = Object.keys(this.appointmentsTree);
         const calendarMonthsLabels = [];
@@ -129,26 +159,31 @@ class AvailableAppointments extends React.Component {
         const appointments = this.props.appointments.slice().sort((a,b) => {
             return new Date(a.datetime) - new Date(b.datetime);
         });
+        const currentPath = this.props.location.pathname.split('/').pop();
+        const categoryNeedsFiltres = this.props.categoriesWithFilters.indexOf(currentPath) !== -1;
 
         this.formatAppointments(appointments);
 
         return (
             <main className="page-container">
-                <h1 className="page-title">Please, select an available option</h1>
-
-                {appointments && appointments.length && this.drawCalendar()}
+                <h1 className="page-title">Please, select an available option.</h1>
+                {categoryNeedsFiltres ? this.drawFilters() : null}
+                {appointments && appointments.length ? this.drawCalendar() : (
+                    <p>Sorry. No appointments are available at the moment.</p>
+                )}
             </main>
         )
     }
 };
 
 const mapStateToProps = ({appointments}) => ({
+    categoriesWithFilters: appointments.categoriesWithFilters,
     appointments: appointments.doctorAppointments,
     error: appointments.doctorAppointmentsError
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    loadAppointments: () => loadAppointments(),
+    loadAppointments: (filter) => loadAppointments(filter),
     saveAppointment: (appointment) => saveAppointment(appointment)
 }, dispatch);
 

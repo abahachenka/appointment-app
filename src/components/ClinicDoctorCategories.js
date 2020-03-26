@@ -21,7 +21,7 @@ class ClinicDoctorCategories extends React.Component {
         return (
             <main className="page-container">
                 <h1 className="page-title">What kind of doctor do you need to visit?</h1>
-                {this.props.categories && this.props.categories.length && (
+                {this.props.categories && this.props.categories.length ? (
                     <ul className="doctor-specialisations-list category-list">
                         {this.props.categories.map((category, index) => {
                             return (
@@ -35,7 +35,7 @@ class ClinicDoctorCategories extends React.Component {
                             )
                         })}
                     </ul>
-                )}
+                ): null}
             </main>
         )
     }

@@ -139,10 +139,16 @@ export const saveDoctorCategory = (categoryId) => {
     }
 }
 
-export const loadAppointments = () => {
+export const loadAppointments = (filter) => {
     return dispatch => {
         const categoryId = Cookies.get('newAppointmentCategoryId');
-        getDoctorAppointments(categoryId)
+        let address = '';
+
+        if (filter) {
+            address = Cookies.get('userAddress');
+        }
+
+        getDoctorAppointments(categoryId, address)
             .then(resp => {
                 dispatch(loadAppointmentsSuccess(resp.data));
             })

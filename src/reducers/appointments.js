@@ -23,7 +23,12 @@ const initialState = {
     registrationCode: '',
     registrationError: '',
     cancelError: '',
-    isAppointmentCancelled: false
+    isAppointmentCancelled: false,
+    categoriesWithFilters: [
+        'dentist',
+        'therapist',
+        'gynaecologist'
+    ]
 };
 
 const appointmentsReducer = (state = initialState, action) => {

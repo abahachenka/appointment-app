@@ -49,7 +49,7 @@ class NewAppointment extends React.Component {
                     <p class="error">{this.props.error}</p>
                 )}
 
-                {this.props.clinics.length && (
+                {this.props.clinics.length ? (
                     <section className="search-results">
                         <h2 className="page-subtitle">Search results</h2>
                         <ul className="search-results-list category-list">
@@ -66,7 +66,7 @@ class NewAppointment extends React.Component {
                             })}
                         </ul>
                     </section>
-                )}
+                ) : null}
             </main>
         )
     }

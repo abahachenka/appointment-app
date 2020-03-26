@@ -6,7 +6,7 @@ const APPOINTMENTS_URL = API_URL + '/appointments';
 
 const getAuthToken = () => Cookies.get('token');
 
-export const getDoctorAppointments = (categoryId) => {
+export const getDoctorAppointments = (categoryId, filter) => {
     let options = {
         headers: {
             'x-access-token': getAuthToken()
@@ -17,6 +17,10 @@ export const getDoctorAppointments = (categoryId) => {
         options.params = {
             categoryId
         };
+    }
+
+    if (filter) {
+        options.params = {...options.params, filter};
     }
 
     return axios.get(APPOINTMENTS_URL, options);

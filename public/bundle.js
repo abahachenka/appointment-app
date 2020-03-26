@@ -42455,11 +42455,17 @@ var saveDoctorCategory = function saveDoctorCategory(categoryId) {
 
 exports.saveDoctorCategory = saveDoctorCategory;
 
-var loadAppointments = function loadAppointments() {
+var loadAppointments = function loadAppointments(filter) {
   return function (dispatch) {
     var categoryId = _jsCookie["default"].get('newAppointmentCategoryId');
 
-    (0, _appointmentsApi.getDoctorAppointments)(categoryId).then(function (resp) {
+    var address = '';
+
+    if (filter) {
+      address = _jsCookie["default"].get('userAddress');
+    }
+
+    (0, _appointmentsApi.getDoctorAppointments)(categoryId, address).then(function (resp) {
       dispatch(loadAppointmentsSuccess(resp.data));
     })["catch"](function (err) {
       dispatch(loadAppointmentsError(err));
@@ -42812,6 +42818,9 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
     _this.getDays = _this.getDays.bind(_assertThisInitialized(_this));
     _this.drawAppointment = _this.drawAppointment.bind(_assertThisInitialized(_this));
     _this.drawAppointmentsList = _this.drawAppointmentsList.bind(_assertThisInitialized(_this));
+    _this.drawFilters = _this.drawFilters.bind(_assertThisInitialized(_this));
+    _this.showDistrictDoctorAppointments = _this.showDistrictDoctorAppointments.bind(_assertThisInitialized(_this));
+    _this.showAllAppointments = _this.showAllAppointments.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -42905,6 +42914,40 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       return html;
     }
   }, {
+    key: "showDistrictDoctorAppointments",
+    value: function showDistrictDoctorAppointments() {
+      this.props.loadAppointments({
+        district: true
+      });
+    }
+  }, {
+    key: "showAllAppointments",
+    value: function showAllAppointments() {
+      this.props.loadAppointments();
+    }
+  }, {
+    key: "drawFilters",
+    value: function drawFilters() {
+      return React.createElement("div", {
+        className: "doctor-filters-wrapper"
+      }, React.createElement("div", {
+        className: "doctor-filter"
+      }, React.createElement("label", null, React.createElement("input", {
+        type: "radio",
+        name: "doctorFilter",
+        defaultChecked: true,
+        onClick: this.showAllAppointments
+      }), "All Doctors")), React.createElement("div", {
+        className: "doctor-filter"
+      }, React.createElement("label", null, React.createElement("input", {
+        type: "radio",
+        name: "doctorFilter",
+        onClick: this.showDistrictDoctorAppointments
+      }), "My District Doctor"), React.createElement("p", {
+        className: "doctor-filter-hint"
+      }, "Your district doctor is automatically determined according to your home address")));
+    }
+  }, {
     key: "drawCalendar",
     value: function drawCalendar() {
       var _this5 = this;
@@ -42932,12 +42975,14 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       var appointments = this.props.appointments.slice().sort(function (a, b) {
         return new Date(a.datetime) - new Date(b.datetime);
       });
+      var currentPath = this.props.location.pathname.split('/').pop();
+      var categoryNeedsFiltres = this.props.categoriesWithFilters.indexOf(currentPath) !== -1;
       this.formatAppointments(appointments);
       return React.createElement("main", {
         className: "page-container"
       }, React.createElement("h1", {
         className: "page-title"
-      }, "Please, select an available option"), appointments && appointments.length && this.drawCalendar());
+      }, "Please, select an available option."), categoryNeedsFiltres ? this.drawFilters() : null, appointments && appointments.length ? this.drawCalendar() : React.createElement("p", null, "Sorry. No appointments are available at the moment."));
     }
   }]);
 
@@ -42949,6 +42994,7 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
 var mapStateToProps = function mapStateToProps(_ref) {
   var appointments = _ref.appointments;
   return {
+    categoriesWithFilters: appointments.categoriesWithFilters,
     appointments: appointments.doctorAppointments,
     error: appointments.doctorAppointmentsError
   };
@@ -42956,8 +43002,8 @@ var mapStateToProps = function mapStateToProps(_ref) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
-    loadAppointments: function loadAppointments() {
-      return (0, _appointments.loadAppointments)();
+    loadAppointments: function loadAppointments(filter) {
+      return (0, _appointments.loadAppointments)(filter);
     },
     saveAppointment: function saveAppointment(appointment) {
       return (0, _appointments.saveAppointment)(appointment);
@@ -43280,7 +43326,7 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
         className: "page-container"
       }, React.createElement("h1", {
         className: "page-title"
-      }, "What kind of doctor do you need to visit?"), this.props.categories && this.props.categories.length && React.createElement("ul", {
+      }, "What kind of doctor do you need to visit?"), this.props.categories && this.props.categories.length ? React.createElement("ul", {
         className: "doctor-specialisations-list category-list"
       }, this.props.categories.map(function (category, index) {
         return React.createElement("li", {
@@ -43289,7 +43335,7 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
           to: _this.props.location.pathname + '/' + category.categoryAlias,
           onClick: _this.saveCategory.bind(_this, event, category._id)
         }, category.categoryName));
-      })));
+      })) : null);
     }
   }]);
 
@@ -45112,7 +45158,7 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
         value: "Search"
       })), this.props.error && React.createElement("p", {
         "class": "error"
-      }, this.props.error), this.props.clinics.length && React.createElement("section", {
+      }, this.props.error), this.props.clinics.length ? React.createElement("section", {
         className: "search-results"
       }, React.createElement("h2", {
         className: "page-subtitle"
@@ -45127,7 +45173,7 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
           to: url,
           onClick: _this2.memorizeClinic.bind(_this2, event, clinic._id)
         }, clinic.name), clinic.address && React.createElement("p", null, "Address: ", clinic.address), clinic.phoneNumber && React.createElement("p", null, "Phone Number: ", clinic.phoneNumber));
-      }))));
+      }))) : null);
     }
   }]);
 
@@ -45694,7 +45740,8 @@ var initialState = {
   registrationCode: '',
   registrationError: '',
   cancelError: '',
-  isAppointmentCancelled: false
+  isAppointmentCancelled: false,
+  categoriesWithFilters: ['dentist', 'therapist', 'gynaecologist']
 };
 
 var appointmentsReducer = function appointmentsReducer() {
@@ -46234,7 +46281,7 @@ var getAuthToken = function getAuthToken() {
   return _jsCookie["default"].get('token');
 };
 
-var getDoctorAppointments = function getDoctorAppointments(categoryId) {
+var getDoctorAppointments = function getDoctorAppointments(categoryId, filter) {
   var options = {
     headers: {
       'x-access-token': getAuthToken()
@@ -46245,6 +46292,12 @@ var getDoctorAppointments = function getDoctorAppointments(categoryId) {
     options.params = {
       categoryId: categoryId
     };
+  }
+
+  if (filter) {
+    options.params = _objectSpread({}, options.params, {
+      filter: filter
+    });
   }
 
   return _axios["default"].get(APPOINTMENTS_URL, options);
