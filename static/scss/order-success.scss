@@ -36,3 +36,20 @@
     }
 }
 
+.new-appointment-finish {
+    text-align: center;
+    
+    a {
+        padding: 10px 30px;
+        background: $primary;
+        color: $white;
+        line-height: 1;
+        text-decoration: none;
+        display: inline-block;
+
+        &:hover {
+            background: $primary-hover;
+        }
+    }
+}
+

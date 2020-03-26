@@ -240,6 +240,18 @@
     color: #00b900;
     font-weight: bold; }
 
+.new-appointment-finish {
+  text-align: center; }
+  .new-appointment-finish a {
+    padding: 10px 30px;
+    background: #4784EB;
+    color: #fff;
+    line-height: 1;
+    text-decoration: none;
+    display: inline-block; }
+    .new-appointment-finish a:hover {
+      background: #3e79dc; }
+
 .cancel-appointment-form {
   display: flex;
   justify-content: center;

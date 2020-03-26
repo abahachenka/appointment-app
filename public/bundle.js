@@ -45175,6 +45175,8 @@ var _redux = require("redux");
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
+var _reactRouterDom = require("react-router-dom");
+
 var _reactRedux = require("react-redux");
 
 var _appointments = require("../actions/appointments");
@@ -45281,7 +45283,11 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
         className: "order-number"
       }, "Order #", React.createElement("span", null, this.props.registrationCode)), React.createElement("p", {
         className: "order-datetime"
-      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), React.createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), React.createElement("p", null, "Room: ", appointment.doctor.room), React.createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName))) : React.createElement(React.Fragment, null, React.createElement("div", {
+      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), React.createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), React.createElement("p", null, "Room: ", appointment.doctor.room), React.createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName)), React.createElement("p", {
+        className: "new-appointment-finish"
+      }, React.createElement(_reactRouterDom.Link, {
+        to: "/"
+      }, "Finish"))) : React.createElement(React.Fragment, null, React.createElement("div", {
         className: "patient-selection"
       }, React.createElement("h1", {
         className: "patient-selection-label page-title"
@@ -45339,7 +45345,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(New
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"redux":89}],130:[function(require,module,exports){
+},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

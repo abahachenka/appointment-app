@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { completeRegistration } from '../actions/appointments';
 import moment from 'moment';
@@ -76,6 +77,9 @@ class NewAppointmentComplete extends React.Component {
                             <p>Room: {appointment.doctor.room}</p>
                             <p>Patient: {this.state.patient.firstName} {this.state.patient.lastName}</p>
                         </div>
+                        <p className="new-appointment-finish">
+                            <Link to="/">Finish</Link>
+                        </p>
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
