@@ -128,13 +128,13 @@ export const loadDoctorCategories = () => {
 }
 
 export const saveClinic = (clinicId) => {
-    return dispatch => {
+    return () => {
         Cookies.set('newAppointmentClinicId', clinicId);
     }
 }
 
 export const saveDoctorCategory = (categoryId) => {
-    return dispatch => {
+    return () => {
         Cookies.set('newAppointmentCategoryId', categoryId);
     }
 }
@@ -173,7 +173,7 @@ export const completeRegistration = (patient, appointment) => {
 export const cancelAppointment = orderNumber => {
     return dispatch => {
         requestCancelAppointment(orderNumber)
-            .then(resp => {
+            .then(() => {
                 dispatch(cancelAppointmentSuccess());
             })
             .catch(err => {

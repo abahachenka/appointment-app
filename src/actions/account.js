@@ -273,7 +273,7 @@ export const loadAccount = () => {
 export const createNewDoctorCategory = (categoryName) => {
     return dispatch => {
         addNewCategory(categoryName)
-            .then(resp => {
+            .then(() => {
                 dispatch(createNewDoctorCategorySuccess());
                 dispatch(loadDoctorCategories());
             })
@@ -338,7 +338,7 @@ export const sendInvitation = (categoryId, invitation) => {
 export const checkInvitationToken = (token) => {
     return dispatch => {
         requestInvitationTokenCheck(token)
-            .then(resp => {
+            .then(() => {
                 dispatch(checkInvitationTokenSuccess());
             })
             .catch(err => {
@@ -350,7 +350,7 @@ export const checkInvitationToken = (token) => {
 export const activateAccount = (token, password) => {
     return dispatch => {
         updateDoctorsAccount(token, password)
-            .then(resp => {
+            .then(() => {
                 dispatch(activateAccountSuccess());
             })
             .catch(err => {
@@ -386,7 +386,7 @@ export const getDoctorAddressList = () => {
 export const addNewAddress = (details) => {
     return dispatch => {
         addNewClinicAddress(details)
-            .then((resp) => {
+            .then(() => {
                 dispatch(getAddressList());
             })
             .catch(err => {
@@ -398,7 +398,7 @@ export const addNewAddress = (details) => {
 export const addNewDoctorAddress = (details) => {
     return dispatch => {
         addNewDoctorAddressCover(details)
-            .then((resp) => {
+            .then(() => {
                 dispatch(getDoctorAddressList());
             })
             .catch(err => {
@@ -410,7 +410,7 @@ export const addNewDoctorAddress = (details) => {
 export const createNewAppointment = (appointment) => {
     return dispatch => {
         addNewAppointment(appointment)
-            .then((resp) => {
+            .then(() => {
                 dispatch(loadDoctorAppointments());
             })
             .catch(err => {

@@ -42120,7 +42120,7 @@ exports.loadAccount = loadAccount;
 
 var createNewDoctorCategory = function createNewDoctorCategory(categoryName) {
   return function (dispatch) {
-    (0, _doctorsApi.addNewCategory)(categoryName).then(function (resp) {
+    (0, _doctorsApi.addNewCategory)(categoryName).then(function () {
       dispatch(createNewDoctorCategorySuccess());
       dispatch(loadDoctorCategories());
     })["catch"](function (err) {
@@ -42186,7 +42186,7 @@ exports.sendInvitation = sendInvitation;
 
 var checkInvitationToken = function checkInvitationToken(token) {
   return function (dispatch) {
-    (0, _doctorsApi.requestInvitationTokenCheck)(token).then(function (resp) {
+    (0, _doctorsApi.requestInvitationTokenCheck)(token).then(function () {
       dispatch(checkInvitationTokenSuccess());
     })["catch"](function (err) {
       dispatch(checkInvitationTokenError(err));
@@ -42198,7 +42198,7 @@ exports.checkInvitationToken = checkInvitationToken;
 
 var activateAccount = function activateAccount(token, password) {
   return function (dispatch) {
-    (0, _doctorsApi.updateDoctorsAccount)(token, password).then(function (resp) {
+    (0, _doctorsApi.updateDoctorsAccount)(token, password).then(function () {
       dispatch(activateAccountSuccess());
     })["catch"](function (err) {
       dispatch(activateAccountSuccess(err));
@@ -42234,7 +42234,7 @@ exports.getDoctorAddressList = getDoctorAddressList;
 
 var addNewAddress = function addNewAddress(details) {
   return function (dispatch) {
-    (0, _clinicsApi.addNewClinicAddress)(details).then(function (resp) {
+    (0, _clinicsApi.addNewClinicAddress)(details).then(function () {
       dispatch(getAddressList());
     })["catch"](function (err) {
       console.log(err);
@@ -42246,7 +42246,7 @@ exports.addNewAddress = addNewAddress;
 
 var addNewDoctorAddress = function addNewDoctorAddress(details) {
   return function (dispatch) {
-    (0, _doctorsApi.addNewDoctorAddressCover)(details).then(function (resp) {
+    (0, _doctorsApi.addNewDoctorAddressCover)(details).then(function () {
       dispatch(getDoctorAddressList());
     })["catch"](function (err) {
       console.log(err);
@@ -42258,7 +42258,7 @@ exports.addNewDoctorAddress = addNewDoctorAddress;
 
 var createNewAppointment = function createNewAppointment(appointment) {
   return function (dispatch) {
-    (0, _appointmentsApi.addNewAppointment)(appointment).then(function (resp) {
+    (0, _appointmentsApi.addNewAppointment)(appointment).then(function () {
       dispatch(loadDoctorAppointments());
     })["catch"](function (err) {
       console.log(err);
@@ -42440,7 +42440,7 @@ var loadDoctorCategories = function loadDoctorCategories() {
 exports.loadDoctorCategories = loadDoctorCategories;
 
 var saveClinic = function saveClinic(clinicId) {
-  return function (dispatch) {
+  return function () {
     _jsCookie["default"].set('newAppointmentClinicId', clinicId);
   };
 };
@@ -42448,7 +42448,7 @@ var saveClinic = function saveClinic(clinicId) {
 exports.saveClinic = saveClinic;
 
 var saveDoctorCategory = function saveDoctorCategory(categoryId) {
-  return function (dispatch) {
+  return function () {
     _jsCookie["default"].set('newAppointmentCategoryId', categoryId);
   };
 };
@@ -42489,7 +42489,7 @@ exports.completeRegistration = completeRegistration;
 
 var cancelAppointment = function cancelAppointment(orderNumber) {
   return function (dispatch) {
-    (0, _appointmentsApi.requestCancelAppointment)(orderNumber).then(function (resp) {
+    (0, _appointmentsApi.requestCancelAppointment)(orderNumber).then(function () {
       dispatch(cancelAppointmentSuccess());
     })["catch"](function (err) {
       dispatch(cancelAppointmentError(err.message));
@@ -42549,7 +42549,7 @@ exports.resetRegistrationError = resetRegistrationError;
 var registerClinic = function registerClinic(clinic) {
   return function (dispatch) {
     dispatch(registerClinicPending());
-    (0, _clinicsApi.createClinic)(clinic).then(function (resp) {
+    (0, _clinicsApi.createClinic)(clinic).then(function () {
       dispatch(registerClinicSuccess());
     })["catch"](function (err) {
       dispatch(registerClinicError(err.message));
@@ -42566,6 +42566,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -42613,7 +42615,7 @@ var initialState = {
 var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
   _inherits(AcceptInvitation, _React$Component);
 
-  function AcceptInvitation(props) {
+  function AcceptInvitation() {
     var _this;
 
     _classCallCheck(this, AcceptInvitation);
@@ -42673,36 +42675,36 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement(React.Fragment, null, React.createElement("main", {
+      return _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("main", {
         className: "home-page page-container"
-      }), React.createElement(_Modal["default"], {
+      }), _react["default"].createElement(_Modal["default"], {
         title: "Accept Invitation"
-      }, !this.state.isSuccessMessageDisplayed && this.props.isTokenValid && React.createElement(React.Fragment, null, React.createElement("p", null, "You have been invited to create a doctors account. Please, finish your registration."), React.createElement("p", {
+      }, !this.state.isSuccessMessageDisplayed && this.props.isTokenValid && _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("p", null, "You have been invited to create a doctors account. Please, finish your registration."), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.acceptInvitationError), React.createElement("form", {
+      }, this.props.acceptInvitationError), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.acceptInvitationForm = el;
         },
         onSubmit: this.handleSubmit
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "password",
         name: "password",
         placeholder: "Password",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "password",
         name: "confirmPassword",
         placeholder: "Confirm Password",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Register"
-      }))), this.state.isSuccessMessageDisplayed && React.createElement("div", {
+      }))), this.state.isSuccessMessageDisplayed && _react["default"].createElement("div", {
         className: "modal-success-message"
-      }, React.createElement("p", null, "Your account has been successfully activated. ", React.createElement("br", null), "Now you may sign-in."), React.createElement("p", null, React.createElement(_reactRouterDom.Link, {
+      }, _react["default"].createElement("p", null, "Your account has been successfully activated. ", _react["default"].createElement("br", null), "Now you may sign-in."), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
         to: "/admin",
         className: "button"
-      }, "OK"))), this.props.isTokenValid === false && React.createElement("div", null, React.createElement("p", null, "The link is invalid!"), React.createElement("p", null, React.createElement(_reactRouterDom.Link, {
+      }, "OK"))), this.props.isTokenValid === false && _react["default"].createElement("div", null, _react["default"].createElement("p", null, "The link is invalid!"), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
         to: "/",
         className: "button"
       }, "Close")))));
@@ -42710,12 +42712,15 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return AcceptInvitation;
-}(React.Component);
+}(_react["default"].Component);
 
 AcceptInvitation.propTypes = {
   activateAccount: _propTypes["default"].func,
   isInvitationAccepted: _propTypes["default"].bool,
-  acceptInvitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object])
+  acceptInvitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  match: _propTypes["default"].object,
+  checkInvitationToken: _propTypes["default"].func,
+  isTokenValid: _propTypes["default"].bool
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -42743,7 +42748,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Acc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],110:[function(require,module,exports){
+},{"../actions/account":106,"./Modal":127,"prop-types":48,"react":87,"react-redux":70,"react-router-dom":81,"redux":89}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

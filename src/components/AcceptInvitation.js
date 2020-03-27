@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from './Modal';
 import { Link } from 'react-router-dom';
@@ -11,7 +12,7 @@ const initialState = {
 };
 
 class AcceptInvitation extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {...initialState};
@@ -106,7 +107,10 @@ class AcceptInvitation extends React.Component {
 AcceptInvitation.propTypes = {
     activateAccount: PropTypes.func,
     isInvitationAccepted: PropTypes.bool,
-    acceptInvitationError: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    acceptInvitationError: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    match: PropTypes.object,
+    checkInvitationToken: PropTypes.func,
+    isTokenValid: PropTypes.bool
 }
 
 const mapStateToProps = ({doctorCategories}) => ({

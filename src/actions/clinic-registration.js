@@ -30,7 +30,7 @@ export const registerClinic = (clinic) => {
         dispatch(registerClinicPending());
         
         createClinic(clinic)
-            .then(resp => {
+            .then(() => {
                 dispatch(registerClinicSuccess());
             })
             .catch(err => {
