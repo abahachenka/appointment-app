@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -5,7 +6,7 @@ import { bindActionCreators } from 'redux';
 import {searchClinic, saveClinic} from '../actions/appointments';
 
 class NewAppointment extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {
@@ -46,7 +47,7 @@ class NewAppointment extends React.Component {
                 </form>
 
                 {this.props.error && (
-                    <p class="error">{this.props.error}</p>
+                    <p className="error">{this.props.error}</p>
                 )}
 
                 {this.props.clinics.length ? (
@@ -76,7 +77,8 @@ class NewAppointment extends React.Component {
 NewAppointment.propTypes = {
     clinics: PropTypes.arrayOf(PropTypes.object),
     error: PropTypes.string,
-    searchClinic: PropTypes.func
+    searchClinic: PropTypes.func,
+    saveClinic: PropTypes.func
 }
 
 const mapStateToProps = ({appointments}) => ({

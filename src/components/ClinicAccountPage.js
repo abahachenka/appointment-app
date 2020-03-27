@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -6,10 +7,6 @@ import {loadAccount} from '../actions/account';
 import DoctorCategories from './DoctorCategories';
 
 class ClinicAccountPage extends React.Component {
-    constructor(props) {
-        super();
-    }
-
     componentDidMount() {
         this.props.loadAccount();
     }
@@ -35,7 +32,10 @@ class ClinicAccountPage extends React.Component {
 
 ClinicAccountPage.propTypes = {
     isAuthenticated: PropTypes.bool,
-    account: PropTypes.object
+    account: PropTypes.object,
+    loadAccount: PropTypes.func,
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    history: PropTypes.object
 }
 
 const mapStateToProps = ({signIn}) => ({
@@ -45,7 +45,6 @@ const mapStateToProps = ({signIn}) => ({
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    resetError: () => {},
     loadAccount: () => loadAccount()
 }, dispatch);
 

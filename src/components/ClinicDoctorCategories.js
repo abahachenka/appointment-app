@@ -1,14 +1,11 @@
-import { bindActionCreators } from 'redux';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {loadDoctorCategories, saveDoctorCategory} from '../actions/appointments';
 
 class ClinicDoctorCategories extends React.Component {
-    constructor(props) {
-        super();
-    }
-    
     componentDidMount() {
         this.props.loadCategories();
     }
@@ -45,7 +42,8 @@ ClinicDoctorCategories.propTypes = {
     categories: PropTypes.array,
     error: PropTypes.string,
     saveDoctorCategory: PropTypes.func,
-    loadCategories: PropTypes.func
+    loadCategories: PropTypes.func,
+    location: PropTypes.object
 };
 
 const mapStateToProps = ({appointments}) => ({

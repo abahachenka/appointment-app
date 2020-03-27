@@ -1,10 +1,14 @@
-import {loadAccount, createNewAppointment} from '../actions/account';
+import React from 'react';
+import PropTypes from 'prop-types';
+import moment from 'moment';
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import Modal from './Modal';
-import moment from 'moment';
+import {
+    loadAccount, 
+    createNewAppointment
+} from '../actions/account';
 
 const initialState = {
     isModalDisplayed: false,
@@ -12,7 +16,7 @@ const initialState = {
 }
 
 class DoctorAccount extends React.Component { 
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {...initialState};
@@ -141,6 +145,8 @@ class DoctorAccount extends React.Component {
 
 DoctorAccount.propTypes = {
     account: PropTypes.object,
+    appointments: PropTypes.arrayOf(PropTypes.object),
+    createNewAppointment: PropTypes.func,
     error: PropTypes.string,
     loadAccount: PropTypes.func
 }

@@ -126,8 +126,1964 @@ function _typeof(obj) {
 
 module.exports = _typeof;
 },{}],7:[function(require,module,exports){
+(function (process){
+/** @license React v16.13.0
+ * react.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+'use strict';
+
+
+
+if (process.env.NODE_ENV !== "production") {
+  (function() {
+'use strict';
+
+var _assign = require('object-assign');
+var checkPropTypes = require('prop-types/checkPropTypes');
+
+var ReactVersion = '16.13.0';
+
+// The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+// nor polyfill, then a plain number is used for performance.
+var hasSymbol = typeof Symbol === 'function' && Symbol.for;
+var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for('react.element') : 0xeac7;
+var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for('react.portal') : 0xeaca;
+var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for('react.fragment') : 0xeacb;
+var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for('react.strict_mode') : 0xeacc;
+var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
+var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for('react.provider') : 0xeacd;
+var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for('react.context') : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
+var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
+var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
+var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
+var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for('react.suspense_list') : 0xead8;
+var REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
+var REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
+var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for('react.block') : 0xead9;
+var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for('react.fundamental') : 0xead5;
+var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for('react.responder') : 0xead6;
+var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for('react.scope') : 0xead7;
+var MAYBE_ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+var FAUX_ITERATOR_SYMBOL = '@@iterator';
+function getIteratorFn(maybeIterable) {
+  if (maybeIterable === null || typeof maybeIterable !== 'object') {
+    return null;
+  }
+
+  var maybeIterator = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL];
+
+  if (typeof maybeIterator === 'function') {
+    return maybeIterator;
+  }
+
+  return null;
+}
+
+/**
+ * Keeps track of the current dispatcher.
+ */
+var ReactCurrentDispatcher = {
+  /**
+   * @internal
+   * @type {ReactComponent}
+   */
+  current: null
+};
+
+/**
+ * Keeps track of the current batch's configuration such as how long an update
+ * should suspend for if it needs to.
+ */
+var ReactCurrentBatchConfig = {
+  suspense: null
+};
+
+/**
+ * Keeps track of the current owner.
+ *
+ * The current owner is the component who should own any components that are
+ * currently being constructed.
+ */
+var ReactCurrentOwner = {
+  /**
+   * @internal
+   * @type {ReactComponent}
+   */
+  current: null
+};
+
+var BEFORE_SLASH_RE = /^(.*)[\\\/]/;
+function describeComponentFrame (name, source, ownerName) {
+  var sourceInfo = '';
+
+  if (source) {
+    var path = source.fileName;
+    var fileName = path.replace(BEFORE_SLASH_RE, '');
+
+    {
+      // In DEV, include code for a common special case:
+      // prefer "folder/index.js" instead of just "index.js".
+      if (/^index\./.test(fileName)) {
+        var match = path.match(BEFORE_SLASH_RE);
+
+        if (match) {
+          var pathBeforeSlash = match[1];
+
+          if (pathBeforeSlash) {
+            var folderName = pathBeforeSlash.replace(BEFORE_SLASH_RE, '');
+            fileName = folderName + '/' + fileName;
+          }
+        }
+      }
+    }
+
+    sourceInfo = ' (at ' + fileName + ':' + source.lineNumber + ')';
+  } else if (ownerName) {
+    sourceInfo = ' (created by ' + ownerName + ')';
+  }
+
+  return '\n    in ' + (name || 'Unknown') + sourceInfo;
+}
+
+var Resolved = 1;
+function refineResolvedLazyComponent(lazyComponent) {
+  return lazyComponent._status === Resolved ? lazyComponent._result : null;
+}
+
+function getWrappedName(outerType, innerType, wrapperName) {
+  var functionName = innerType.displayName || innerType.name || '';
+  return outerType.displayName || (functionName !== '' ? wrapperName + "(" + functionName + ")" : wrapperName);
+}
+
+function getComponentName(type) {
+  if (type == null) {
+    // Host root, text node or just invalid type.
+    return null;
+  }
+
+  {
+    if (typeof type.tag === 'number') {
+      error('Received an unexpected object in getComponentName(). ' + 'This is likely a bug in React. Please file an issue.');
+    }
+  }
+
+  if (typeof type === 'function') {
+    return type.displayName || type.name || null;
+  }
+
+  if (typeof type === 'string') {
+    return type;
+  }
+
+  switch (type) {
+    case REACT_FRAGMENT_TYPE:
+      return 'Fragment';
+
+    case REACT_PORTAL_TYPE:
+      return 'Portal';
+
+    case REACT_PROFILER_TYPE:
+      return "Profiler";
+
+    case REACT_STRICT_MODE_TYPE:
+      return 'StrictMode';
+
+    case REACT_SUSPENSE_TYPE:
+      return 'Suspense';
+
+    case REACT_SUSPENSE_LIST_TYPE:
+      return 'SuspenseList';
+  }
+
+  if (typeof type === 'object') {
+    switch (type.$$typeof) {
+      case REACT_CONTEXT_TYPE:
+        return 'Context.Consumer';
+
+      case REACT_PROVIDER_TYPE:
+        return 'Context.Provider';
+
+      case REACT_FORWARD_REF_TYPE:
+        return getWrappedName(type, type.render, 'ForwardRef');
+
+      case REACT_MEMO_TYPE:
+        return getComponentName(type.type);
+
+      case REACT_BLOCK_TYPE:
+        return getComponentName(type.render);
+
+      case REACT_LAZY_TYPE:
+        {
+          var thenable = type;
+          var resolvedThenable = refineResolvedLazyComponent(thenable);
+
+          if (resolvedThenable) {
+            return getComponentName(resolvedThenable);
+          }
+
+          break;
+        }
+    }
+  }
+
+  return null;
+}
+
+var ReactDebugCurrentFrame = {};
+var currentlyValidatingElement = null;
+function setCurrentlyValidatingElement(element) {
+  {
+    currentlyValidatingElement = element;
+  }
+}
+
+{
+  // Stack implementation injected by the current renderer.
+  ReactDebugCurrentFrame.getCurrentStack = null;
+
+  ReactDebugCurrentFrame.getStackAddendum = function () {
+    var stack = ''; // Add an extra top frame while an element is being validated
+
+    if (currentlyValidatingElement) {
+      var name = getComponentName(currentlyValidatingElement.type);
+      var owner = currentlyValidatingElement._owner;
+      stack += describeComponentFrame(name, currentlyValidatingElement._source, owner && getComponentName(owner.type));
+    } // Delegate to the injected renderer-specific implementation
+
+
+    var impl = ReactDebugCurrentFrame.getCurrentStack;
+
+    if (impl) {
+      stack += impl() || '';
+    }
+
+    return stack;
+  };
+}
+
+/**
+ * Used by act() to track whether you're inside an act() scope.
+ */
+var IsSomeRendererActing = {
+  current: false
+};
+
+var ReactSharedInternals = {
+  ReactCurrentDispatcher: ReactCurrentDispatcher,
+  ReactCurrentBatchConfig: ReactCurrentBatchConfig,
+  ReactCurrentOwner: ReactCurrentOwner,
+  IsSomeRendererActing: IsSomeRendererActing,
+  // Used by renderers to avoid bundling object-assign twice in UMD bundles:
+  assign: _assign
+};
+
+{
+  _assign(ReactSharedInternals, {
+    // These should not be included in production.
+    ReactDebugCurrentFrame: ReactDebugCurrentFrame,
+    // Shim for React DOM 16.0.0 which still destructured (but not used) this.
+    // TODO: remove in React 17.0.
+    ReactComponentTreeHook: {}
+  });
+}
+
+// by calls to these methods by a Babel plugin.
+//
+// In PROD (or in packages without access to React internals),
+// they are left as they are instead.
+
+function warn(format) {
+  {
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    printWarning('warn', format, args);
+  }
+}
+function error(format) {
+  {
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    printWarning('error', format, args);
+  }
+}
+
+function printWarning(level, format, args) {
+  // When changing this logic, you might want to also
+  // update consoleWithStackDev.www.js as well.
+  {
+    var hasExistingStack = args.length > 0 && typeof args[args.length - 1] === 'string' && args[args.length - 1].indexOf('\n    in') === 0;
+
+    if (!hasExistingStack) {
+      var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
+      var stack = ReactDebugCurrentFrame.getStackAddendum();
+
+      if (stack !== '') {
+        format += '%s';
+        args = args.concat([stack]);
+      }
+    }
+
+    var argsWithFormat = args.map(function (item) {
+      return '' + item;
+    }); // Careful: RN currently depends on this prefix
+
+    argsWithFormat.unshift('Warning: ' + format); // We intentionally don't use spread (or .apply) directly because it
+    // breaks IE9: https://github.com/facebook/react/issues/13610
+    // eslint-disable-next-line react-internal/no-production-logging
+
+    Function.prototype.apply.call(console[level], console, argsWithFormat);
+
+    try {
+      // --- Welcome to debugging React ---
+      // This error was thrown as a convenience so that you can use this stack
+      // to find the callsite that caused this warning to fire.
+      var argIndex = 0;
+      var message = 'Warning: ' + format.replace(/%s/g, function () {
+        return args[argIndex++];
+      });
+      throw new Error(message);
+    } catch (x) {}
+  }
+}
+
+var didWarnStateUpdateForUnmountedComponent = {};
+
+function warnNoop(publicInstance, callerName) {
+  {
+    var _constructor = publicInstance.constructor;
+    var componentName = _constructor && (_constructor.displayName || _constructor.name) || 'ReactClass';
+    var warningKey = componentName + "." + callerName;
+
+    if (didWarnStateUpdateForUnmountedComponent[warningKey]) {
+      return;
+    }
+
+    error("Can't call %s on a component that is not yet mounted. " + 'This is a no-op, but it might indicate a bug in your application. ' + 'Instead, assign to `this.state` directly or define a `state = {};` ' + 'class property with the desired state in the %s component.', callerName, componentName);
+
+    didWarnStateUpdateForUnmountedComponent[warningKey] = true;
+  }
+}
+/**
+ * This is the abstract API for an update queue.
+ */
+
+
+var ReactNoopUpdateQueue = {
+  /**
+   * Checks whether or not this composite component is mounted.
+   * @param {ReactClass} publicInstance The instance we want to test.
+   * @return {boolean} True if mounted, false otherwise.
+   * @protected
+   * @final
+   */
+  isMounted: function (publicInstance) {
+    return false;
+  },
+
+  /**
+   * Forces an update. This should only be invoked when it is known with
+   * certainty that we are **not** in a DOM transaction.
+   *
+   * You may want to call this when you know that some deeper aspect of the
+   * component's state has changed but `setState` was not called.
+   *
+   * This will not invoke `shouldComponentUpdate`, but it will invoke
+   * `componentWillUpdate` and `componentDidUpdate`.
+   *
+   * @param {ReactClass} publicInstance The instance that should rerender.
+   * @param {?function} callback Called after component is updated.
+   * @param {?string} callerName name of the calling function in the public API.
+   * @internal
+   */
+  enqueueForceUpdate: function (publicInstance, callback, callerName) {
+    warnNoop(publicInstance, 'forceUpdate');
+  },
+
+  /**
+   * Replaces all of the state. Always use this or `setState` to mutate state.
+   * You should treat `this.state` as immutable.
+   *
+   * There is no guarantee that `this.state` will be immediately updated, so
+   * accessing `this.state` after calling this method may return the old value.
+   *
+   * @param {ReactClass} publicInstance The instance that should rerender.
+   * @param {object} completeState Next state.
+   * @param {?function} callback Called after component is updated.
+   * @param {?string} callerName name of the calling function in the public API.
+   * @internal
+   */
+  enqueueReplaceState: function (publicInstance, completeState, callback, callerName) {
+    warnNoop(publicInstance, 'replaceState');
+  },
+
+  /**
+   * Sets a subset of the state. This only exists because _pendingState is
+   * internal. This provides a merging strategy that is not available to deep
+   * properties which is confusing. TODO: Expose pendingState or don't use it
+   * during the merge.
+   *
+   * @param {ReactClass} publicInstance The instance that should rerender.
+   * @param {object} partialState Next partial state to be merged with state.
+   * @param {?function} callback Called after component is updated.
+   * @param {?string} Name of the calling function in the public API.
+   * @internal
+   */
+  enqueueSetState: function (publicInstance, partialState, callback, callerName) {
+    warnNoop(publicInstance, 'setState');
+  }
+};
+
+var emptyObject = {};
+
+{
+  Object.freeze(emptyObject);
+}
+/**
+ * Base class helpers for the updating state of a component.
+ */
+
+
+function Component(props, context, updater) {
+  this.props = props;
+  this.context = context; // If a component has string refs, we will assign a different object later.
+
+  this.refs = emptyObject; // We initialize the default updater but the real one gets injected by the
+  // renderer.
+
+  this.updater = updater || ReactNoopUpdateQueue;
+}
+
+Component.prototype.isReactComponent = {};
+/**
+ * Sets a subset of the state. Always use this to mutate
+ * state. You should treat `this.state` as immutable.
+ *
+ * There is no guarantee that `this.state` will be immediately updated, so
+ * accessing `this.state` after calling this method may return the old value.
+ *
+ * There is no guarantee that calls to `setState` will run synchronously,
+ * as they may eventually be batched together.  You can provide an optional
+ * callback that will be executed when the call to setState is actually
+ * completed.
+ *
+ * When a function is provided to setState, it will be called at some point in
+ * the future (not synchronously). It will be called with the up to date
+ * component arguments (state, props, context). These values can be different
+ * from this.* because your function may be called after receiveProps but before
+ * shouldComponentUpdate, and this new state, props, and context will not yet be
+ * assigned to this.
+ *
+ * @param {object|function} partialState Next partial state or function to
+ *        produce next partial state to be merged with current state.
+ * @param {?function} callback Called after state is updated.
+ * @final
+ * @protected
+ */
+
+Component.prototype.setState = function (partialState, callback) {
+  if (!(typeof partialState === 'object' || typeof partialState === 'function' || partialState == null)) {
+    {
+      throw Error( "setState(...): takes an object of state variables to update or a function which returns an object of state variables." );
+    }
+  }
+
+  this.updater.enqueueSetState(this, partialState, callback, 'setState');
+};
+/**
+ * Forces an update. This should only be invoked when it is known with
+ * certainty that we are **not** in a DOM transaction.
+ *
+ * You may want to call this when you know that some deeper aspect of the
+ * component's state has changed but `setState` was not called.
+ *
+ * This will not invoke `shouldComponentUpdate`, but it will invoke
+ * `componentWillUpdate` and `componentDidUpdate`.
+ *
+ * @param {?function} callback Called after update is complete.
+ * @final
+ * @protected
+ */
+
+
+Component.prototype.forceUpdate = function (callback) {
+  this.updater.enqueueForceUpdate(this, callback, 'forceUpdate');
+};
+/**
+ * Deprecated APIs. These APIs used to exist on classic React classes but since
+ * we would like to deprecate them, we're not going to move them over to this
+ * modern base class. Instead, we define a getter that warns if it's accessed.
+ */
+
+
+{
+  var deprecatedAPIs = {
+    isMounted: ['isMounted', 'Instead, make sure to clean up subscriptions and pending requests in ' + 'componentWillUnmount to prevent memory leaks.'],
+    replaceState: ['replaceState', 'Refactor your code to use setState instead (see ' + 'https://github.com/facebook/react/issues/3236).']
+  };
+
+  var defineDeprecationWarning = function (methodName, info) {
+    Object.defineProperty(Component.prototype, methodName, {
+      get: function () {
+        warn('%s(...) is deprecated in plain JavaScript React classes. %s', info[0], info[1]);
+
+        return undefined;
+      }
+    });
+  };
+
+  for (var fnName in deprecatedAPIs) {
+    if (deprecatedAPIs.hasOwnProperty(fnName)) {
+      defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
+    }
+  }
+}
+
+function ComponentDummy() {}
+
+ComponentDummy.prototype = Component.prototype;
+/**
+ * Convenience component with default shallow equality check for sCU.
+ */
+
+function PureComponent(props, context, updater) {
+  this.props = props;
+  this.context = context; // If a component has string refs, we will assign a different object later.
+
+  this.refs = emptyObject;
+  this.updater = updater || ReactNoopUpdateQueue;
+}
+
+var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
+pureComponentPrototype.constructor = PureComponent; // Avoid an extra prototype jump for these methods.
+
+_assign(pureComponentPrototype, Component.prototype);
+
+pureComponentPrototype.isPureReactComponent = true;
+
+// an immutable object with a single mutable value
+function createRef() {
+  var refObject = {
+    current: null
+  };
+
+  {
+    Object.seal(refObject);
+  }
+
+  return refObject;
+}
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var RESERVED_PROPS = {
+  key: true,
+  ref: true,
+  __self: true,
+  __source: true
+};
+var specialPropKeyWarningShown, specialPropRefWarningShown, didWarnAboutStringRefs;
+
+{
+  didWarnAboutStringRefs = {};
+}
+
+function hasValidRef(config) {
+  {
+    if (hasOwnProperty.call(config, 'ref')) {
+      var getter = Object.getOwnPropertyDescriptor(config, 'ref').get;
+
+      if (getter && getter.isReactWarning) {
+        return false;
+      }
+    }
+  }
+
+  return config.ref !== undefined;
+}
+
+function hasValidKey(config) {
+  {
+    if (hasOwnProperty.call(config, 'key')) {
+      var getter = Object.getOwnPropertyDescriptor(config, 'key').get;
+
+      if (getter && getter.isReactWarning) {
+        return false;
+      }
+    }
+  }
+
+  return config.key !== undefined;
+}
+
+function defineKeyPropWarningGetter(props, displayName) {
+  var warnAboutAccessingKey = function () {
+    {
+      if (!specialPropKeyWarningShown) {
+        specialPropKeyWarningShown = true;
+
+        error('%s: `key` is not a prop. Trying to access it will result ' + 'in `undefined` being returned. If you need to access the same ' + 'value within the child component, you should pass it as a different ' + 'prop. (https://fb.me/react-special-props)', displayName);
+      }
+    }
+  };
+
+  warnAboutAccessingKey.isReactWarning = true;
+  Object.defineProperty(props, 'key', {
+    get: warnAboutAccessingKey,
+    configurable: true
+  });
+}
+
+function defineRefPropWarningGetter(props, displayName) {
+  var warnAboutAccessingRef = function () {
+    {
+      if (!specialPropRefWarningShown) {
+        specialPropRefWarningShown = true;
+
+        error('%s: `ref` is not a prop. Trying to access it will result ' + 'in `undefined` being returned. If you need to access the same ' + 'value within the child component, you should pass it as a different ' + 'prop. (https://fb.me/react-special-props)', displayName);
+      }
+    }
+  };
+
+  warnAboutAccessingRef.isReactWarning = true;
+  Object.defineProperty(props, 'ref', {
+    get: warnAboutAccessingRef,
+    configurable: true
+  });
+}
+
+function warnIfStringRefCannotBeAutoConverted(config) {
+  {
+    if (typeof config.ref === 'string' && ReactCurrentOwner.current && config.__self && ReactCurrentOwner.current.stateNode !== config.__self) {
+      var componentName = getComponentName(ReactCurrentOwner.current.type);
+
+      if (!didWarnAboutStringRefs[componentName]) {
+        error('Component "%s" contains the string ref "%s". ' + 'Support for string refs will be removed in a future major release. ' + 'This case cannot be automatically converted to an arrow function. ' + 'We ask you to manually fix this case by using useRef() or createRef() instead. ' + 'Learn more about using refs safely here: ' + 'https://fb.me/react-strict-mode-string-ref', getComponentName(ReactCurrentOwner.current.type), config.ref);
+
+        didWarnAboutStringRefs[componentName] = true;
+      }
+    }
+  }
+}
+/**
+ * Factory method to create a new React element. This no longer adheres to
+ * the class pattern, so do not use new to call it. Also, instanceof check
+ * will not work. Instead test $$typeof field against Symbol.for('react.element') to check
+ * if something is a React Element.
+ *
+ * @param {*} type
+ * @param {*} props
+ * @param {*} key
+ * @param {string|object} ref
+ * @param {*} owner
+ * @param {*} self A *temporary* helper to detect places where `this` is
+ * different from the `owner` when React.createElement is called, so that we
+ * can warn. We want to get rid of owner and replace string `ref`s with arrow
+ * functions, and as long as `this` and owner are the same, there will be no
+ * change in behavior.
+ * @param {*} source An annotation object (added by a transpiler or otherwise)
+ * indicating filename, line number, and/or other information.
+ * @internal
+ */
+
+
+var ReactElement = function (type, key, ref, self, source, owner, props) {
+  var element = {
+    // This tag allows us to uniquely identify this as a React Element
+    $$typeof: REACT_ELEMENT_TYPE,
+    // Built-in properties that belong on the element
+    type: type,
+    key: key,
+    ref: ref,
+    props: props,
+    // Record the component responsible for creating this element.
+    _owner: owner
+  };
+
+  {
+    // The validation flag is currently mutative. We put it on
+    // an external backing store so that we can freeze the whole object.
+    // This can be replaced with a WeakMap once they are implemented in
+    // commonly used development environments.
+    element._store = {}; // To make comparing ReactElements easier for testing purposes, we make
+    // the validation flag non-enumerable (where possible, which should
+    // include every environment we run tests in), so the test framework
+    // ignores it.
+
+    Object.defineProperty(element._store, 'validated', {
+      configurable: false,
+      enumerable: false,
+      writable: true,
+      value: false
+    }); // self and source are DEV only properties.
+
+    Object.defineProperty(element, '_self', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: self
+    }); // Two elements created in two different places should be considered
+    // equal for testing purposes and therefore we hide it from enumeration.
+
+    Object.defineProperty(element, '_source', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: source
+    });
+
+    if (Object.freeze) {
+      Object.freeze(element.props);
+      Object.freeze(element);
+    }
+  }
+
+  return element;
+};
+/**
+ * Create and return a new ReactElement of the given type.
+ * See https://reactjs.org/docs/react-api.html#createelement
+ */
+
+function createElement(type, config, children) {
+  var propName; // Reserved names are extracted
+
+  var props = {};
+  var key = null;
+  var ref = null;
+  var self = null;
+  var source = null;
+
+  if (config != null) {
+    if (hasValidRef(config)) {
+      ref = config.ref;
+
+      {
+        warnIfStringRefCannotBeAutoConverted(config);
+      }
+    }
+
+    if (hasValidKey(config)) {
+      key = '' + config.key;
+    }
+
+    self = config.__self === undefined ? null : config.__self;
+    source = config.__source === undefined ? null : config.__source; // Remaining properties are added to a new props object
+
+    for (propName in config) {
+      if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
+        props[propName] = config[propName];
+      }
+    }
+  } // Children can be more than one argument, and those are transferred onto
+  // the newly allocated props object.
+
+
+  var childrenLength = arguments.length - 2;
+
+  if (childrenLength === 1) {
+    props.children = children;
+  } else if (childrenLength > 1) {
+    var childArray = Array(childrenLength);
+
+    for (var i = 0; i < childrenLength; i++) {
+      childArray[i] = arguments[i + 2];
+    }
+
+    {
+      if (Object.freeze) {
+        Object.freeze(childArray);
+      }
+    }
+
+    props.children = childArray;
+  } // Resolve default props
+
+
+  if (type && type.defaultProps) {
+    var defaultProps = type.defaultProps;
+
+    for (propName in defaultProps) {
+      if (props[propName] === undefined) {
+        props[propName] = defaultProps[propName];
+      }
+    }
+  }
+
+  {
+    if (key || ref) {
+      var displayName = typeof type === 'function' ? type.displayName || type.name || 'Unknown' : type;
+
+      if (key) {
+        defineKeyPropWarningGetter(props, displayName);
+      }
+
+      if (ref) {
+        defineRefPropWarningGetter(props, displayName);
+      }
+    }
+  }
+
+  return ReactElement(type, key, ref, self, source, ReactCurrentOwner.current, props);
+}
+function cloneAndReplaceKey(oldElement, newKey) {
+  var newElement = ReactElement(oldElement.type, newKey, oldElement.ref, oldElement._self, oldElement._source, oldElement._owner, oldElement.props);
+  return newElement;
+}
+/**
+ * Clone and return a new ReactElement using element as the starting point.
+ * See https://reactjs.org/docs/react-api.html#cloneelement
+ */
+
+function cloneElement(element, config, children) {
+  if (!!(element === null || element === undefined)) {
+    {
+      throw Error( "React.cloneElement(...): The argument must be a React element, but you passed " + element + "." );
+    }
+  }
+
+  var propName; // Original props are copied
+
+  var props = _assign({}, element.props); // Reserved names are extracted
+
+
+  var key = element.key;
+  var ref = element.ref; // Self is preserved since the owner is preserved.
+
+  var self = element._self; // Source is preserved since cloneElement is unlikely to be targeted by a
+  // transpiler, and the original source is probably a better indicator of the
+  // true owner.
+
+  var source = element._source; // Owner will be preserved, unless ref is overridden
+
+  var owner = element._owner;
+
+  if (config != null) {
+    if (hasValidRef(config)) {
+      // Silently steal the ref from the parent.
+      ref = config.ref;
+      owner = ReactCurrentOwner.current;
+    }
+
+    if (hasValidKey(config)) {
+      key = '' + config.key;
+    } // Remaining properties override existing props
+
+
+    var defaultProps;
+
+    if (element.type && element.type.defaultProps) {
+      defaultProps = element.type.defaultProps;
+    }
+
+    for (propName in config) {
+      if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
+        if (config[propName] === undefined && defaultProps !== undefined) {
+          // Resolve default props
+          props[propName] = defaultProps[propName];
+        } else {
+          props[propName] = config[propName];
+        }
+      }
+    }
+  } // Children can be more than one argument, and those are transferred onto
+  // the newly allocated props object.
+
+
+  var childrenLength = arguments.length - 2;
+
+  if (childrenLength === 1) {
+    props.children = children;
+  } else if (childrenLength > 1) {
+    var childArray = Array(childrenLength);
+
+    for (var i = 0; i < childrenLength; i++) {
+      childArray[i] = arguments[i + 2];
+    }
+
+    props.children = childArray;
+  }
+
+  return ReactElement(element.type, key, ref, self, source, owner, props);
+}
+/**
+ * Verifies the object is a ReactElement.
+ * See https://reactjs.org/docs/react-api.html#isvalidelement
+ * @param {?object} object
+ * @return {boolean} True if `object` is a ReactElement.
+ * @final
+ */
+
+function isValidElement(object) {
+  return typeof object === 'object' && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+}
+
+var SEPARATOR = '.';
+var SUBSEPARATOR = ':';
+/**
+ * Escape and wrap key so it is safe to use as a reactid
+ *
+ * @param {string} key to be escaped.
+ * @return {string} the escaped key.
+ */
+
+function escape(key) {
+  var escapeRegex = /[=:]/g;
+  var escaperLookup = {
+    '=': '=0',
+    ':': '=2'
+  };
+  var escapedString = ('' + key).replace(escapeRegex, function (match) {
+    return escaperLookup[match];
+  });
+  return '$' + escapedString;
+}
+/**
+ * TODO: Test that a single child and an array with one item have the same key
+ * pattern.
+ */
+
+
+var didWarnAboutMaps = false;
+var userProvidedKeyEscapeRegex = /\/+/g;
+
+function escapeUserProvidedKey(text) {
+  return ('' + text).replace(userProvidedKeyEscapeRegex, '$&/');
+}
+
+var POOL_SIZE = 10;
+var traverseContextPool = [];
+
+function getPooledTraverseContext(mapResult, keyPrefix, mapFunction, mapContext) {
+  if (traverseContextPool.length) {
+    var traverseContext = traverseContextPool.pop();
+    traverseContext.result = mapResult;
+    traverseContext.keyPrefix = keyPrefix;
+    traverseContext.func = mapFunction;
+    traverseContext.context = mapContext;
+    traverseContext.count = 0;
+    return traverseContext;
+  } else {
+    return {
+      result: mapResult,
+      keyPrefix: keyPrefix,
+      func: mapFunction,
+      context: mapContext,
+      count: 0
+    };
+  }
+}
+
+function releaseTraverseContext(traverseContext) {
+  traverseContext.result = null;
+  traverseContext.keyPrefix = null;
+  traverseContext.func = null;
+  traverseContext.context = null;
+  traverseContext.count = 0;
+
+  if (traverseContextPool.length < POOL_SIZE) {
+    traverseContextPool.push(traverseContext);
+  }
+}
+/**
+ * @param {?*} children Children tree container.
+ * @param {!string} nameSoFar Name of the key path so far.
+ * @param {!function} callback Callback to invoke with each child found.
+ * @param {?*} traverseContext Used to pass information throughout the traversal
+ * process.
+ * @return {!number} The number of children in this subtree.
+ */
+
+
+function traverseAllChildrenImpl(children, nameSoFar, callback, traverseContext) {
+  var type = typeof children;
+
+  if (type === 'undefined' || type === 'boolean') {
+    // All of the above are perceived as null.
+    children = null;
+  }
+
+  var invokeCallback = false;
+
+  if (children === null) {
+    invokeCallback = true;
+  } else {
+    switch (type) {
+      case 'string':
+      case 'number':
+        invokeCallback = true;
+        break;
+
+      case 'object':
+        switch (children.$$typeof) {
+          case REACT_ELEMENT_TYPE:
+          case REACT_PORTAL_TYPE:
+            invokeCallback = true;
+        }
+
+    }
+  }
+
+  if (invokeCallback) {
+    callback(traverseContext, children, // If it's the only child, treat the name as if it was wrapped in an array
+    // so that it's consistent if the number of children grows.
+    nameSoFar === '' ? SEPARATOR + getComponentKey(children, 0) : nameSoFar);
+    return 1;
+  }
+
+  var child;
+  var nextName;
+  var subtreeCount = 0; // Count of children found in the current subtree.
+
+  var nextNamePrefix = nameSoFar === '' ? SEPARATOR : nameSoFar + SUBSEPARATOR;
+
+  if (Array.isArray(children)) {
+    for (var i = 0; i < children.length; i++) {
+      child = children[i];
+      nextName = nextNamePrefix + getComponentKey(child, i);
+      subtreeCount += traverseAllChildrenImpl(child, nextName, callback, traverseContext);
+    }
+  } else {
+    var iteratorFn = getIteratorFn(children);
+
+    if (typeof iteratorFn === 'function') {
+
+      {
+        // Warn about using Maps as children
+        if (iteratorFn === children.entries) {
+          if (!didWarnAboutMaps) {
+            warn('Using Maps as children is deprecated and will be removed in ' + 'a future major release. Consider converting children to ' + 'an array of keyed ReactElements instead.');
+          }
+
+          didWarnAboutMaps = true;
+        }
+      }
+
+      var iterator = iteratorFn.call(children);
+      var step;
+      var ii = 0;
+
+      while (!(step = iterator.next()).done) {
+        child = step.value;
+        nextName = nextNamePrefix + getComponentKey(child, ii++);
+        subtreeCount += traverseAllChildrenImpl(child, nextName, callback, traverseContext);
+      }
+    } else if (type === 'object') {
+      var addendum = '';
+
+      {
+        addendum = ' If you meant to render a collection of children, use an array ' + 'instead.' + ReactDebugCurrentFrame.getStackAddendum();
+      }
+
+      var childrenString = '' + children;
+
+      {
+        {
+          throw Error( "Objects are not valid as a React child (found: " + (childrenString === '[object Object]' ? 'object with keys {' + Object.keys(children).join(', ') + '}' : childrenString) + ")." + addendum );
+        }
+      }
+    }
+  }
+
+  return subtreeCount;
+}
+/**
+ * Traverses children that are typically specified as `props.children`, but
+ * might also be specified through attributes:
+ *
+ * - `traverseAllChildren(this.props.children, ...)`
+ * - `traverseAllChildren(this.props.leftPanelChildren, ...)`
+ *
+ * The `traverseContext` is an optional argument that is passed through the
+ * entire traversal. It can be used to store accumulations or anything else that
+ * the callback might find relevant.
+ *
+ * @param {?*} children Children tree object.
+ * @param {!function} callback To invoke upon traversing each child.
+ * @param {?*} traverseContext Context for traversal.
+ * @return {!number} The number of children in this subtree.
+ */
+
+
+function traverseAllChildren(children, callback, traverseContext) {
+  if (children == null) {
+    return 0;
+  }
+
+  return traverseAllChildrenImpl(children, '', callback, traverseContext);
+}
+/**
+ * Generate a key string that identifies a component within a set.
+ *
+ * @param {*} component A component that could contain a manual key.
+ * @param {number} index Index that is used if a manual key is not provided.
+ * @return {string}
+ */
+
+
+function getComponentKey(component, index) {
+  // Do some typechecking here since we call this blindly. We want to ensure
+  // that we don't block potential future ES APIs.
+  if (typeof component === 'object' && component !== null && component.key != null) {
+    // Explicit key
+    return escape(component.key);
+  } // Implicit key determined by the index in the set
+
+
+  return index.toString(36);
+}
+
+function forEachSingleChild(bookKeeping, child, name) {
+  var func = bookKeeping.func,
+      context = bookKeeping.context;
+  func.call(context, child, bookKeeping.count++);
+}
+/**
+ * Iterates through children that are typically specified as `props.children`.
+ *
+ * See https://reactjs.org/docs/react-api.html#reactchildrenforeach
+ *
+ * The provided forEachFunc(child, index) will be called for each
+ * leaf child.
+ *
+ * @param {?*} children Children tree container.
+ * @param {function(*, int)} forEachFunc
+ * @param {*} forEachContext Context for forEachContext.
+ */
+
+
+function forEachChildren(children, forEachFunc, forEachContext) {
+  if (children == null) {
+    return children;
+  }
+
+  var traverseContext = getPooledTraverseContext(null, null, forEachFunc, forEachContext);
+  traverseAllChildren(children, forEachSingleChild, traverseContext);
+  releaseTraverseContext(traverseContext);
+}
+
+function mapSingleChildIntoContext(bookKeeping, child, childKey) {
+  var result = bookKeeping.result,
+      keyPrefix = bookKeeping.keyPrefix,
+      func = bookKeeping.func,
+      context = bookKeeping.context;
+  var mappedChild = func.call(context, child, bookKeeping.count++);
+
+  if (Array.isArray(mappedChild)) {
+    mapIntoWithKeyPrefixInternal(mappedChild, result, childKey, function (c) {
+      return c;
+    });
+  } else if (mappedChild != null) {
+    if (isValidElement(mappedChild)) {
+      mappedChild = cloneAndReplaceKey(mappedChild, // Keep both the (mapped) and old keys if they differ, just as
+      // traverseAllChildren used to do for objects as children
+      keyPrefix + (mappedChild.key && (!child || child.key !== mappedChild.key) ? escapeUserProvidedKey(mappedChild.key) + '/' : '') + childKey);
+    }
+
+    result.push(mappedChild);
+  }
+}
+
+function mapIntoWithKeyPrefixInternal(children, array, prefix, func, context) {
+  var escapedPrefix = '';
+
+  if (prefix != null) {
+    escapedPrefix = escapeUserProvidedKey(prefix) + '/';
+  }
+
+  var traverseContext = getPooledTraverseContext(array, escapedPrefix, func, context);
+  traverseAllChildren(children, mapSingleChildIntoContext, traverseContext);
+  releaseTraverseContext(traverseContext);
+}
+/**
+ * Maps children that are typically specified as `props.children`.
+ *
+ * See https://reactjs.org/docs/react-api.html#reactchildrenmap
+ *
+ * The provided mapFunction(child, key, index) will be called for each
+ * leaf child.
+ *
+ * @param {?*} children Children tree container.
+ * @param {function(*, int)} func The map function.
+ * @param {*} context Context for mapFunction.
+ * @return {object} Object containing the ordered map of results.
+ */
+
+
+function mapChildren(children, func, context) {
+  if (children == null) {
+    return children;
+  }
+
+  var result = [];
+  mapIntoWithKeyPrefixInternal(children, result, null, func, context);
+  return result;
+}
+/**
+ * Count the number of children that are typically specified as
+ * `props.children`.
+ *
+ * See https://reactjs.org/docs/react-api.html#reactchildrencount
+ *
+ * @param {?*} children Children tree container.
+ * @return {number} The number of children.
+ */
+
+
+function countChildren(children) {
+  return traverseAllChildren(children, function () {
+    return null;
+  }, null);
+}
+/**
+ * Flatten a children object (typically specified as `props.children`) and
+ * return an array with appropriately re-keyed children.
+ *
+ * See https://reactjs.org/docs/react-api.html#reactchildrentoarray
+ */
+
+
+function toArray(children) {
+  var result = [];
+  mapIntoWithKeyPrefixInternal(children, result, null, function (child) {
+    return child;
+  });
+  return result;
+}
+/**
+ * Returns the first child in a collection of children and verifies that there
+ * is only one child in the collection.
+ *
+ * See https://reactjs.org/docs/react-api.html#reactchildrenonly
+ *
+ * The current implementation of this function assumes that a single child gets
+ * passed without a wrapper, but the purpose of this helper function is to
+ * abstract away the particular structure of children.
+ *
+ * @param {?object} children Child collection structure.
+ * @return {ReactElement} The first and only `ReactElement` contained in the
+ * structure.
+ */
+
+
+function onlyChild(children) {
+  if (!isValidElement(children)) {
+    {
+      throw Error( "React.Children.only expected to receive a single React element child." );
+    }
+  }
+
+  return children;
+}
+
+function createContext(defaultValue, calculateChangedBits) {
+  if (calculateChangedBits === undefined) {
+    calculateChangedBits = null;
+  } else {
+    {
+      if (calculateChangedBits !== null && typeof calculateChangedBits !== 'function') {
+        error('createContext: Expected the optional second argument to be a ' + 'function. Instead received: %s', calculateChangedBits);
+      }
+    }
+  }
+
+  var context = {
+    $$typeof: REACT_CONTEXT_TYPE,
+    _calculateChangedBits: calculateChangedBits,
+    // As a workaround to support multiple concurrent renderers, we categorize
+    // some renderers as primary and others as secondary. We only expect
+    // there to be two concurrent renderers at most: React Native (primary) and
+    // Fabric (secondary); React DOM (primary) and React ART (secondary).
+    // Secondary renderers store their context values on separate fields.
+    _currentValue: defaultValue,
+    _currentValue2: defaultValue,
+    // Used to track how many concurrent renderers this context currently
+    // supports within in a single renderer. Such as parallel server rendering.
+    _threadCount: 0,
+    // These are circular
+    Provider: null,
+    Consumer: null
+  };
+  context.Provider = {
+    $$typeof: REACT_PROVIDER_TYPE,
+    _context: context
+  };
+  var hasWarnedAboutUsingNestedContextConsumers = false;
+  var hasWarnedAboutUsingConsumerProvider = false;
+
+  {
+    // A separate object, but proxies back to the original context object for
+    // backwards compatibility. It has a different $$typeof, so we can properly
+    // warn for the incorrect usage of Context as a Consumer.
+    var Consumer = {
+      $$typeof: REACT_CONTEXT_TYPE,
+      _context: context,
+      _calculateChangedBits: context._calculateChangedBits
+    }; // $FlowFixMe: Flow complains about not setting a value, which is intentional here
+
+    Object.defineProperties(Consumer, {
+      Provider: {
+        get: function () {
+          if (!hasWarnedAboutUsingConsumerProvider) {
+            hasWarnedAboutUsingConsumerProvider = true;
+
+            error('Rendering <Context.Consumer.Provider> is not supported and will be removed in ' + 'a future major release. Did you mean to render <Context.Provider> instead?');
+          }
+
+          return context.Provider;
+        },
+        set: function (_Provider) {
+          context.Provider = _Provider;
+        }
+      },
+      _currentValue: {
+        get: function () {
+          return context._currentValue;
+        },
+        set: function (_currentValue) {
+          context._currentValue = _currentValue;
+        }
+      },
+      _currentValue2: {
+        get: function () {
+          return context._currentValue2;
+        },
+        set: function (_currentValue2) {
+          context._currentValue2 = _currentValue2;
+        }
+      },
+      _threadCount: {
+        get: function () {
+          return context._threadCount;
+        },
+        set: function (_threadCount) {
+          context._threadCount = _threadCount;
+        }
+      },
+      Consumer: {
+        get: function () {
+          if (!hasWarnedAboutUsingNestedContextConsumers) {
+            hasWarnedAboutUsingNestedContextConsumers = true;
+
+            error('Rendering <Context.Consumer.Consumer> is not supported and will be removed in ' + 'a future major release. Did you mean to render <Context.Consumer> instead?');
+          }
+
+          return context.Consumer;
+        }
+      }
+    }); // $FlowFixMe: Flow complains about missing properties because it doesn't understand defineProperty
+
+    context.Consumer = Consumer;
+  }
+
+  {
+    context._currentRenderer = null;
+    context._currentRenderer2 = null;
+  }
+
+  return context;
+}
+
+function lazy(ctor) {
+  var lazyType = {
+    $$typeof: REACT_LAZY_TYPE,
+    _ctor: ctor,
+    // React uses these fields to store the result.
+    _status: -1,
+    _result: null
+  };
+
+  {
+    // In production, this would just set it on the object.
+    var defaultProps;
+    var propTypes;
+    Object.defineProperties(lazyType, {
+      defaultProps: {
+        configurable: true,
+        get: function () {
+          return defaultProps;
+        },
+        set: function (newDefaultProps) {
+          error('React.lazy(...): It is not supported to assign `defaultProps` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
+
+          defaultProps = newDefaultProps; // Match production behavior more closely:
+
+          Object.defineProperty(lazyType, 'defaultProps', {
+            enumerable: true
+          });
+        }
+      },
+      propTypes: {
+        configurable: true,
+        get: function () {
+          return propTypes;
+        },
+        set: function (newPropTypes) {
+          error('React.lazy(...): It is not supported to assign `propTypes` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
+
+          propTypes = newPropTypes; // Match production behavior more closely:
+
+          Object.defineProperty(lazyType, 'propTypes', {
+            enumerable: true
+          });
+        }
+      }
+    });
+  }
+
+  return lazyType;
+}
+
+function forwardRef(render) {
+  {
+    if (render != null && render.$$typeof === REACT_MEMO_TYPE) {
+      error('forwardRef requires a render function but received a `memo` ' + 'component. Instead of forwardRef(memo(...)), use ' + 'memo(forwardRef(...)).');
+    } else if (typeof render !== 'function') {
+      error('forwardRef requires a render function but was given %s.', render === null ? 'null' : typeof render);
+    } else {
+      if (render.length !== 0 && render.length !== 2) {
+        error('forwardRef render functions accept exactly two parameters: props and ref. %s', render.length === 1 ? 'Did you forget to use the ref parameter?' : 'Any additional parameter will be undefined.');
+      }
+    }
+
+    if (render != null) {
+      if (render.defaultProps != null || render.propTypes != null) {
+        error('forwardRef render functions do not support propTypes or defaultProps. ' + 'Did you accidentally pass a React component?');
+      }
+    }
+  }
+
+  return {
+    $$typeof: REACT_FORWARD_REF_TYPE,
+    render: render
+  };
+}
+
+function isValidElementType(type) {
+  return typeof type === 'string' || typeof type === 'function' || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+  type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === 'object' && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
+}
+
+function memo(type, compare) {
+  {
+    if (!isValidElementType(type)) {
+      error('memo: The first argument must be a component. Instead ' + 'received: %s', type === null ? 'null' : typeof type);
+    }
+  }
+
+  return {
+    $$typeof: REACT_MEMO_TYPE,
+    type: type,
+    compare: compare === undefined ? null : compare
+  };
+}
+
+function resolveDispatcher() {
+  var dispatcher = ReactCurrentDispatcher.current;
+
+  if (!(dispatcher !== null)) {
+    {
+      throw Error( "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://fb.me/react-invalid-hook-call for tips about how to debug and fix this problem." );
+    }
+  }
+
+  return dispatcher;
+}
+
+function useContext(Context, unstable_observedBits) {
+  var dispatcher = resolveDispatcher();
+
+  {
+    if (unstable_observedBits !== undefined) {
+      error('useContext() second argument is reserved for future ' + 'use in React. Passing it is not supported. ' + 'You passed: %s.%s', unstable_observedBits, typeof unstable_observedBits === 'number' && Array.isArray(arguments[2]) ? '\n\nDid you call array.map(useContext)? ' + 'Calling Hooks inside a loop is not supported. ' + 'Learn more at https://fb.me/rules-of-hooks' : '');
+    } // TODO: add a more generic warning for invalid values.
+
+
+    if (Context._context !== undefined) {
+      var realContext = Context._context; // Don't deduplicate because this legitimately causes bugs
+      // and nobody should be using this in existing code.
+
+      if (realContext.Consumer === Context) {
+        error('Calling useContext(Context.Consumer) is not supported, may cause bugs, and will be ' + 'removed in a future major release. Did you mean to call useContext(Context) instead?');
+      } else if (realContext.Provider === Context) {
+        error('Calling useContext(Context.Provider) is not supported. ' + 'Did you mean to call useContext(Context) instead?');
+      }
+    }
+  }
+
+  return dispatcher.useContext(Context, unstable_observedBits);
+}
+function useState(initialState) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useState(initialState);
+}
+function useReducer(reducer, initialArg, init) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useReducer(reducer, initialArg, init);
+}
+function useRef(initialValue) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useRef(initialValue);
+}
+function useEffect(create, deps) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useEffect(create, deps);
+}
+function useLayoutEffect(create, deps) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useLayoutEffect(create, deps);
+}
+function useCallback(callback, deps) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useCallback(callback, deps);
+}
+function useMemo(create, deps) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useMemo(create, deps);
+}
+function useImperativeHandle(ref, create, deps) {
+  var dispatcher = resolveDispatcher();
+  return dispatcher.useImperativeHandle(ref, create, deps);
+}
+function useDebugValue(value, formatterFn) {
+  {
+    var dispatcher = resolveDispatcher();
+    return dispatcher.useDebugValue(value, formatterFn);
+  }
+}
+
+var propTypesMisspellWarningShown;
+
+{
+  propTypesMisspellWarningShown = false;
+}
+
+function getDeclarationErrorAddendum() {
+  if (ReactCurrentOwner.current) {
+    var name = getComponentName(ReactCurrentOwner.current.type);
+
+    if (name) {
+      return '\n\nCheck the render method of `' + name + '`.';
+    }
+  }
+
+  return '';
+}
+
+function getSourceInfoErrorAddendum(source) {
+  if (source !== undefined) {
+    var fileName = source.fileName.replace(/^.*[\\\/]/, '');
+    var lineNumber = source.lineNumber;
+    return '\n\nCheck your code at ' + fileName + ':' + lineNumber + '.';
+  }
+
+  return '';
+}
+
+function getSourceInfoErrorAddendumForProps(elementProps) {
+  if (elementProps !== null && elementProps !== undefined) {
+    return getSourceInfoErrorAddendum(elementProps.__source);
+  }
+
+  return '';
+}
+/**
+ * Warn if there's no key explicitly set on dynamic arrays of children or
+ * object keys are not valid. This allows us to keep track of children between
+ * updates.
+ */
+
+
+var ownerHasKeyUseWarning = {};
+
+function getCurrentComponentErrorInfo(parentType) {
+  var info = getDeclarationErrorAddendum();
+
+  if (!info) {
+    var parentName = typeof parentType === 'string' ? parentType : parentType.displayName || parentType.name;
+
+    if (parentName) {
+      info = "\n\nCheck the top-level render call using <" + parentName + ">.";
+    }
+  }
+
+  return info;
+}
+/**
+ * Warn if the element doesn't have an explicit key assigned to it.
+ * This element is in an array. The array could grow and shrink or be
+ * reordered. All children that haven't already been validated are required to
+ * have a "key" property assigned to it. Error statuses are cached so a warning
+ * will only be shown once.
+ *
+ * @internal
+ * @param {ReactElement} element Element that requires a key.
+ * @param {*} parentType element's parent's type.
+ */
+
+
+function validateExplicitKey(element, parentType) {
+  if (!element._store || element._store.validated || element.key != null) {
+    return;
+  }
+
+  element._store.validated = true;
+  var currentComponentErrorInfo = getCurrentComponentErrorInfo(parentType);
+
+  if (ownerHasKeyUseWarning[currentComponentErrorInfo]) {
+    return;
+  }
+
+  ownerHasKeyUseWarning[currentComponentErrorInfo] = true; // Usually the current owner is the offender, but if it accepts children as a
+  // property, it may be the creator of the child that's responsible for
+  // assigning it a key.
+
+  var childOwner = '';
+
+  if (element && element._owner && element._owner !== ReactCurrentOwner.current) {
+    // Give the component that originally created this child.
+    childOwner = " It was passed a child from " + getComponentName(element._owner.type) + ".";
+  }
+
+  setCurrentlyValidatingElement(element);
+
+  {
+    error('Each child in a list should have a unique "key" prop.' + '%s%s See https://fb.me/react-warning-keys for more information.', currentComponentErrorInfo, childOwner);
+  }
+
+  setCurrentlyValidatingElement(null);
+}
+/**
+ * Ensure that every element either is passed in a static location, in an
+ * array with an explicit keys property defined, or in an object literal
+ * with valid key property.
+ *
+ * @internal
+ * @param {ReactNode} node Statically passed child of any type.
+ * @param {*} parentType node's parent's type.
+ */
+
+
+function validateChildKeys(node, parentType) {
+  if (typeof node !== 'object') {
+    return;
+  }
+
+  if (Array.isArray(node)) {
+    for (var i = 0; i < node.length; i++) {
+      var child = node[i];
+
+      if (isValidElement(child)) {
+        validateExplicitKey(child, parentType);
+      }
+    }
+  } else if (isValidElement(node)) {
+    // This element was passed in a valid location.
+    if (node._store) {
+      node._store.validated = true;
+    }
+  } else if (node) {
+    var iteratorFn = getIteratorFn(node);
+
+    if (typeof iteratorFn === 'function') {
+      // Entry iterators used to provide implicit keys,
+      // but now we print a separate warning for them later.
+      if (iteratorFn !== node.entries) {
+        var iterator = iteratorFn.call(node);
+        var step;
+
+        while (!(step = iterator.next()).done) {
+          if (isValidElement(step.value)) {
+            validateExplicitKey(step.value, parentType);
+          }
+        }
+      }
+    }
+  }
+}
+/**
+ * Given an element, validate that its props follow the propTypes definition,
+ * provided by the type.
+ *
+ * @param {ReactElement} element
+ */
+
+
+function validatePropTypes(element) {
+  {
+    var type = element.type;
+
+    if (type === null || type === undefined || typeof type === 'string') {
+      return;
+    }
+
+    var name = getComponentName(type);
+    var propTypes;
+
+    if (typeof type === 'function') {
+      propTypes = type.propTypes;
+    } else if (typeof type === 'object' && (type.$$typeof === REACT_FORWARD_REF_TYPE || // Note: Memo only checks outer props here.
+    // Inner props are checked in the reconciler.
+    type.$$typeof === REACT_MEMO_TYPE)) {
+      propTypes = type.propTypes;
+    } else {
+      return;
+    }
+
+    if (propTypes) {
+      setCurrentlyValidatingElement(element);
+      checkPropTypes(propTypes, element.props, 'prop', name, ReactDebugCurrentFrame.getStackAddendum);
+      setCurrentlyValidatingElement(null);
+    } else if (type.PropTypes !== undefined && !propTypesMisspellWarningShown) {
+      propTypesMisspellWarningShown = true;
+
+      error('Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?', name || 'Unknown');
+    }
+
+    if (typeof type.getDefaultProps === 'function' && !type.getDefaultProps.isReactClassApproved) {
+      error('getDefaultProps is only used on classic React.createClass ' + 'definitions. Use a static property named `defaultProps` instead.');
+    }
+  }
+}
+/**
+ * Given a fragment, validate that it can only be provided with fragment props
+ * @param {ReactElement} fragment
+ */
+
+
+function validateFragmentProps(fragment) {
+  {
+    setCurrentlyValidatingElement(fragment);
+    var keys = Object.keys(fragment.props);
+
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+
+      if (key !== 'children' && key !== 'key') {
+        error('Invalid prop `%s` supplied to `React.Fragment`. ' + 'React.Fragment can only have `key` and `children` props.', key);
+
+        break;
+      }
+    }
+
+    if (fragment.ref !== null) {
+      error('Invalid attribute `ref` supplied to `React.Fragment`.');
+    }
+
+    setCurrentlyValidatingElement(null);
+  }
+}
+function createElementWithValidation(type, props, children) {
+  var validType = isValidElementType(type); // We warn in this case but don't throw. We expect the element creation to
+  // succeed and there will likely be errors in render.
+
+  if (!validType) {
+    var info = '';
+
+    if (type === undefined || typeof type === 'object' && type !== null && Object.keys(type).length === 0) {
+      info += ' You likely forgot to export your component from the file ' + "it's defined in, or you might have mixed up default and named imports.";
+    }
+
+    var sourceInfo = getSourceInfoErrorAddendumForProps(props);
+
+    if (sourceInfo) {
+      info += sourceInfo;
+    } else {
+      info += getDeclarationErrorAddendum();
+    }
+
+    var typeString;
+
+    if (type === null) {
+      typeString = 'null';
+    } else if (Array.isArray(type)) {
+      typeString = 'array';
+    } else if (type !== undefined && type.$$typeof === REACT_ELEMENT_TYPE) {
+      typeString = "<" + (getComponentName(type.type) || 'Unknown') + " />";
+      info = ' Did you accidentally export a JSX literal instead of a component?';
+    } else {
+      typeString = typeof type;
+    }
+
+    {
+      error('React.createElement: type is invalid -- expected a string (for ' + 'built-in components) or a class/function (for composite ' + 'components) but got: %s.%s', typeString, info);
+    }
+  }
+
+  var element = createElement.apply(this, arguments); // The result can be nullish if a mock or a custom function is used.
+  // TODO: Drop this when these are no longer allowed as the type argument.
+
+  if (element == null) {
+    return element;
+  } // Skip key warning if the type isn't valid since our key validation logic
+  // doesn't expect a non-string/function type and can throw confusing errors.
+  // We don't want exception behavior to differ between dev and prod.
+  // (Rendering will throw with a helpful message and as soon as the type is
+  // fixed, the key warnings will appear.)
+
+
+  if (validType) {
+    for (var i = 2; i < arguments.length; i++) {
+      validateChildKeys(arguments[i], type);
+    }
+  }
+
+  if (type === REACT_FRAGMENT_TYPE) {
+    validateFragmentProps(element);
+  } else {
+    validatePropTypes(element);
+  }
+
+  return element;
+}
+var didWarnAboutDeprecatedCreateFactory = false;
+function createFactoryWithValidation(type) {
+  var validatedFactory = createElementWithValidation.bind(null, type);
+  validatedFactory.type = type;
+
+  {
+    if (!didWarnAboutDeprecatedCreateFactory) {
+      didWarnAboutDeprecatedCreateFactory = true;
+
+      warn('React.createFactory() is deprecated and will be removed in ' + 'a future major release. Consider using JSX ' + 'or use React.createElement() directly instead.');
+    } // Legacy hook: remove it
+
+
+    Object.defineProperty(validatedFactory, 'type', {
+      enumerable: false,
+      get: function () {
+        warn('Factory.type is deprecated. Access the class directly ' + 'before passing it to createFactory.');
+
+        Object.defineProperty(this, 'type', {
+          value: type
+        });
+        return type;
+      }
+    });
+  }
+
+  return validatedFactory;
+}
+function cloneElementWithValidation(element, props, children) {
+  var newElement = cloneElement.apply(this, arguments);
+
+  for (var i = 2; i < arguments.length; i++) {
+    validateChildKeys(arguments[i], newElement.type);
+  }
+
+  validatePropTypes(newElement);
+  return newElement;
+}
+
+{
+
+  try {
+    var frozenObject = Object.freeze({});
+    var testMap = new Map([[frozenObject, null]]);
+    var testSet = new Set([frozenObject]); // This is necessary for Rollup to not consider these unused.
+    // https://github.com/rollup/rollup/issues/1771
+    // TODO: we can remove these if Rollup fixes the bug.
+
+    testMap.set(0, 0);
+    testSet.add(0);
+  } catch (e) {
+  }
+}
+
+var createElement$1 =  createElementWithValidation ;
+var cloneElement$1 =  cloneElementWithValidation ;
+var createFactory =  createFactoryWithValidation ;
+var Children = {
+  map: mapChildren,
+  forEach: forEachChildren,
+  count: countChildren,
+  toArray: toArray,
+  only: onlyChild
+};
+
+exports.Children = Children;
+exports.Component = Component;
+exports.Fragment = REACT_FRAGMENT_TYPE;
+exports.Profiler = REACT_PROFILER_TYPE;
+exports.PureComponent = PureComponent;
+exports.StrictMode = REACT_STRICT_MODE_TYPE;
+exports.Suspense = REACT_SUSPENSE_TYPE;
+exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactSharedInternals;
+exports.cloneElement = cloneElement$1;
+exports.createContext = createContext;
+exports.createElement = createElement$1;
+exports.createFactory = createFactory;
+exports.createRef = createRef;
+exports.forwardRef = forwardRef;
+exports.isValidElement = isValidElement;
+exports.lazy = lazy;
+exports.memo = memo;
+exports.useCallback = useCallback;
+exports.useContext = useContext;
+exports.useDebugValue = useDebugValue;
+exports.useEffect = useEffect;
+exports.useImperativeHandle = useImperativeHandle;
+exports.useLayoutEffect = useLayoutEffect;
+exports.useMemo = useMemo;
+exports.useReducer = useReducer;
+exports.useRef = useRef;
+exports.useState = useState;
+exports.version = ReactVersion;
+  })();
+}
+
+}).call(this,require('_process'))
+
+},{"_process":47,"object-assign":44,"prop-types/checkPropTypes":48}],8:[function(require,module,exports){
+/** @license React v16.13.0
+ * react.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+'use strict';var l=require("object-assign"),n="function"===typeof Symbol&&Symbol.for,p=n?Symbol.for("react.element"):60103,q=n?Symbol.for("react.portal"):60106,r=n?Symbol.for("react.fragment"):60107,t=n?Symbol.for("react.strict_mode"):60108,u=n?Symbol.for("react.profiler"):60114,v=n?Symbol.for("react.provider"):60109,w=n?Symbol.for("react.context"):60110,x=n?Symbol.for("react.forward_ref"):60112,y=n?Symbol.for("react.suspense"):60113,z=n?Symbol.for("react.memo"):60115,A=n?Symbol.for("react.lazy"):
+60116,B="function"===typeof Symbol&&Symbol.iterator;function C(a){for(var b="https://reactjs.org/docs/error-decoder.html?invariant="+a,c=1;c<arguments.length;c++)b+="&args[]="+encodeURIComponent(arguments[c]);return"Minified React error #"+a+"; visit "+b+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}
+var D={isMounted:function(){return!1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},E={};function F(a,b,c){this.props=a;this.context=b;this.refs=E;this.updater=c||D}F.prototype.isReactComponent={};F.prototype.setState=function(a,b){if("object"!==typeof a&&"function"!==typeof a&&null!=a)throw Error(C(85));this.updater.enqueueSetState(this,a,b,"setState")};F.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate")};
+function G(){}G.prototype=F.prototype;function H(a,b,c){this.props=a;this.context=b;this.refs=E;this.updater=c||D}var I=H.prototype=new G;I.constructor=H;l(I,F.prototype);I.isPureReactComponent=!0;var J={current:null},K=Object.prototype.hasOwnProperty,L={key:!0,ref:!0,__self:!0,__source:!0};
+function M(a,b,c){var e,d={},g=null,k=null;if(null!=b)for(e in void 0!==b.ref&&(k=b.ref),void 0!==b.key&&(g=""+b.key),b)K.call(b,e)&&!L.hasOwnProperty(e)&&(d[e]=b[e]);var f=arguments.length-2;if(1===f)d.children=c;else if(1<f){for(var h=Array(f),m=0;m<f;m++)h[m]=arguments[m+2];d.children=h}if(a&&a.defaultProps)for(e in f=a.defaultProps,f)void 0===d[e]&&(d[e]=f[e]);return{$$typeof:p,type:a,key:g,ref:k,props:d,_owner:J.current}}
+function N(a,b){return{$$typeof:p,type:a.type,key:b,ref:a.ref,props:a.props,_owner:a._owner}}function O(a){return"object"===typeof a&&null!==a&&a.$$typeof===p}function escape(a){var b={"=":"=0",":":"=2"};return"$"+(""+a).replace(/[=:]/g,function(a){return b[a]})}var P=/\/+/g,Q=[];function R(a,b,c,e){if(Q.length){var d=Q.pop();d.result=a;d.keyPrefix=b;d.func=c;d.context=e;d.count=0;return d}return{result:a,keyPrefix:b,func:c,context:e,count:0}}
+function S(a){a.result=null;a.keyPrefix=null;a.func=null;a.context=null;a.count=0;10>Q.length&&Q.push(a)}
+function T(a,b,c,e){var d=typeof a;if("undefined"===d||"boolean"===d)a=null;var g=!1;if(null===a)g=!0;else switch(d){case "string":case "number":g=!0;break;case "object":switch(a.$$typeof){case p:case q:g=!0}}if(g)return c(e,a,""===b?"."+U(a,0):b),1;g=0;b=""===b?".":b+":";if(Array.isArray(a))for(var k=0;k<a.length;k++){d=a[k];var f=b+U(d,k);g+=T(d,f,c,e)}else if(null===a||"object"!==typeof a?f=null:(f=B&&a[B]||a["@@iterator"],f="function"===typeof f?f:null),"function"===typeof f)for(a=f.call(a),k=
+0;!(d=a.next()).done;)d=d.value,f=b+U(d,k++),g+=T(d,f,c,e);else if("object"===d)throw c=""+a,Error(C(31,"[object Object]"===c?"object with keys {"+Object.keys(a).join(", ")+"}":c,""));return g}function V(a,b,c){return null==a?0:T(a,"",b,c)}function U(a,b){return"object"===typeof a&&null!==a&&null!=a.key?escape(a.key):b.toString(36)}function W(a,b){a.func.call(a.context,b,a.count++)}
+function aa(a,b,c){var e=a.result,d=a.keyPrefix;a=a.func.call(a.context,b,a.count++);Array.isArray(a)?X(a,e,c,function(a){return a}):null!=a&&(O(a)&&(a=N(a,d+(!a.key||b&&b.key===a.key?"":(""+a.key).replace(P,"$&/")+"/")+c)),e.push(a))}function X(a,b,c,e,d){var g="";null!=c&&(g=(""+c).replace(P,"$&/")+"/");b=R(b,g,e,d);V(a,aa,b);S(b)}var Y={current:null};function Z(){var a=Y.current;if(null===a)throw Error(C(321));return a}
+var ba={ReactCurrentDispatcher:Y,ReactCurrentBatchConfig:{suspense:null},ReactCurrentOwner:J,IsSomeRendererActing:{current:!1},assign:l};exports.Children={map:function(a,b,c){if(null==a)return a;var e=[];X(a,e,null,b,c);return e},forEach:function(a,b,c){if(null==a)return a;b=R(null,null,b,c);V(a,W,b);S(b)},count:function(a){return V(a,function(){return null},null)},toArray:function(a){var b=[];X(a,b,null,function(a){return a});return b},only:function(a){if(!O(a))throw Error(C(143));return a}};
+exports.Component=F;exports.Fragment=r;exports.Profiler=u;exports.PureComponent=H;exports.StrictMode=t;exports.Suspense=y;exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=ba;
+exports.cloneElement=function(a,b,c){if(null===a||void 0===a)throw Error(C(267,a));var e=l({},a.props),d=a.key,g=a.ref,k=a._owner;if(null!=b){void 0!==b.ref&&(g=b.ref,k=J.current);void 0!==b.key&&(d=""+b.key);if(a.type&&a.type.defaultProps)var f=a.type.defaultProps;for(h in b)K.call(b,h)&&!L.hasOwnProperty(h)&&(e[h]=void 0===b[h]&&void 0!==f?f[h]:b[h])}var h=arguments.length-2;if(1===h)e.children=c;else if(1<h){f=Array(h);for(var m=0;m<h;m++)f[m]=arguments[m+2];e.children=f}return{$$typeof:p,type:a.type,
+key:d,ref:g,props:e,_owner:k}};exports.createContext=function(a,b){void 0===b&&(b=null);a={$$typeof:w,_calculateChangedBits:b,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null};a.Provider={$$typeof:v,_context:a};return a.Consumer=a};exports.createElement=M;exports.createFactory=function(a){var b=M.bind(null,a);b.type=a;return b};exports.createRef=function(){return{current:null}};exports.forwardRef=function(a){return{$$typeof:x,render:a}};exports.isValidElement=O;
+exports.lazy=function(a){return{$$typeof:A,_ctor:a,_status:-1,_result:null}};exports.memo=function(a,b){return{$$typeof:z,type:a,compare:void 0===b?null:b}};exports.useCallback=function(a,b){return Z().useCallback(a,b)};exports.useContext=function(a,b){return Z().useContext(a,b)};exports.useDebugValue=function(){};exports.useEffect=function(a,b){return Z().useEffect(a,b)};exports.useImperativeHandle=function(a,b,c){return Z().useImperativeHandle(a,b,c)};
+exports.useLayoutEffect=function(a,b){return Z().useLayoutEffect(a,b)};exports.useMemo=function(a,b){return Z().useMemo(a,b)};exports.useReducer=function(a,b,c){return Z().useReducer(a,b,c)};exports.useRef=function(a){return Z().useRef(a)};exports.useState=function(a){return Z().useState(a)};exports.version="16.13.0";
+
+},{"object-assign":44}],9:[function(require,module,exports){
+(function (process){
+'use strict';
+
+if (process.env.NODE_ENV === 'production') {
+  module.exports = require('./cjs/react.production.min.js');
+} else {
+  module.exports = require('./cjs/react.development.js');
+}
+
+}).call(this,require('_process'))
+
+},{"./cjs/react.development.js":7,"./cjs/react.production.min.js":8,"_process":47}],10:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":9}],8:[function(require,module,exports){
+},{"./lib/axios":12}],11:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -309,7 +2265,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"../core/buildFullPath":15,"../core/createError":16,"./../core/settle":20,"./../helpers/buildURL":24,"./../helpers/cookies":26,"./../helpers/isURLSameOrigin":28,"./../helpers/parseHeaders":30,"./../utils":32}],9:[function(require,module,exports){
+},{"../core/buildFullPath":18,"../core/createError":19,"./../core/settle":23,"./../helpers/buildURL":27,"./../helpers/cookies":29,"./../helpers/isURLSameOrigin":31,"./../helpers/parseHeaders":33,"./../utils":35}],12:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -364,7 +2320,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":10,"./cancel/CancelToken":11,"./cancel/isCancel":12,"./core/Axios":13,"./core/mergeConfig":19,"./defaults":22,"./helpers/bind":23,"./helpers/spread":31,"./utils":32}],10:[function(require,module,exports){
+},{"./cancel/Cancel":13,"./cancel/CancelToken":14,"./cancel/isCancel":15,"./core/Axios":16,"./core/mergeConfig":22,"./defaults":25,"./helpers/bind":26,"./helpers/spread":34,"./utils":35}],13:[function(require,module,exports){
 'use strict';
 
 /**
@@ -385,7 +2341,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -444,14 +2400,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":10}],12:[function(require,module,exports){
+},{"./Cancel":13}],15:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -547,7 +2503,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"../helpers/buildURL":24,"./../utils":32,"./InterceptorManager":14,"./dispatchRequest":17,"./mergeConfig":19}],14:[function(require,module,exports){
+},{"../helpers/buildURL":27,"./../utils":35,"./InterceptorManager":17,"./dispatchRequest":20,"./mergeConfig":22}],17:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -601,7 +2557,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":32}],15:[function(require,module,exports){
+},{"./../utils":35}],18:[function(require,module,exports){
 'use strict';
 
 var isAbsoluteURL = require('../helpers/isAbsoluteURL');
@@ -623,7 +2579,7 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 };
 
-},{"../helpers/combineURLs":25,"../helpers/isAbsoluteURL":27}],16:[function(require,module,exports){
+},{"../helpers/combineURLs":28,"../helpers/isAbsoluteURL":30}],19:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -643,7 +2599,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":18}],17:[function(require,module,exports){
+},{"./enhanceError":21}],20:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -724,7 +2680,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":12,"../defaults":22,"./../utils":32,"./transformData":21}],18:[function(require,module,exports){
+},{"../cancel/isCancel":15,"../defaults":25,"./../utils":35,"./transformData":24}],21:[function(require,module,exports){
 'use strict';
 
 /**
@@ -768,7 +2724,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -843,7 +2799,7 @@ module.exports = function mergeConfig(config1, config2) {
   return config;
 };
 
-},{"../utils":32}],20:[function(require,module,exports){
+},{"../utils":35}],23:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -870,7 +2826,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":16}],21:[function(require,module,exports){
+},{"./createError":19}],24:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -892,7 +2848,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":32}],22:[function(require,module,exports){
+},{"./../utils":35}],25:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -994,7 +2950,7 @@ module.exports = defaults;
 
 }).call(this,require('_process'))
 
-},{"./adapters/http":8,"./adapters/xhr":8,"./helpers/normalizeHeaderName":29,"./utils":32,"_process":44}],23:[function(require,module,exports){
+},{"./adapters/http":11,"./adapters/xhr":11,"./helpers/normalizeHeaderName":32,"./utils":35,"_process":47}],26:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -1007,7 +2963,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],24:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1080,7 +3036,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":32}],25:[function(require,module,exports){
+},{"./../utils":35}],28:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1096,7 +3052,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1151,7 +3107,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":32}],27:[function(require,module,exports){
+},{"./../utils":35}],30:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1167,7 +3123,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1237,7 +3193,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":32}],29:[function(require,module,exports){
+},{"./../utils":35}],32:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -1251,7 +3207,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":32}],30:[function(require,module,exports){
+},{"../utils":35}],33:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -1306,7 +3262,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":32}],31:[function(require,module,exports){
+},{"./../utils":35}],34:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1335,7 +3291,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],32:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -1681,7 +3637,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":23}],33:[function(require,module,exports){
+},{"./helpers/bind":26}],36:[function(require,module,exports){
 (function (global){
 // @flow
 'use strict';
@@ -1694,7 +3650,7 @@ module.exports = function() {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],34:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -2644,10 +4600,10 @@ exports.locationsAreEqual = locationsAreEqual;
 exports.parsePath = parsePath;
 exports.createPath = createPath;
 
-},{"resolve-pathname":92,"tiny-invariant":101,"tiny-warning":102,"value-equal":105}],35:[function(require,module,exports){
+},{"resolve-pathname":95,"tiny-invariant":104,"tiny-warning":105,"value-equal":108}],38:[function(require,module,exports){
 "use strict";function _interopDefault(t){return t&&"object"==typeof t&&"default"in t?t.default:t}Object.defineProperty(exports,"__esModule",{value:!0});var resolvePathname=_interopDefault(require("resolve-pathname")),valueEqual=_interopDefault(require("value-equal"));require("tiny-warning");var invariant=_interopDefault(require("tiny-invariant"));function _extends(){return(_extends=Object.assign||function(t){for(var n=1;n<arguments.length;n++){var e=arguments[n];for(var a in e)Object.prototype.hasOwnProperty.call(e,a)&&(t[a]=e[a])}return t}).apply(this,arguments)}function addLeadingSlash(t){return"/"===t.charAt(0)?t:"/"+t}function stripLeadingSlash(t){return"/"===t.charAt(0)?t.substr(1):t}function hasBasename(t,n){return 0===t.toLowerCase().indexOf(n.toLowerCase())&&-1!=="/?#".indexOf(t.charAt(n.length))}function stripBasename(t,n){return hasBasename(t,n)?t.substr(n.length):t}function stripTrailingSlash(t){return"/"===t.charAt(t.length-1)?t.slice(0,-1):t}function parsePath(t){var n=t||"/",e="",a="",r=n.indexOf("#");-1!==r&&(a=n.substr(r),n=n.substr(0,r));var o=n.indexOf("?");return-1!==o&&(e=n.substr(o),n=n.substr(0,o)),{pathname:n,search:"?"===e?"":e,hash:"#"===a?"":a}}function createPath(t){var n=t.pathname,e=t.search,a=t.hash,r=n||"/";return e&&"?"!==e&&(r+="?"===e.charAt(0)?e:"?"+e),a&&"#"!==a&&(r+="#"===a.charAt(0)?a:"#"+a),r}function createLocation(t,n,e,a){var r;"string"==typeof t?(r=parsePath(t)).state=n:(void 0===(r=_extends({},t)).pathname&&(r.pathname=""),r.search?"?"!==r.search.charAt(0)&&(r.search="?"+r.search):r.search="",r.hash?"#"!==r.hash.charAt(0)&&(r.hash="#"+r.hash):r.hash="",void 0!==n&&void 0===r.state&&(r.state=n));try{r.pathname=decodeURI(r.pathname)}catch(t){throw t instanceof URIError?new URIError('Pathname "'+r.pathname+'" could not be decoded. This is likely caused by an invalid percent-encoding.'):t}return e&&(r.key=e),a?r.pathname?"/"!==r.pathname.charAt(0)&&(r.pathname=resolvePathname(r.pathname,a.pathname)):r.pathname=a.pathname:r.pathname||(r.pathname="/"),r}function locationsAreEqual(t,n){return t.pathname===n.pathname&&t.search===n.search&&t.hash===n.hash&&t.key===n.key&&valueEqual(t.state,n.state)}function createTransitionManager(){var o=null;var a=[];return{setPrompt:function(t){return o=t,function(){o===t&&(o=null)}},confirmTransitionTo:function(t,n,e,a){if(null!=o){var r="function"==typeof o?o(t,n):o;"string"==typeof r?"function"==typeof e?e(r,a):a(!0):a(!1!==r)}else a(!0)},appendListener:function(t){var n=!0;function e(){n&&t.apply(void 0,arguments)}return a.push(e),function(){n=!1,a=a.filter(function(t){return t!==e})}},notifyListeners:function(){for(var t=arguments.length,n=new Array(t),e=0;e<t;e++)n[e]=arguments[e];a.forEach(function(t){return t.apply(void 0,n)})}}}var canUseDOM=!("undefined"==typeof window||!window.document||!window.document.createElement);function getConfirmation(t,n){n(window.confirm(t))}function supportsHistory(){var t=window.navigator.userAgent;return(-1===t.indexOf("Android 2.")&&-1===t.indexOf("Android 4.0")||-1===t.indexOf("Mobile Safari")||-1!==t.indexOf("Chrome")||-1!==t.indexOf("Windows Phone"))&&(window.history&&"pushState"in window.history)}function supportsPopStateOnHashChange(){return-1===window.navigator.userAgent.indexOf("Trident")}function supportsGoWithoutReloadUsingHash(){return-1===window.navigator.userAgent.indexOf("Firefox")}function isExtraneousPopstateEvent(t){return void 0===t.state&&-1===navigator.userAgent.indexOf("CriOS")}var PopStateEvent="popstate",HashChangeEvent="hashchange";function getHistoryState(){try{return window.history.state||{}}catch(t){return{}}}function createBrowserHistory(t){void 0===t&&(t={}),canUseDOM||invariant(!1);var s=window.history,c=supportsHistory(),n=!supportsPopStateOnHashChange(),e=t,a=e.forceRefresh,h=void 0!==a&&a,r=e.getUserConfirmation,u=void 0===r?getConfirmation:r,o=e.keyLength,i=void 0===o?6:o,f=t.basename?stripTrailingSlash(addLeadingSlash(t.basename)):"";function l(t){var n=t||{},e=n.key,a=n.state,r=window.location,o=r.pathname+r.search+r.hash;return f&&(o=stripBasename(o,f)),createLocation(o,a,e)}function d(){return Math.random().toString(36).substr(2,i)}var v=createTransitionManager();function p(t){_extends(T,t),T.length=s.length,v.notifyListeners(T.location,T.action)}function g(t){isExtraneousPopstateEvent(t)||w(l(t.state))}function P(){w(l(getHistoryState()))}var m=!1;function w(n){if(m)m=!1,p();else{v.confirmTransitionTo(n,"POP",u,function(t){t?p({action:"POP",location:n}):function(t){var n=T.location,e=H.indexOf(n.key);-1===e&&(e=0);var a=H.indexOf(t.key);-1===a&&(a=0);var r=e-a;r&&(m=!0,L(r))}(n)})}}var y=l(getHistoryState()),H=[y.key];function x(t){return f+createPath(t)}function L(t){s.go(t)}var O=0;function E(t){1===(O+=t)&&1===t?(window.addEventListener(PopStateEvent,g),n&&window.addEventListener(HashChangeEvent,P)):0===O&&(window.removeEventListener(PopStateEvent,g),n&&window.removeEventListener(HashChangeEvent,P))}var S=!1;var T={length:s.length,action:"POP",location:y,createHref:x,push:function(t,n){var i=createLocation(t,n,d(),T.location);v.confirmTransitionTo(i,"PUSH",u,function(t){if(t){var n=x(i),e=i.key,a=i.state;if(c)if(s.pushState({key:e,state:a},null,n),h)window.location.href=n;else{var r=H.indexOf(T.location.key),o=H.slice(0,r+1);o.push(i.key),H=o,p({action:"PUSH",location:i})}else window.location.href=n}})},replace:function(t,n){var o="REPLACE",i=createLocation(t,n,d(),T.location);v.confirmTransitionTo(i,o,u,function(t){if(t){var n=x(i),e=i.key,a=i.state;if(c)if(s.replaceState({key:e,state:a},null,n),h)window.location.replace(n);else{var r=H.indexOf(T.location.key);-1!==r&&(H[r]=i.key),p({action:o,location:i})}else window.location.replace(n)}})},go:L,goBack:function(){L(-1)},goForward:function(){L(1)},block:function(t){void 0===t&&(t=!1);var n=v.setPrompt(t);return S||(E(1),S=!0),function(){return S&&(S=!1,E(-1)),n()}},listen:function(t){var n=v.appendListener(t);return E(1),function(){E(-1),n()}}};return T}var HashChangeEvent$1="hashchange",HashPathCoders={hashbang:{encodePath:function(t){return"!"===t.charAt(0)?t:"!/"+stripLeadingSlash(t)},decodePath:function(t){return"!"===t.charAt(0)?t.substr(1):t}},noslash:{encodePath:stripLeadingSlash,decodePath:addLeadingSlash},slash:{encodePath:addLeadingSlash,decodePath:addLeadingSlash}};function stripHash(t){var n=t.indexOf("#");return-1===n?t:t.slice(0,n)}function getHashPath(){var t=window.location.href,n=t.indexOf("#");return-1===n?"":t.substring(n+1)}function pushHashPath(t){window.location.hash=t}function replaceHashPath(t){window.location.replace(stripHash(window.location.href)+"#"+t)}function createHashHistory(t){void 0===t&&(t={}),canUseDOM||invariant(!1);var n=window.history,e=(supportsGoWithoutReloadUsingHash(),t),a=e.getUserConfirmation,i=void 0===a?getConfirmation:a,r=e.hashType,o=void 0===r?"slash":r,s=t.basename?stripTrailingSlash(addLeadingSlash(t.basename)):"",c=HashPathCoders[o],h=c.encodePath,u=c.decodePath;function f(){var t=u(getHashPath());return s&&(t=stripBasename(t,s)),createLocation(t)}var l=createTransitionManager();function d(t){_extends(E,t),E.length=n.length,l.notifyListeners(E.location,E.action)}var v=!1,p=null;function g(){var t=getHashPath(),n=h(t);if(t!==n)replaceHashPath(n);else{var e=f(),a=E.location;if(!v&&function(t,n){return t.pathname===n.pathname&&t.search===n.search&&t.hash===n.hash}(a,e))return;if(p===createPath(e))return;p=null,function(n){if(v)v=!1,d();else{l.confirmTransitionTo(n,"POP",i,function(t){t?d({action:"POP",location:n}):function(t){var n=E.location,e=y.lastIndexOf(createPath(n));-1===e&&(e=0);var a=y.lastIndexOf(createPath(t));-1===a&&(a=0);var r=e-a;r&&(v=!0,H(r))}(n)})}}(e)}}var P=getHashPath(),m=h(P);P!==m&&replaceHashPath(m);var w=f(),y=[createPath(w)];function H(t){n.go(t)}var x=0;function L(t){1===(x+=t)&&1===t?window.addEventListener(HashChangeEvent$1,g):0===x&&window.removeEventListener(HashChangeEvent$1,g)}var O=!1;var E={length:n.length,action:"POP",location:w,createHref:function(t){var n=document.querySelector("base"),e="";return n&&n.getAttribute("href")&&(e=stripHash(window.location.href)),e+"#"+h(s+createPath(t))},push:function(t,n){var o=createLocation(t,void 0,void 0,E.location);l.confirmTransitionTo(o,"PUSH",i,function(t){if(t){var n=createPath(o),e=h(s+n);if(getHashPath()!==e){p=n,pushHashPath(e);var a=y.lastIndexOf(createPath(E.location)),r=y.slice(0,a+1);r.push(n),y=r,d({action:"PUSH",location:o})}else d()}})},replace:function(t,n){var r="REPLACE",o=createLocation(t,void 0,void 0,E.location);l.confirmTransitionTo(o,r,i,function(t){if(t){var n=createPath(o),e=h(s+n);getHashPath()!==e&&(p=n,replaceHashPath(e));var a=y.indexOf(createPath(E.location));-1!==a&&(y[a]=n),d({action:r,location:o})}})},go:H,goBack:function(){H(-1)},goForward:function(){H(1)},block:function(t){void 0===t&&(t=!1);var n=l.setPrompt(t);return O||(L(1),O=!0),function(){return O&&(O=!1,L(-1)),n()}},listen:function(t){var n=l.appendListener(t);return L(1),function(){L(-1),n()}}};return E}function clamp(t,n,e){return Math.min(Math.max(t,n),e)}function createMemoryHistory(t){void 0===t&&(t={});var n=t,r=n.getUserConfirmation,e=n.initialEntries,a=void 0===e?["/"]:e,o=n.initialIndex,i=void 0===o?0:o,s=n.keyLength,c=void 0===s?6:s,h=createTransitionManager();function u(t){_extends(g,t),g.length=g.entries.length,h.notifyListeners(g.location,g.action)}function f(){return Math.random().toString(36).substr(2,c)}var l=clamp(i,0,a.length-1),d=a.map(function(t){return createLocation(t,void 0,"string"==typeof t?f():t.key||f())}),v=createPath;function p(t){var n=clamp(g.index+t,0,g.entries.length-1),e=g.entries[n];h.confirmTransitionTo(e,"POP",r,function(t){t?u({action:"POP",location:e,index:n}):u()})}var g={length:d.length,action:"POP",location:d[l],index:l,entries:d,createHref:v,push:function(t,n){var a=createLocation(t,n,f(),g.location);h.confirmTransitionTo(a,"PUSH",r,function(t){if(t){var n=g.index+1,e=g.entries.slice(0);e.length>n?e.splice(n,e.length-n,a):e.push(a),u({action:"PUSH",location:a,index:n,entries:e})}})},replace:function(t,n){var e="REPLACE",a=createLocation(t,n,f(),g.location);h.confirmTransitionTo(a,e,r,function(t){t&&(g.entries[g.index]=a,u({action:e,location:a}))})},go:p,goBack:function(){p(-1)},goForward:function(){p(1)},canGo:function(t){var n=g.index+t;return 0<=n&&n<g.entries.length},block:function(t){return void 0===t&&(t=!1),h.setPrompt(t)},listen:function(t){return h.appendListener(t)}};return g}exports.createBrowserHistory=createBrowserHistory,exports.createHashHistory=createHashHistory,exports.createMemoryHistory=createMemoryHistory,exports.createLocation=createLocation,exports.locationsAreEqual=locationsAreEqual,exports.parsePath=parsePath,exports.createPath=createPath;
 
-},{"resolve-pathname":92,"tiny-invariant":101,"tiny-warning":102,"value-equal":105}],36:[function(require,module,exports){
+},{"resolve-pathname":95,"tiny-invariant":104,"tiny-warning":105,"value-equal":108}],39:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -2659,7 +4615,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/history.js":34,"./cjs/history.min.js":35,"_process":44}],37:[function(require,module,exports){
+},{"./cjs/history.js":37,"./cjs/history.min.js":38,"_process":47}],40:[function(require,module,exports){
 'use strict';
 
 var reactIs = require('react-is');
@@ -2764,7 +4720,7 @@ function hoistNonReactStatics(targetComponent, sourceComponent, blacklist) {
 
 module.exports = hoistNonReactStatics;
 
-},{"react-is":55}],38:[function(require,module,exports){
+},{"react-is":58}],41:[function(require,module,exports){
 /*!
  * JavaScript Cookie v2.2.1
  * https://github.com/js-cookie/js-cookie
@@ -2929,7 +4885,7 @@ module.exports = hoistNonReactStatics;
 	return init(function () {});
 }));
 
-},{}],39:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (process){
 'use strict';function _interopDefault(e){return(e&&(typeof e==='object')&&'default'in e)?e['default']:e}var React=require('react'),React__default=_interopDefault(React),_inheritsLoose=_interopDefault(require('@babel/runtime/helpers/inheritsLoose')),PropTypes=_interopDefault(require('prop-types')),gud=_interopDefault(require('gud')),warning=_interopDefault(require('tiny-warning'));var MAX_SIGNED_31_BIT_INT = 1073741823;
 
@@ -3098,7 +5054,7 @@ function createReactContext(defaultValue, calculateChangedBits) {
 }var index = React__default.createContext || createReactContext;module.exports=index;
 }).call(this,require('_process'))
 
-},{"@babel/runtime/helpers/inheritsLoose":2,"_process":44,"gud":33,"prop-types":48,"react":87,"tiny-warning":102}],40:[function(require,module,exports){
+},{"@babel/runtime/helpers/inheritsLoose":2,"_process":47,"gud":36,"prop-types":51,"react":90,"tiny-warning":105}],43:[function(require,module,exports){
 //! moment.js
 
 ;(function (global, factory) {
@@ -7702,7 +9658,7 @@ function createReactContext(defaultValue, calculateChangedBits) {
 
 })));
 
-},{}],41:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -7794,7 +9750,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],42:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var isarray = require('isarray')
 
 /**
@@ -8222,12 +10178,12 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-},{"isarray":43}],43:[function(require,module,exports){
+},{"isarray":46}],46:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],44:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -8413,7 +10369,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],45:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -8520,7 +10476,7 @@ module.exports = checkPropTypes;
 
 }).call(this,require('_process'))
 
-},{"./lib/ReactPropTypesSecret":49,"_process":44}],46:[function(require,module,exports){
+},{"./lib/ReactPropTypesSecret":52,"_process":47}],49:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  *
@@ -8586,7 +10542,7 @@ module.exports = function() {
   return ReactPropTypes;
 };
 
-},{"./lib/ReactPropTypesSecret":49}],47:[function(require,module,exports){
+},{"./lib/ReactPropTypesSecret":52}],50:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -9182,7 +11138,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 
 }).call(this,require('_process'))
 
-},{"./checkPropTypes":45,"./lib/ReactPropTypesSecret":49,"_process":44,"object-assign":41,"react-is":55}],48:[function(require,module,exports){
+},{"./checkPropTypes":48,"./lib/ReactPropTypesSecret":52,"_process":47,"object-assign":44,"react-is":58}],51:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -9206,7 +11162,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 }).call(this,require('_process'))
 
-},{"./factoryWithThrowingShims":46,"./factoryWithTypeCheckers":47,"_process":44,"react-is":55}],49:[function(require,module,exports){
+},{"./factoryWithThrowingShims":49,"./factoryWithTypeCheckers":50,"_process":47,"react-is":58}],52:[function(require,module,exports){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  *
@@ -9220,7 +11176,7 @@ var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 
 module.exports = ReactPropTypesSecret;
 
-},{}],50:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 (function (process){
 /** @license React v16.13.0
  * react-dom.development.js
@@ -34271,7 +36227,7 @@ exports.version = ReactVersion;
 
 }).call(this,require('_process'))
 
-},{"_process":44,"object-assign":41,"prop-types/checkPropTypes":45,"react":87,"scheduler":97,"scheduler/tracing":98}],51:[function(require,module,exports){
+},{"_process":47,"object-assign":44,"prop-types/checkPropTypes":48,"react":90,"scheduler":100,"scheduler/tracing":101}],54:[function(require,module,exports){
 /** @license React v16.13.0
  * react-dom.production.min.js
  *
@@ -34565,7 +36521,7 @@ exports.flushSync=function(a,b){if((W&(fj|gj))!==V)throw Error(u(187));var c=W;W
 exports.unmountComponentAtNode=function(a){if(!gk(a))throw Error(u(40));return a._reactRootContainer?(Nj(function(){ik(null,null,a,!1,function(){a._reactRootContainer=null;a[Od]=null})}),!0):!1};exports.unstable_batchedUpdates=Mj;exports.unstable_createPortal=function(a,b){return kk(a,b,2<arguments.length&&void 0!==arguments[2]?arguments[2]:null)};
 exports.unstable_renderSubtreeIntoContainer=function(a,b,c,d){if(!gk(c))throw Error(u(200));if(null==a||void 0===a._reactInternalFiber)throw Error(u(38));return ik(a,b,c,!1,d)};exports.version="16.13.0";
 
-},{"object-assign":41,"react":87,"scheduler":97}],52:[function(require,module,exports){
+},{"object-assign":44,"react":90,"scheduler":100}],55:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -34608,7 +36564,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/react-dom.development.js":50,"./cjs/react-dom.production.min.js":51,"_process":44}],53:[function(require,module,exports){
+},{"./cjs/react-dom.development.js":53,"./cjs/react-dom.production.min.js":54,"_process":47}],56:[function(require,module,exports){
 (function (process){
 /** @license React v16.13.0
  * react-is.development.js
@@ -34794,7 +36750,7 @@ exports.typeOf = typeOf;
 
 }).call(this,require('_process'))
 
-},{"_process":44}],54:[function(require,module,exports){
+},{"_process":47}],57:[function(require,module,exports){
 /** @license React v16.13.0
  * react-is.production.min.js
  *
@@ -34811,7 +36767,7 @@ exports.Profiler=g;exports.StrictMode=f;exports.Suspense=p;exports.isAsyncMode=f
 exports.isMemo=function(a){return z(a)===r};exports.isPortal=function(a){return z(a)===d};exports.isProfiler=function(a){return z(a)===g};exports.isStrictMode=function(a){return z(a)===f};exports.isSuspense=function(a){return z(a)===p};
 exports.isValidElementType=function(a){return"string"===typeof a||"function"===typeof a||a===e||a===m||a===g||a===f||a===p||a===q||"object"===typeof a&&null!==a&&(a.$$typeof===t||a.$$typeof===r||a.$$typeof===h||a.$$typeof===k||a.$$typeof===n||a.$$typeof===w||a.$$typeof===x||a.$$typeof===y||a.$$typeof===v)};exports.typeOf=z;
 
-},{}],55:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -34823,7 +36779,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/react-is.development.js":53,"./cjs/react-is.production.min.js":54,"_process":44}],56:[function(require,module,exports){
+},{"./cjs/react-is.development.js":56,"./cjs/react-is.production.min.js":57,"_process":47}],59:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -34848,7 +36804,7 @@ var _default = ReactReduxContext;
 exports["default"] = _default;
 }).call(this,require('_process'))
 
-},{"@babel/runtime/helpers/interopRequireDefault":3,"_process":44,"react":87}],57:[function(require,module,exports){
+},{"@babel/runtime/helpers/interopRequireDefault":3,"_process":47,"react":90}],60:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -34917,7 +36873,7 @@ var _default = Provider;
 exports["default"] = _default;
 }).call(this,require('_process'))
 
-},{"../utils/Subscription":71,"./Context":56,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/interopRequireWildcard":4,"_process":44,"prop-types":48,"react":87}],58:[function(require,module,exports){
+},{"../utils/Subscription":74,"./Context":59,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/interopRequireWildcard":4,"_process":47,"prop-types":51,"react":90}],61:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -35305,7 +37261,7 @@ _ref) {
 }
 }).call(this,require('_process'))
 
-},{"../utils/Subscription":71,"../utils/useIsomorphicLayoutEffect":76,"./Context":56,"@babel/runtime/helpers/extends":1,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/interopRequireWildcard":4,"@babel/runtime/helpers/objectWithoutPropertiesLoose":5,"_process":44,"hoist-non-react-statics":37,"react":87,"react-is":55}],59:[function(require,module,exports){
+},{"../utils/Subscription":74,"../utils/useIsomorphicLayoutEffect":79,"./Context":59,"@babel/runtime/helpers/extends":1,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/interopRequireWildcard":4,"@babel/runtime/helpers/objectWithoutPropertiesLoose":5,"_process":47,"hoist-non-react-statics":40,"react":90,"react-is":58}],62:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -35423,7 +37379,7 @@ var _default =
 createConnect();
 
 exports["default"] = _default;
-},{"../components/connectAdvanced":58,"../utils/shallowEqual":75,"./mapDispatchToProps":60,"./mapStateToProps":61,"./mergeProps":62,"./selectorFactory":63,"@babel/runtime/helpers/extends":1,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/objectWithoutPropertiesLoose":5}],60:[function(require,module,exports){
+},{"../components/connectAdvanced":61,"../utils/shallowEqual":78,"./mapDispatchToProps":63,"./mapStateToProps":64,"./mergeProps":65,"./selectorFactory":66,"@babel/runtime/helpers/extends":1,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/objectWithoutPropertiesLoose":5}],63:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -35456,7 +37412,7 @@ function whenMapDispatchToPropsIsObject(mapDispatchToProps) {
 
 var _default = [whenMapDispatchToPropsIsFunction, whenMapDispatchToPropsIsMissing, whenMapDispatchToPropsIsObject];
 exports["default"] = _default;
-},{"./wrapMapToProps":65,"redux":89}],61:[function(require,module,exports){
+},{"./wrapMapToProps":68,"redux":92}],64:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -35478,7 +37434,7 @@ function whenMapStateToPropsIsMissing(mapStateToProps) {
 
 var _default = [whenMapStateToPropsIsFunction, whenMapStateToPropsIsMissing];
 exports["default"] = _default;
-},{"./wrapMapToProps":65}],62:[function(require,module,exports){
+},{"./wrapMapToProps":68}],65:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -35536,7 +37492,7 @@ var _default = [whenMergePropsIsFunction, whenMergePropsIsOmitted];
 exports["default"] = _default;
 }).call(this,require('_process'))
 
-},{"../utils/verifyPlainObject":77,"@babel/runtime/helpers/extends":1,"@babel/runtime/helpers/interopRequireDefault":3,"_process":44}],63:[function(require,module,exports){
+},{"../utils/verifyPlainObject":80,"@babel/runtime/helpers/extends":1,"@babel/runtime/helpers/interopRequireDefault":3,"_process":47}],66:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -35639,7 +37595,7 @@ function finalPropsSelectorFactory(dispatch, _ref2) {
 }
 }).call(this,require('_process'))
 
-},{"./verifySubselectors":64,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/objectWithoutPropertiesLoose":5,"_process":44}],64:[function(require,module,exports){
+},{"./verifySubselectors":67,"@babel/runtime/helpers/interopRequireDefault":3,"@babel/runtime/helpers/objectWithoutPropertiesLoose":5,"_process":47}],67:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -35664,7 +37620,7 @@ function verifySubselectors(mapStateToProps, mapDispatchToProps, mergeProps, dis
   verify(mapDispatchToProps, 'mapDispatchToProps', displayName);
   verify(mergeProps, 'mergeProps', displayName);
 }
-},{"../utils/warning":78,"@babel/runtime/helpers/interopRequireDefault":3}],65:[function(require,module,exports){
+},{"../utils/warning":81,"@babel/runtime/helpers/interopRequireDefault":3}],68:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -35744,7 +37700,7 @@ function wrapMapToPropsFunc(mapToProps, methodName) {
 }
 }).call(this,require('_process'))
 
-},{"../utils/verifyPlainObject":77,"@babel/runtime/helpers/interopRequireDefault":3,"_process":44}],66:[function(require,module,exports){
+},{"../utils/verifyPlainObject":80,"@babel/runtime/helpers/interopRequireDefault":3,"_process":47}],69:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -35799,7 +37755,7 @@ var useDispatch =
 /*#__PURE__*/
 createDispatchHook();
 exports.useDispatch = useDispatch;
-},{"../components/Context":56,"./useStore":69}],67:[function(require,module,exports){
+},{"../components/Context":59,"./useStore":72}],70:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -35837,7 +37793,7 @@ function useReduxContext() {
 }
 }).call(this,require('_process'))
 
-},{"../components/Context":56,"_process":44,"react":87}],68:[function(require,module,exports){
+},{"../components/Context":59,"_process":47,"react":90}],71:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -35987,7 +37943,7 @@ createSelectorHook();
 exports.useSelector = useSelector;
 }).call(this,require('_process'))
 
-},{"../components/Context":56,"../utils/Subscription":71,"../utils/useIsomorphicLayoutEffect":76,"./useReduxContext":67,"@babel/runtime/helpers/interopRequireDefault":3,"_process":44,"react":87}],69:[function(require,module,exports){
+},{"../components/Context":59,"../utils/Subscription":74,"../utils/useIsomorphicLayoutEffect":79,"./useReduxContext":70,"@babel/runtime/helpers/interopRequireDefault":3,"_process":47,"react":90}],72:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36042,7 +37998,7 @@ var useStore =
 /*#__PURE__*/
 createStoreHook();
 exports.useStore = useStore;
-},{"../components/Context":56,"./useReduxContext":67,"react":87}],70:[function(require,module,exports){
+},{"../components/Context":59,"./useReduxContext":70,"react":90}],73:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -36090,7 +38046,7 @@ var _shallowEqual = _interopRequireDefault(require("./utils/shallowEqual"));
 
 exports.shallowEqual = _shallowEqual["default"];
 (0, _batch.setBatch)(_reactBatchedUpdates.unstable_batchedUpdates);
-},{"./components/Context":56,"./components/Provider":57,"./components/connectAdvanced":58,"./connect/connect":59,"./hooks/useDispatch":66,"./hooks/useSelector":68,"./hooks/useStore":69,"./utils/batch":72,"./utils/reactBatchedUpdates":74,"./utils/shallowEqual":75,"@babel/runtime/helpers/interopRequireDefault":3}],71:[function(require,module,exports){
+},{"./components/Context":59,"./components/Provider":60,"./components/connectAdvanced":61,"./connect/connect":62,"./hooks/useDispatch":69,"./hooks/useSelector":71,"./hooks/useStore":72,"./utils/batch":75,"./utils/reactBatchedUpdates":77,"./utils/shallowEqual":78,"@babel/runtime/helpers/interopRequireDefault":3}],74:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36221,7 +38177,7 @@ function () {
 }();
 
 exports["default"] = Subscription;
-},{"./batch":72}],72:[function(require,module,exports){
+},{"./batch":75}],75:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36246,7 +38202,7 @@ var getBatch = function getBatch() {
 };
 
 exports.getBatch = getBatch;
-},{}],73:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36268,7 +38224,7 @@ function isPlainObject(obj) {
 
   return proto === baseProto;
 }
-},{}],74:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36277,7 +38233,7 @@ exports.unstable_batchedUpdates = void 0;
 var _reactDom = require("react-dom");
 
 exports.unstable_batchedUpdates = _reactDom.unstable_batchedUpdates;
-},{"react-dom":52}],75:[function(require,module,exports){
+},{"react-dom":55}],78:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36310,7 +38266,7 @@ function shallowEqual(objA, objB) {
 
   return true;
 }
-},{}],76:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36328,7 +38284,7 @@ var _react = require("react");
 // subscription is created and an inconsistent state may be observed
 var useIsomorphicLayoutEffect = typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.createElement !== 'undefined' ? _react.useLayoutEffect : _react.useEffect;
 exports.useIsomorphicLayoutEffect = useIsomorphicLayoutEffect;
-},{"react":87}],77:[function(require,module,exports){
+},{"react":90}],80:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -36345,7 +38301,7 @@ function verifyPlainObject(value, displayName, methodName) {
     (0, _warning["default"])(methodName + "() in " + displayName + " must return a plain object. Instead received " + value + ".");
   }
 }
-},{"./isPlainObject":73,"./warning":78,"@babel/runtime/helpers/interopRequireDefault":3}],78:[function(require,module,exports){
+},{"./isPlainObject":76,"./warning":81,"@babel/runtime/helpers/interopRequireDefault":3}],81:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -36375,7 +38331,7 @@ function warning(message) {
   /* eslint-enable no-empty */
 
 }
-},{}],79:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -36739,11 +38695,11 @@ exports.Link = Link;
 exports.NavLink = NavLink;
 
 
-},{"history":36,"prop-types":48,"react":87,"react-router":84,"tiny-invariant":101,"tiny-warning":102}],80:[function(require,module,exports){
+},{"history":39,"prop-types":51,"react":90,"react-router":87,"tiny-invariant":104,"tiny-warning":105}],83:[function(require,module,exports){
 "use strict";function _interopDefault(e){return e&&"object"==typeof e&&"default"in e?e.default:e}Object.defineProperty(exports,"__esModule",{value:!0});var reactRouter=require("react-router"),React=_interopDefault(require("react")),history=require("history");require("prop-types"),require("tiny-warning");var invariant=_interopDefault(require("tiny-invariant"));function _extends(){return(_extends=Object.assign||function(e){for(var r=1;r<arguments.length;r++){var t=arguments[r];for(var o in t)Object.prototype.hasOwnProperty.call(t,o)&&(e[o]=t[o])}return e}).apply(this,arguments)}function _inheritsLoose(e,r){e.prototype=Object.create(r.prototype),(e.prototype.constructor=e).__proto__=r}function _objectWithoutPropertiesLoose(e,r){if(null==e)return{};var t,o,n={},a=Object.keys(e);for(o=0;o<a.length;o++)t=a[o],0<=r.indexOf(t)||(n[t]=e[t]);return n}var BrowserRouter=function(n){function e(){for(var e,r=arguments.length,t=new Array(r),o=0;o<r;o++)t[o]=arguments[o];return(e=n.call.apply(n,[this].concat(t))||this).history=history.createBrowserHistory(e.props),e}return _inheritsLoose(e,n),e.prototype.render=function(){return React.createElement(reactRouter.Router,{history:this.history,children:this.props.children})},e}(React.Component),HashRouter=function(n){function e(){for(var e,r=arguments.length,t=new Array(r),o=0;o<r;o++)t[o]=arguments[o];return(e=n.call.apply(n,[this].concat(t))||this).history=history.createHashHistory(e.props),e}return _inheritsLoose(e,n),e.prototype.render=function(){return React.createElement(reactRouter.Router,{history:this.history,children:this.props.children})},e}(React.Component),resolveToLocation=function(e,r){return"function"==typeof e?e(r):e},normalizeToLocation=function(e,r){return"string"==typeof e?history.createLocation(e,null,null,r):e},forwardRefShim=function(e){return e},forwardRef=React.forwardRef;function isModifiedEvent(e){return!!(e.metaKey||e.altKey||e.ctrlKey||e.shiftKey)}void 0===forwardRef&&(forwardRef=forwardRefShim);var LinkAnchor=forwardRef(function(e,r){var t=e.innerRef,o=e.navigate,n=e.onClick,a=_objectWithoutPropertiesLoose(e,["innerRef","navigate","onClick"]),i=a.target,c=_extends({},a,{onClick:function(r){try{n&&n(r)}catch(e){throw r.preventDefault(),e}r.defaultPrevented||0!==r.button||i&&"_self"!==i||isModifiedEvent(r)||(r.preventDefault(),o())}});return c.ref=forwardRefShim!==forwardRef&&r||t,React.createElement("a",c)}),Link=forwardRef(function(e,a){var r=e.component,i=void 0===r?LinkAnchor:r,c=e.replace,f=e.to,u=e.innerRef,s=_objectWithoutPropertiesLoose(e,["component","replace","to","innerRef"]);return React.createElement(reactRouter.__RouterContext.Consumer,null,function(r){r||invariant(!1);var t=r.history,e=normalizeToLocation(resolveToLocation(f,r.location),r.location),o=e?t.createHref(e):"",n=_extends({},s,{href:o,navigate:function(){var e=resolveToLocation(f,r.location);(c?t.replace:t.push)(e)}});return forwardRefShim!==forwardRef?n.ref=a||u:n.innerRef=u,React.createElement(i,n)})}),forwardRefShim$1=function(e){return e},forwardRef$1=React.forwardRef;function joinClassnames(){for(var e=arguments.length,r=new Array(e),t=0;t<e;t++)r[t]=arguments[t];return r.filter(function(e){return e}).join(" ")}void 0===forwardRef$1&&(forwardRef$1=forwardRefShim$1);var NavLink=forwardRef$1(function(e,s){var r=e["aria-current"],l=void 0===r?"page":r,t=e.activeClassName,p=void 0===t?"active":t,h=e.activeStyle,R=e.className,d=e.exact,v=e.isActive,y=e.location,m=e.strict,w=e.style,_=e.to,L=e.innerRef,x=_objectWithoutPropertiesLoose(e,["aria-current","activeClassName","activeStyle","className","exact","isActive","location","strict","style","to","innerRef"]);return React.createElement(reactRouter.__RouterContext.Consumer,null,function(e){e||invariant(!1);var r=y||e.location,t=normalizeToLocation(resolveToLocation(_,r),r),o=t.pathname,n=o&&o.replace(/([.+*?=^!:${}()[\]|/\\])/g,"\\$1"),a=n?reactRouter.matchPath(r.pathname,{path:n,exact:d,strict:m}):null,i=!!(v?v(a,r):a),c=i?joinClassnames(R,p):R,f=i?_extends({},w,{},h):w,u=_extends({"aria-current":i&&l||null,className:c,style:f,to:t},x);return forwardRefShim$1!==forwardRef$1?u.ref=s||L:u.innerRef=L,React.createElement(Link,u)})});Object.keys(reactRouter).forEach(function(e){"default"!==e&&Object.defineProperty(exports,e,{enumerable:!0,get:function(){return reactRouter[e]}})}),exports.BrowserRouter=BrowserRouter,exports.HashRouter=HashRouter,exports.Link=Link,exports.NavLink=NavLink;
 
 
-},{"history":36,"prop-types":48,"react":87,"react-router":84,"tiny-invariant":101,"tiny-warning":102}],81:[function(require,module,exports){
+},{"history":39,"prop-types":51,"react":90,"react-router":87,"tiny-invariant":104,"tiny-warning":105}],84:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -36755,7 +38711,7 @@ if (process.env.NODE_ENV === "production") {
 
 }).call(this,require('_process'))
 
-},{"./cjs/react-router-dom.js":79,"./cjs/react-router-dom.min.js":80,"_process":44}],82:[function(require,module,exports){
+},{"./cjs/react-router-dom.js":82,"./cjs/react-router-dom.min.js":83,"_process":47}],85:[function(require,module,exports){
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -37565,11 +39521,11 @@ exports.useRouteMatch = useRouteMatch;
 exports.withRouter = withRouter;
 
 
-},{"history":36,"hoist-non-react-statics":37,"mini-create-react-context":39,"path-to-regexp":42,"prop-types":48,"react":87,"react-is":55,"tiny-invariant":101,"tiny-warning":102}],83:[function(require,module,exports){
+},{"history":39,"hoist-non-react-statics":40,"mini-create-react-context":42,"path-to-regexp":45,"prop-types":51,"react":90,"react-is":58,"tiny-invariant":104,"tiny-warning":105}],86:[function(require,module,exports){
 "use strict";function _interopDefault(t){return t&&"object"==typeof t&&"default"in t?t.default:t}Object.defineProperty(exports,"__esModule",{value:!0});var React=_interopDefault(require("react"));require("prop-types");var history=require("history");require("tiny-warning");var createContext=_interopDefault(require("mini-create-react-context")),invariant=_interopDefault(require("tiny-invariant")),pathToRegexp=_interopDefault(require("path-to-regexp"));require("react-is");var hoistStatics=_interopDefault(require("hoist-non-react-statics"));function _extends(){return(_extends=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var n=arguments[e];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(t[o]=n[o])}return t}).apply(this,arguments)}function _inheritsLoose(t,e){t.prototype=Object.create(e.prototype),(t.prototype.constructor=t).__proto__=e}function _objectWithoutPropertiesLoose(t,e){if(null==t)return{};var n,o,r={},a=Object.keys(t);for(o=0;o<a.length;o++)n=a[o],0<=e.indexOf(n)||(r[n]=t[n]);return r}var createNamedContext=function(t){var e=createContext();return e.displayName=t,e},context=createNamedContext("Router"),Router=function(n){function t(t){var e;return(e=n.call(this,t)||this).state={location:t.history.location},e._isMounted=!1,e._pendingLocation=null,t.staticContext||(e.unlisten=t.history.listen(function(t){e._isMounted?e.setState({location:t}):e._pendingLocation=t})),e}_inheritsLoose(t,n),t.computeRootMatch=function(t){return{path:"/",url:"/",params:{},isExact:"/"===t}};var e=t.prototype;return e.componentDidMount=function(){this._isMounted=!0,this._pendingLocation&&this.setState({location:this._pendingLocation})},e.componentWillUnmount=function(){this.unlisten&&this.unlisten()},e.render=function(){return React.createElement(context.Provider,{children:this.props.children||null,value:{history:this.props.history,location:this.state.location,match:t.computeRootMatch(this.state.location.pathname),staticContext:this.props.staticContext}})},t}(React.Component),MemoryRouter=function(r){function t(){for(var t,e=arguments.length,n=new Array(e),o=0;o<e;o++)n[o]=arguments[o];return(t=r.call.apply(r,[this].concat(n))||this).history=history.createMemoryHistory(t.props),t}return _inheritsLoose(t,r),t.prototype.render=function(){return React.createElement(Router,{history:this.history,children:this.props.children})},t}(React.Component),Lifecycle=function(t){function e(){return t.apply(this,arguments)||this}_inheritsLoose(e,t);var n=e.prototype;return n.componentDidMount=function(){this.props.onMount&&this.props.onMount.call(this,this)},n.componentDidUpdate=function(t){this.props.onUpdate&&this.props.onUpdate.call(this,this,t)},n.componentWillUnmount=function(){this.props.onUnmount&&this.props.onUnmount.call(this,this)},n.render=function(){return null},e}(React.Component);function Prompt(t){var o=t.message,e=t.when,r=void 0===e||e;return React.createElement(context.Consumer,null,function(t){if(t||invariant(!1),!r||t.staticContext)return null;var n=t.history.block;return React.createElement(Lifecycle,{onMount:function(t){t.release=n(o)},onUpdate:function(t,e){e.message!==o&&(t.release(),t.release=n(o))},onUnmount:function(t){t.release()},message:o})})}var cache={},cacheLimit=1e4,cacheCount=0;function compilePath(t){if(cache[t])return cache[t];var e=pathToRegexp.compile(t);return cacheCount<cacheLimit&&(cache[t]=e,cacheCount++),e}function generatePath(t,e){return void 0===t&&(t="/"),void 0===e&&(e={}),"/"===t?t:compilePath(t)(e,{pretty:!0})}function Redirect(t){var a=t.computedMatch,i=t.to,e=t.push,c=void 0!==e&&e;return React.createElement(context.Consumer,null,function(t){t||invariant(!1);var e=t.history,n=t.staticContext,o=c?e.push:e.replace,r=history.createLocation(a?"string"==typeof i?generatePath(i,a.params):_extends({},i,{pathname:generatePath(i.pathname,a.params)}):i);return n?(o(r),null):React.createElement(Lifecycle,{onMount:function(){o(r)},onUpdate:function(t,e){var n=history.createLocation(e.to);history.locationsAreEqual(n,_extends({},r,{key:n.key}))||o(r)},to:i})})}var cache$1={},cacheLimit$1=1e4,cacheCount$1=0;function compilePath$1(t,e){var n=""+e.end+e.strict+e.sensitive,o=cache$1[n]||(cache$1[n]={});if(o[t])return o[t];var r=[],a={regexp:pathToRegexp(t,r,e),keys:r};return cacheCount$1<cacheLimit$1&&(o[t]=a,cacheCount$1++),a}function matchPath(u,t){void 0===t&&(t={}),"string"!=typeof t&&!Array.isArray(t)||(t={path:t});var e=t,n=e.path,o=e.exact,p=void 0!==o&&o,r=e.strict,h=void 0!==r&&r,a=e.sensitive,l=void 0!==a&&a;return[].concat(n).reduce(function(t,e){if(!e&&""!==e)return null;if(t)return t;var n=compilePath$1(e,{end:p,strict:h,sensitive:l}),o=n.regexp,r=n.keys,a=o.exec(u);if(!a)return null;var i=a[0],c=a.slice(1),s=u===i;return p&&!s?null:{path:e,url:"/"===e&&""===i?"/":i,isExact:s,params:r.reduce(function(t,e,n){return t[e.name]=c[n],t},{})}},null)}var Route=function(t){function e(){return t.apply(this,arguments)||this}return _inheritsLoose(e,t),e.prototype.render=function(){var c=this;return React.createElement(context.Consumer,null,function(t){t||invariant(!1);var e=c.props.location||t.location,n=_extends({},t,{location:e,match:c.props.computedMatch?c.props.computedMatch:c.props.path?matchPath(e.pathname,c.props):t.match}),o=c.props,r=o.children,a=o.component,i=o.render;return Array.isArray(r)&&0===r.length&&(r=null),React.createElement(context.Provider,{value:n},n.match?r?"function"==typeof r?r(n):r:a?React.createElement(a,n):i?i(n):null:"function"==typeof r?r(n):null)})},e}(React.Component);function addLeadingSlash(t){return"/"===t.charAt(0)?t:"/"+t}function addBasename(t,e){return t?_extends({},e,{pathname:addLeadingSlash(t)+e.pathname}):e}function stripBasename(t,e){if(!t)return e;var n=addLeadingSlash(t);return 0!==e.pathname.indexOf(n)?e:_extends({},e,{pathname:e.pathname.substr(n.length)})}function createURL(t){return"string"==typeof t?t:history.createPath(t)}function staticHandler(t){return function(){invariant(!1)}}function noop(){}var StaticRouter=function(r){function t(){for(var e,t=arguments.length,n=new Array(t),o=0;o<t;o++)n[o]=arguments[o];return(e=r.call.apply(r,[this].concat(n))||this).handlePush=function(t){return e.navigateTo(t,"PUSH")},e.handleReplace=function(t){return e.navigateTo(t,"REPLACE")},e.handleListen=function(){return noop},e.handleBlock=function(){return noop},e}_inheritsLoose(t,r);var e=t.prototype;return e.navigateTo=function(t,e){var n=this.props,o=n.basename,r=void 0===o?"":o,a=n.context,i=void 0===a?{}:a;i.action=e,i.location=addBasename(r,history.createLocation(t)),i.url=createURL(i.location)},e.render=function(){var t=this.props,e=t.basename,n=void 0===e?"":e,o=t.context,r=void 0===o?{}:o,a=t.location,i=void 0===a?"/":a,c=_objectWithoutPropertiesLoose(t,["basename","context","location"]),s={createHref:function(t){return addLeadingSlash(n+createURL(t))},action:"POP",location:stripBasename(n,history.createLocation(i)),push:this.handlePush,replace:this.handleReplace,go:staticHandler(),goBack:staticHandler(),goForward:staticHandler(),listen:this.handleListen,block:this.handleBlock};return React.createElement(Router,_extends({},c,{history:s,staticContext:r}))},t}(React.Component),Switch=function(t){function e(){return t.apply(this,arguments)||this}return _inheritsLoose(e,t),e.prototype.render=function(){var t=this;return React.createElement(context.Consumer,null,function(n){n||invariant(!1);var o,r,a=t.props.location||n.location;return React.Children.forEach(t.props.children,function(t){if(null==r&&React.isValidElement(t)){var e=(o=t).props.path||t.props.from;r=e?matchPath(a.pathname,_extends({},t.props,{path:e})):n.match}}),r?React.cloneElement(o,{location:a,computedMatch:r}):null})},e}(React.Component);function withRouter(o){function t(t){var e=t.wrappedComponentRef,n=_objectWithoutPropertiesLoose(t,["wrappedComponentRef"]);return React.createElement(context.Consumer,null,function(t){return t||invariant(!1),React.createElement(o,_extends({},n,t,{ref:e}))})}var e="withRouter("+(o.displayName||o.name)+")";return t.displayName=e,t.WrappedComponent=o,hoistStatics(t,o)}var useContext=React.useContext;function useHistory(){return useContext(context).history}function useLocation(){return useContext(context).location}function useParams(){var t=useContext(context).match;return t?t.params:{}}function useRouteMatch(t){return t?matchPath(useLocation().pathname,t):useContext(context).match}exports.MemoryRouter=MemoryRouter,exports.Prompt=Prompt,exports.Redirect=Redirect,exports.Route=Route,exports.Router=Router,exports.StaticRouter=StaticRouter,exports.Switch=Switch,exports.__RouterContext=context,exports.generatePath=generatePath,exports.matchPath=matchPath,exports.useHistory=useHistory,exports.useLocation=useLocation,exports.useParams=useParams,exports.useRouteMatch=useRouteMatch,exports.withRouter=withRouter;
 
 
-},{"history":36,"hoist-non-react-statics":37,"mini-create-react-context":39,"path-to-regexp":42,"prop-types":48,"react":87,"react-is":55,"tiny-invariant":101,"tiny-warning":102}],84:[function(require,module,exports){
+},{"history":39,"hoist-non-react-statics":40,"mini-create-react-context":42,"path-to-regexp":45,"prop-types":51,"react":90,"react-is":58,"tiny-invariant":104,"tiny-warning":105}],87:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -37581,7 +39537,7 @@ if (process.env.NODE_ENV === "production") {
 
 }).call(this,require('_process'))
 
-},{"./cjs/react-router.js":82,"./cjs/react-router.min.js":83,"_process":44}],85:[function(require,module,exports){
+},{"./cjs/react-router.js":85,"./cjs/react-router.min.js":86,"_process":47}],88:[function(require,module,exports){
 (function (process){
 /** @license React v16.13.0
  * react.development.js
@@ -39498,34 +41454,9 @@ exports.version = ReactVersion;
 
 }).call(this,require('_process'))
 
-},{"_process":44,"object-assign":41,"prop-types/checkPropTypes":45}],86:[function(require,module,exports){
-/** @license React v16.13.0
- * react.production.min.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-'use strict';var l=require("object-assign"),n="function"===typeof Symbol&&Symbol.for,p=n?Symbol.for("react.element"):60103,q=n?Symbol.for("react.portal"):60106,r=n?Symbol.for("react.fragment"):60107,t=n?Symbol.for("react.strict_mode"):60108,u=n?Symbol.for("react.profiler"):60114,v=n?Symbol.for("react.provider"):60109,w=n?Symbol.for("react.context"):60110,x=n?Symbol.for("react.forward_ref"):60112,y=n?Symbol.for("react.suspense"):60113,z=n?Symbol.for("react.memo"):60115,A=n?Symbol.for("react.lazy"):
-60116,B="function"===typeof Symbol&&Symbol.iterator;function C(a){for(var b="https://reactjs.org/docs/error-decoder.html?invariant="+a,c=1;c<arguments.length;c++)b+="&args[]="+encodeURIComponent(arguments[c]);return"Minified React error #"+a+"; visit "+b+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings."}
-var D={isMounted:function(){return!1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},E={};function F(a,b,c){this.props=a;this.context=b;this.refs=E;this.updater=c||D}F.prototype.isReactComponent={};F.prototype.setState=function(a,b){if("object"!==typeof a&&"function"!==typeof a&&null!=a)throw Error(C(85));this.updater.enqueueSetState(this,a,b,"setState")};F.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate")};
-function G(){}G.prototype=F.prototype;function H(a,b,c){this.props=a;this.context=b;this.refs=E;this.updater=c||D}var I=H.prototype=new G;I.constructor=H;l(I,F.prototype);I.isPureReactComponent=!0;var J={current:null},K=Object.prototype.hasOwnProperty,L={key:!0,ref:!0,__self:!0,__source:!0};
-function M(a,b,c){var e,d={},g=null,k=null;if(null!=b)for(e in void 0!==b.ref&&(k=b.ref),void 0!==b.key&&(g=""+b.key),b)K.call(b,e)&&!L.hasOwnProperty(e)&&(d[e]=b[e]);var f=arguments.length-2;if(1===f)d.children=c;else if(1<f){for(var h=Array(f),m=0;m<f;m++)h[m]=arguments[m+2];d.children=h}if(a&&a.defaultProps)for(e in f=a.defaultProps,f)void 0===d[e]&&(d[e]=f[e]);return{$$typeof:p,type:a,key:g,ref:k,props:d,_owner:J.current}}
-function N(a,b){return{$$typeof:p,type:a.type,key:b,ref:a.ref,props:a.props,_owner:a._owner}}function O(a){return"object"===typeof a&&null!==a&&a.$$typeof===p}function escape(a){var b={"=":"=0",":":"=2"};return"$"+(""+a).replace(/[=:]/g,function(a){return b[a]})}var P=/\/+/g,Q=[];function R(a,b,c,e){if(Q.length){var d=Q.pop();d.result=a;d.keyPrefix=b;d.func=c;d.context=e;d.count=0;return d}return{result:a,keyPrefix:b,func:c,context:e,count:0}}
-function S(a){a.result=null;a.keyPrefix=null;a.func=null;a.context=null;a.count=0;10>Q.length&&Q.push(a)}
-function T(a,b,c,e){var d=typeof a;if("undefined"===d||"boolean"===d)a=null;var g=!1;if(null===a)g=!0;else switch(d){case "string":case "number":g=!0;break;case "object":switch(a.$$typeof){case p:case q:g=!0}}if(g)return c(e,a,""===b?"."+U(a,0):b),1;g=0;b=""===b?".":b+":";if(Array.isArray(a))for(var k=0;k<a.length;k++){d=a[k];var f=b+U(d,k);g+=T(d,f,c,e)}else if(null===a||"object"!==typeof a?f=null:(f=B&&a[B]||a["@@iterator"],f="function"===typeof f?f:null),"function"===typeof f)for(a=f.call(a),k=
-0;!(d=a.next()).done;)d=d.value,f=b+U(d,k++),g+=T(d,f,c,e);else if("object"===d)throw c=""+a,Error(C(31,"[object Object]"===c?"object with keys {"+Object.keys(a).join(", ")+"}":c,""));return g}function V(a,b,c){return null==a?0:T(a,"",b,c)}function U(a,b){return"object"===typeof a&&null!==a&&null!=a.key?escape(a.key):b.toString(36)}function W(a,b){a.func.call(a.context,b,a.count++)}
-function aa(a,b,c){var e=a.result,d=a.keyPrefix;a=a.func.call(a.context,b,a.count++);Array.isArray(a)?X(a,e,c,function(a){return a}):null!=a&&(O(a)&&(a=N(a,d+(!a.key||b&&b.key===a.key?"":(""+a.key).replace(P,"$&/")+"/")+c)),e.push(a))}function X(a,b,c,e,d){var g="";null!=c&&(g=(""+c).replace(P,"$&/")+"/");b=R(b,g,e,d);V(a,aa,b);S(b)}var Y={current:null};function Z(){var a=Y.current;if(null===a)throw Error(C(321));return a}
-var ba={ReactCurrentDispatcher:Y,ReactCurrentBatchConfig:{suspense:null},ReactCurrentOwner:J,IsSomeRendererActing:{current:!1},assign:l};exports.Children={map:function(a,b,c){if(null==a)return a;var e=[];X(a,e,null,b,c);return e},forEach:function(a,b,c){if(null==a)return a;b=R(null,null,b,c);V(a,W,b);S(b)},count:function(a){return V(a,function(){return null},null)},toArray:function(a){var b=[];X(a,b,null,function(a){return a});return b},only:function(a){if(!O(a))throw Error(C(143));return a}};
-exports.Component=F;exports.Fragment=r;exports.Profiler=u;exports.PureComponent=H;exports.StrictMode=t;exports.Suspense=y;exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED=ba;
-exports.cloneElement=function(a,b,c){if(null===a||void 0===a)throw Error(C(267,a));var e=l({},a.props),d=a.key,g=a.ref,k=a._owner;if(null!=b){void 0!==b.ref&&(g=b.ref,k=J.current);void 0!==b.key&&(d=""+b.key);if(a.type&&a.type.defaultProps)var f=a.type.defaultProps;for(h in b)K.call(b,h)&&!L.hasOwnProperty(h)&&(e[h]=void 0===b[h]&&void 0!==f?f[h]:b[h])}var h=arguments.length-2;if(1===h)e.children=c;else if(1<h){f=Array(h);for(var m=0;m<h;m++)f[m]=arguments[m+2];e.children=f}return{$$typeof:p,type:a.type,
-key:d,ref:g,props:e,_owner:k}};exports.createContext=function(a,b){void 0===b&&(b=null);a={$$typeof:w,_calculateChangedBits:b,_currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null};a.Provider={$$typeof:v,_context:a};return a.Consumer=a};exports.createElement=M;exports.createFactory=function(a){var b=M.bind(null,a);b.type=a;return b};exports.createRef=function(){return{current:null}};exports.forwardRef=function(a){return{$$typeof:x,render:a}};exports.isValidElement=O;
-exports.lazy=function(a){return{$$typeof:A,_ctor:a,_status:-1,_result:null}};exports.memo=function(a,b){return{$$typeof:z,type:a,compare:void 0===b?null:b}};exports.useCallback=function(a,b){return Z().useCallback(a,b)};exports.useContext=function(a,b){return Z().useContext(a,b)};exports.useDebugValue=function(){};exports.useEffect=function(a,b){return Z().useEffect(a,b)};exports.useImperativeHandle=function(a,b,c){return Z().useImperativeHandle(a,b,c)};
-exports.useLayoutEffect=function(a,b){return Z().useLayoutEffect(a,b)};exports.useMemo=function(a,b){return Z().useMemo(a,b)};exports.useReducer=function(a,b,c){return Z().useReducer(a,b,c)};exports.useRef=function(a){return Z().useRef(a)};exports.useState=function(a){return Z().useState(a)};exports.version="16.13.0";
-
-},{"object-assign":41}],87:[function(require,module,exports){
+},{"_process":47,"object-assign":44,"prop-types/checkPropTypes":48}],89:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8,"object-assign":44}],90:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -39537,7 +41468,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/react.development.js":85,"./cjs/react.production.min.js":86,"_process":44}],88:[function(require,module,exports){
+},{"./cjs/react.development.js":88,"./cjs/react.production.min.js":89,"_process":47}],91:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -39561,7 +41492,7 @@ var thunk = createThunkMiddleware();
 thunk.withExtraArgument = createThunkMiddleware;
 
 exports['default'] = thunk;
-},{}],89:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -40240,7 +42171,7 @@ exports.createStore = createStore;
 
 }).call(this,require('_process'))
 
-},{"_process":44,"symbol-observable":99}],90:[function(require,module,exports){
+},{"_process":47,"symbol-observable":102}],93:[function(require,module,exports){
 'use strict';
 
 function isAbsolute(pathname) {
@@ -40319,10 +42250,10 @@ function resolvePathname(to, from) {
 
 module.exports = resolvePathname;
 
-},{}],91:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 "use strict";function isAbsolute(e){return"/"===e.charAt(0)}function spliceOne(e,t){for(var s=t,n=s+1,i=e.length;n<i;s+=1,n+=1)e[s]=e[n];e.pop()}function resolvePathname(e,t){void 0===t&&(t="");var s,n=e&&e.split("/")||[],i=t&&t.split("/")||[],l=e&&isAbsolute(e),r=t&&isAbsolute(t),o=l||r;if(e&&isAbsolute(e)?i=n:n.length&&(i.pop(),i=i.concat(n)),!i.length)return"/";if(i.length){var u=i[i.length-1];s="."===u||".."===u||""===u}else s=!1;for(var a=0,c=i.length;0<=c;c--){var f=i[c];"."===f?spliceOne(i,c):".."===f?(spliceOne(i,c),a++):a&&(spliceOne(i,c),a--)}if(!o)for(;a--;a)i.unshift("..");!o||""===i[0]||i[0]&&isAbsolute(i[0])||i.unshift("");var h=i.join("/");return s&&"/"!==h.substr(-1)&&(h+="/"),h}module.exports=resolvePathname;
 
-},{}],92:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -40334,7 +42265,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/resolve-pathname.js":90,"./cjs/resolve-pathname.min.js":91,"_process":44}],93:[function(require,module,exports){
+},{"./cjs/resolve-pathname.js":93,"./cjs/resolve-pathname.min.js":94,"_process":47}],96:[function(require,module,exports){
 (function (process){
 /** @license React v0.19.0
  * scheduler-tracing.development.js
@@ -40688,7 +42619,7 @@ exports.unstable_wrap = unstable_wrap;
 
 }).call(this,require('_process'))
 
-},{"_process":44}],94:[function(require,module,exports){
+},{"_process":47}],97:[function(require,module,exports){
 /** @license React v0.19.0
  * scheduler-tracing.production.min.js
  *
@@ -40700,7 +42631,7 @@ exports.unstable_wrap = unstable_wrap;
 
 'use strict';var b=0;exports.__interactionsRef=null;exports.__subscriberRef=null;exports.unstable_clear=function(a){return a()};exports.unstable_getCurrent=function(){return null};exports.unstable_getThreadID=function(){return++b};exports.unstable_subscribe=function(){};exports.unstable_trace=function(a,d,c){return c()};exports.unstable_unsubscribe=function(){};exports.unstable_wrap=function(a){return a};
 
-},{}],95:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 (function (process){
 /** @license React v0.19.0
  * scheduler.development.js
@@ -41563,7 +43494,7 @@ exports.unstable_wrapCallback = unstable_wrapCallback;
 
 }).call(this,require('_process'))
 
-},{"_process":44}],96:[function(require,module,exports){
+},{"_process":47}],99:[function(require,module,exports){
 /** @license React v0.19.0
  * scheduler.production.min.js
  *
@@ -41586,7 +43517,7 @@ exports.unstable_getCurrentPriorityLevel=function(){return R};exports.unstable_g
 exports.unstable_scheduleCallback=function(a,b,c){var d=exports.unstable_now();if("object"===typeof c&&null!==c){var e=c.delay;e="number"===typeof e&&0<e?d+e:d;c="number"===typeof c.timeout?c.timeout:Y(a)}else c=Y(a),e=d;c=e+c;a={id:P++,callback:b,priorityLevel:a,startTime:e,expirationTime:c,sortIndex:-1};e>d?(a.sortIndex=e,J(O,a),null===L(N)&&a===L(O)&&(U?h():U=!0,g(W,e-d))):(a.sortIndex=c,J(N,a),T||S||(T=!0,f(X)));return a};
 exports.unstable_shouldYield=function(){var a=exports.unstable_now();V(a);var b=L(N);return b!==Q&&null!==Q&&null!==b&&null!==b.callback&&b.startTime<=a&&b.expirationTime<Q.expirationTime||k()};exports.unstable_wrapCallback=function(a){var b=R;return function(){var c=R;R=b;try{return a.apply(this,arguments)}finally{R=c}}};
 
-},{}],97:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -41598,7 +43529,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/scheduler.development.js":95,"./cjs/scheduler.production.min.js":96,"_process":44}],98:[function(require,module,exports){
+},{"./cjs/scheduler.development.js":98,"./cjs/scheduler.production.min.js":99,"_process":47}],101:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -41610,7 +43541,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/scheduler-tracing.development.js":93,"./cjs/scheduler-tracing.production.min.js":94,"_process":44}],99:[function(require,module,exports){
+},{"./cjs/scheduler-tracing.development.js":96,"./cjs/scheduler-tracing.production.min.js":97,"_process":47}],102:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -41643,7 +43574,7 @@ var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./ponyfill.js":100}],100:[function(require,module,exports){
+},{"./ponyfill.js":103}],103:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -41667,7 +43598,7 @@ function symbolObservablePonyfill(root) {
 
 	return result;
 };
-},{}],101:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -41687,7 +43618,7 @@ exports.default = invariant;
 
 }).call(this,require('_process'))
 
-},{"_process":44}],102:[function(require,module,exports){
+},{"_process":47}],105:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -41714,7 +43645,7 @@ module.exports = warning;
 
 }).call(this,require('_process'))
 
-},{"_process":44}],103:[function(require,module,exports){
+},{"_process":47}],106:[function(require,module,exports){
 'use strict';
 
 function valueOf(obj) {
@@ -41754,10 +43685,10 @@ function valueEqual(a, b) {
 
 module.exports = valueEqual;
 
-},{}],104:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 "use strict";function valueOf(e){return e.valueOf?e.valueOf():Object.prototype.valueOf.call(e)}function valueEqual(u,r){if(u===r)return!0;if(null==u||null==r)return!1;if(Array.isArray(u))return Array.isArray(r)&&u.length===r.length&&u.every(function(e,u){return valueEqual(e,r[u])});if("object"!=typeof u&&"object"!=typeof r)return!1;var e=valueOf(u),t=valueOf(r);return e!==u||t!==r?valueEqual(e,t):Object.keys(Object.assign({},u,r)).every(function(e){return valueEqual(u[e],r[e])})}module.exports=valueEqual;
 
-},{}],105:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -41769,7 +43700,7 @@ if (process.env.NODE_ENV === 'production') {
 
 }).call(this,require('_process'))
 
-},{"./cjs/value-equal.js":103,"./cjs/value-equal.min.js":104,"_process":44}],106:[function(require,module,exports){
+},{"./cjs/value-equal.js":106,"./cjs/value-equal.min.js":107,"_process":47}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42268,7 +44199,7 @@ var createNewAppointment = function createNewAppointment(appointment) {
 
 exports.createNewAppointment = createNewAppointment;
 
-},{"../constants/action-types":132,"../utils/appointments-api":143,"../utils/clinics-api":144,"../utils/doctors-api":145,"../utils/user-api":146,"js-cookie":38}],107:[function(require,module,exports){
+},{"../constants/action-types":135,"../utils/appointments-api":146,"../utils/clinics-api":147,"../utils/doctors-api":148,"../utils/user-api":149,"js-cookie":41}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42499,7 +44430,7 @@ var cancelAppointment = function cancelAppointment(orderNumber) {
 
 exports.cancelAppointment = cancelAppointment;
 
-},{"../constants/action-types":132,"../utils/appointments-api":143,"../utils/clinics-api":144,"../utils/doctors-api":145,"js-cookie":38}],108:[function(require,module,exports){
+},{"../constants/action-types":135,"../utils/appointments-api":146,"../utils/clinics-api":147,"../utils/doctors-api":148,"js-cookie":41}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42559,7 +44490,7 @@ var registerClinic = function registerClinic(clinic) {
 
 exports.registerClinic = registerClinic;
 
-},{"../constants/action-types":132,"../utils/clinics-api":144}],109:[function(require,module,exports){
+},{"../constants/action-types":135,"../utils/clinics-api":147}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42748,13 +44679,15 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Acc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":127,"prop-types":48,"react":87,"react-redux":70,"react-router-dom":81,"redux":89}],110:[function(require,module,exports){
+},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _Header = _interopRequireDefault(require("./Header"));
 
@@ -42765,13 +44698,13 @@ var _Main = _interopRequireDefault(require("./Main"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var App = function App() {
-  return React.createElement(React.Fragment, null, React.createElement(_Header["default"], null), React.createElement(_Main["default"], null), React.createElement(_Footer["default"], null));
+  return _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement(_Header["default"], null), _react["default"].createElement(_Main["default"], null), _react["default"].createElement(_Footer["default"], null));
 };
 
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":122,"./Header":123,"./Main":126}],111:[function(require,module,exports){
+},{"./Footer":125,"./Header":126,"./Main":129,"react":90}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42779,15 +44712,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _redux = require("redux");
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
+var _moment = _interopRequireDefault(require("moment"));
+
 var _reactRedux = require("react-redux");
 
-var _appointments = require("../actions/appointments");
+var _redux = require("redux");
 
-var _moment = _interopRequireDefault(require("moment"));
+var _appointments = require("../actions/appointments");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -42812,7 +44747,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
   _inherits(AvailableAppointments, _React$Component);
 
-  function AvailableAppointments(props) {
+  function AvailableAppointments() {
     var _this;
 
     _classCallCheck(this, AvailableAppointments);
@@ -42840,7 +44775,7 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       this.appointmentsTree = {};
-      src.map(function (appointment, index) {
+      src.map(function (appointment) {
         var date = (0, _moment["default"])(appointment.datetime);
         var year = date.year();
         var month = date.format('MMMM');
@@ -42877,12 +44812,12 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       var time = (0, _moment["default"])(appointment.datetime).format('hh:mm');
       var doctor = appointment.doctor;
       var doctorName = doctor.title + '. ' + doctor.firstName + ' ' + doctor.lastName;
-      return React.createElement("li", {
+      return _react["default"].createElement("li", {
         key: index,
         onClick: this.saveAppointment.bind(this, appointment)
-      }, React.createElement("div", {
+      }, _react["default"].createElement("div", {
         className: "time"
-      }, time), React.createElement("p", {
+      }, time), _react["default"].createElement("p", {
         className: "doctor-info"
       }, doctorName, ", room: ", doctor.room));
     }
@@ -42906,13 +44841,13 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       var html = [];
       days.forEach(function (day, index) {
         var currentDay = _this4.appointmentsTree[year][month][day];
-        html.push(React.createElement("li", {
+        html.push(_react["default"].createElement("li", {
           key: index
-        }, React.createElement("div", {
+        }, _react["default"].createElement("div", {
           className: "appointment-day"
-        }, React.createElement("span", {
+        }, _react["default"].createElement("span", {
           className: "date"
-        }, day), currentDay.weekday), React.createElement("ul", {
+        }, day), currentDay.weekday), _react["default"].createElement("ul", {
           className: "appointment-options"
         }, _this4.drawAppointmentsList(currentDay.appointments))));
       });
@@ -42933,22 +44868,22 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "drawFilters",
     value: function drawFilters() {
-      return React.createElement("div", {
+      return _react["default"].createElement("div", {
         className: "doctor-filters-wrapper"
-      }, React.createElement("div", {
+      }, _react["default"].createElement("div", {
         className: "doctor-filter"
-      }, React.createElement("label", null, React.createElement("input", {
+      }, _react["default"].createElement("label", null, _react["default"].createElement("input", {
         type: "radio",
         name: "doctorFilter",
         defaultChecked: true,
         onClick: this.showAllAppointments
-      }), "All Doctors")), React.createElement("div", {
+      }), "All Doctors")), _react["default"].createElement("div", {
         className: "doctor-filter"
-      }, React.createElement("label", null, React.createElement("input", {
+      }, _react["default"].createElement("label", null, _react["default"].createElement("input", {
         type: "radio",
         name: "doctorFilter",
         onClick: this.showDistrictDoctorAppointments
-      }), "My District Doctor"), React.createElement("p", {
+      }), "My District Doctor"), _react["default"].createElement("p", {
         className: "doctor-filter-hint"
       }, "Your district doctor is automatically determined according to your home address")));
     }
@@ -42958,16 +44893,15 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       var _this5 = this;
 
       var years = Object.keys(this.appointmentsTree);
-      var calendarMonthsLabels = [];
       var html = [];
-      years.forEach(function (year, index) {
+      years.forEach(function (year) {
         var months = Object.keys(_this5.appointmentsTree[year]);
         months.forEach(function (month, index) {
-          html.push(React.createElement("div", {
+          html.push(_react["default"].createElement("div", {
             key: index
-          }, React.createElement("h2", {
+          }, _react["default"].createElement("h2", {
             className: "page-subtitle"
-          }, month + ', ' + year), React.createElement("ul", {
+          }, month + ', ' + year), _react["default"].createElement("ul", {
             className: "available-appointments"
           }, _this5.getDays(year, month))));
         });
@@ -42983,18 +44917,26 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
       var currentPath = this.props.location.pathname.split('/').pop();
       var categoryNeedsFiltres = this.props.categoriesWithFilters.indexOf(currentPath) !== -1;
       this.formatAppointments(appointments);
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Please, select an available option."), categoryNeedsFiltres ? this.drawFilters() : null, appointments && appointments.length ? this.drawCalendar() : React.createElement("p", null, "Sorry. No appointments are available at the moment."));
+      }, "Please, select an available option."), categoryNeedsFiltres ? this.drawFilters() : null, appointments && appointments.length ? this.drawCalendar() : _react["default"].createElement("p", null, "Sorry. No appointments are available at the moment."));
     }
   }]);
 
   return AvailableAppointments;
-}(React.Component);
+}(_react["default"].Component);
 
-;
+AvailableAppointments.propTypes = {
+  appointments: _propTypes["default"].arrayOf(_propTypes["default"].object),
+  categoriesWithFilters: _propTypes["default"].arrayOf(_propTypes["default"].string),
+  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  loadAppointments: _propTypes["default"].func,
+  saveAppointment: _propTypes["default"].func,
+  location: _propTypes["default"].object,
+  history: _propTypes["default"].object
+};
 
 var mapStateToProps = function mapStateToProps(_ref) {
   var appointments = _ref.appointments;
@@ -43020,7 +44962,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Ava
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"redux":89}],112:[function(require,module,exports){
+},{"../actions/appointments":110,"moment":43,"prop-types":51,"react":90,"react-redux":73,"redux":92}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43028,9 +44970,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _redux = require("redux");
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _redux = require("redux");
 
 var _reactRedux = require("react-redux");
 
@@ -43059,7 +45003,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var CancelAppointment = /*#__PURE__*/function (_React$Component) {
   _inherits(CancelAppointment, _React$Component);
 
-  function CancelAppointment(props) {
+  function CancelAppointment() {
     var _this;
 
     _classCallCheck(this, CancelAppointment);
@@ -43077,7 +45021,9 @@ var CancelAppointment = /*#__PURE__*/function (_React$Component) {
   _createClass(CancelAppointment, [{
     key: "onChange",
     value: function onChange(event) {
-      this.state.orderNumber = event.target.value;
+      this.setState({
+        orderNumber: event.target.value
+      });
     }
   }, {
     key: "cancelAppointment",
@@ -43103,28 +45049,28 @@ var CancelAppointment = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container container"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Please, enter your order number"), React.createElement("p", {
+      }, "Please, enter your order number"), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), React.createElement("form", {
+      }, this.props.error), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.cancelForm = el;
         },
         className: "cancel-appointment-form",
         onSubmit: this.cancelAppointment
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "text",
         placeholder: "Order Number",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Cancel Appointment"
-      })), React.createElement("div", {
+      })), _react["default"].createElement("div", {
         className: "cancel-sample"
-      }, React.createElement("img", {
+      }, _react["default"].createElement("img", {
         src: "img/cancel-sample.png",
         alt: ""
       })));
@@ -43132,11 +45078,12 @@ var CancelAppointment = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return CancelAppointment;
-}(React.Component);
+}(_react["default"].Component);
 
 CancelAppointment.propTypes = {
   error: _propTypes["default"].string,
-  cancelAppointment: _propTypes["default"].func
+  cancelAppointment: _propTypes["default"].func,
+  isCancelled: _propTypes["default"].bool
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -43159,13 +45106,15 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Can
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"prop-types":48,"react-redux":70,"redux":89}],113:[function(require,module,exports){
+},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"redux":92}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -43202,10 +45151,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
   _inherits(ClinicAccountPage, _React$Component);
 
-  function ClinicAccountPage(props) {
+  function ClinicAccountPage() {
     _classCallCheck(this, ClinicAccountPage);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ClinicAccountPage).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ClinicAccountPage).apply(this, arguments));
   }
 
   _createClass(ClinicAccountPage, [{
@@ -43224,23 +45173,26 @@ var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var account = this.props.account;
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "account-page page-container"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, account && account.name), React.createElement(_reactRouterDom.Link, {
+      }, account && account.name), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/clinic-account/settings",
         className: "account-settings"
-      }, "Settings"), React.createElement(_DoctorCategories["default"], null));
+      }, "Settings"), _react["default"].createElement(_DoctorCategories["default"], null));
     }
   }]);
 
   return ClinicAccountPage;
-}(React.Component);
+}(_react["default"].Component);
 
 ClinicAccountPage.propTypes = {
   isAuthenticated: _propTypes["default"].bool,
-  account: _propTypes["default"].object
+  account: _propTypes["default"].object,
+  loadAccount: _propTypes["default"].func,
+  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  history: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -43254,7 +45206,6 @@ var mapStateToProps = function mapStateToProps(_ref) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
-    resetError: function resetError() {},
     loadAccount: function loadAccount() {
       return (0, _account.loadAccount)();
     }
@@ -43265,7 +45216,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./DoctorCategories":118,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],114:[function(require,module,exports){
+},{"../actions/account":109,"./DoctorCategories":121,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43273,9 +45224,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _redux = require("redux");
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _redux = require("redux");
 
 var _reactRedux = require("react-redux");
 
@@ -43306,10 +45259,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
   _inherits(ClinicDoctorCategories, _React$Component);
 
-  function ClinicDoctorCategories(props) {
+  function ClinicDoctorCategories() {
     _classCallCheck(this, ClinicDoctorCategories);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ClinicDoctorCategories).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ClinicDoctorCategories).apply(this, arguments));
   }
 
   _createClass(ClinicDoctorCategories, [{
@@ -43327,16 +45280,16 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this = this;
 
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, "What kind of doctor do you need to visit?"), this.props.categories && this.props.categories.length ? React.createElement("ul", {
+      }, "What kind of doctor do you need to visit?"), this.props.categories && this.props.categories.length ? _react["default"].createElement("ul", {
         className: "doctor-specialisations-list category-list"
       }, this.props.categories.map(function (category, index) {
-        return React.createElement("li", {
+        return _react["default"].createElement("li", {
           key: index
-        }, React.createElement(_reactRouterDom.Link, {
+        }, _react["default"].createElement(_reactRouterDom.Link, {
           to: _this.props.location.pathname + '/' + category.categoryAlias,
           onClick: _this.saveCategory.bind(_this, event, category._id)
         }, category.categoryName));
@@ -43345,13 +45298,14 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return ClinicDoctorCategories;
-}(React.Component);
+}(_react["default"].Component);
 
 ClinicDoctorCategories.propTypes = {
   categories: _propTypes["default"].array,
   error: _propTypes["default"].string,
   saveDoctorCategory: _propTypes["default"].func,
-  loadCategories: _propTypes["default"].func
+  loadCategories: _propTypes["default"].func,
+  location: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -43377,7 +45331,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],115:[function(require,module,exports){
+},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43385,13 +45339,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
 var _reactRedux = require("react-redux");
 
 var _clinicRegistration = require("../actions/clinic-registration");
 
 var _redux = require("redux");
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -43433,7 +45389,7 @@ var initialState = {
 var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
   _inherits(ClinicRegistration, _React$Component);
 
-  function ClinicRegistration(props) {
+  function ClinicRegistration() {
     var _this;
 
     _classCallCheck(this, ClinicRegistration);
@@ -43512,49 +45468,49 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       var isSubmitDisabled = this.state.isRegistrationDisabled || this.props.isPending;
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Register a clinic's account"), React.createElement("form", {
+      }, "Register a clinic\u2018s account"), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.registrationForm = el;
         },
         className: "clinic-registration-form",
         onSubmit: this.handleSubmit
-      }, React.createElement("p", {
+      }, _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), React.createElement("input", {
+      }, this.props.error), _react["default"].createElement("input", {
         type: "text",
         name: "name",
         placeholder: "Clinic's name",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "tel",
         name: "phoneNumber",
         placeholder: "Contact number",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "address",
         placeholder: "Address",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "email",
         name: "email",
         placeholder: "Email",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "password",
         name: "password",
         placeholder: "Password",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "password",
         name: "confirmPassword",
         placeholder: "Confirm Password",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Register",
         disabled: isSubmitDisabled
@@ -43563,7 +45519,7 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return ClinicRegistration;
-}(React.Component);
+}(_react["default"].Component);
 
 ClinicRegistration.propTypes = {
   isPending: _propTypes["default"].bool,
@@ -43597,7 +45553,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/clinic-registration":108,"prop-types":48,"react-redux":70,"redux":89}],116:[function(require,module,exports){
+},{"../actions/clinic-registration":111,"prop-types":51,"react":90,"react-redux":73,"redux":92}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43605,15 +45561,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _account = require("../actions/account");
-
-var _redux = require("redux");
-
-var _reactRedux = require("react-redux");
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
+var _reactRedux = require("react-redux");
+
+var _redux = require("redux");
+
 var _Modal = _interopRequireDefault(require("./Modal"));
+
+var _account = require("../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -43644,7 +45602,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var ClinicSettings = /*#__PURE__*/function (_React$Component) {
   _inherits(ClinicSettings, _React$Component);
 
-  function ClinicSettings(props) {
+  function ClinicSettings() {
     var _this;
 
     _classCallCheck(this, ClinicSettings);
@@ -43722,57 +45680,57 @@ var ClinicSettings = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "account-page page-container"
-      }, React.createElement("ul", {
+      }, _react["default"].createElement("ul", {
         className: "breadcrumbs"
-      }, React.createElement("li", null, React.createElement("a", {
+      }, _react["default"].createElement("li", null, _react["default"].createElement("a", {
         href: "/clinic-account"
-      }, this.props.clinicName), React.createElement("span", {
+      }, this.props.clinicName), _react["default"].createElement("span", {
         className: "separator"
-      }, ">")), React.createElement("li", null, "Settings")), React.createElement("h1", {
+      }, ">")), _react["default"].createElement("li", null, "Settings")), _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Settings"), React.createElement("section", {
+      }, "Settings"), _react["default"].createElement("section", {
         className: "address-cover data-section"
-      }, React.createElement("header", {
+      }, _react["default"].createElement("header", {
         className: "data-section-header"
-      }, React.createElement("h2", {
+      }, _react["default"].createElement("h2", {
         className: "data-section-title"
-      }, "Address Cover"), React.createElement("button", {
+      }, "Address Cover"), _react["default"].createElement("button", {
         className: "data-section-btn",
         onClick: this.openAddNewAddressModal
-      }, "Add")), React.createElement("p", {
+      }, "Add")), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), this.props.addressList && this.props.addressList.length && React.createElement("table", {
+      }, this.props.error), this.props.addressList && this.props.addressList.length && _react["default"].createElement("table", {
         className: "data-table"
-      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Place"), React.createElement("th", null, "Street"), React.createElement("th", null, "Buildings"))), React.createElement("tbody", null, this.props.addressList.map(function (address, index) {
-        return React.createElement("tr", {
+      }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Place"), _react["default"].createElement("th", null, "Street"), _react["default"].createElement("th", null, "Buildings"))), _react["default"].createElement("tbody", null, this.props.addressList.map(function (address, index) {
+        return _react["default"].createElement("tr", {
           key: index
-        }, React.createElement("td", null, address.place), React.createElement("td", null, address.street), React.createElement("td", null, address.buildings));
-      })))), this.state.isModalDisplayed ? React.createElement(_Modal["default"], {
+        }, _react["default"].createElement("td", null, address.place), _react["default"].createElement("td", null, address.street), _react["default"].createElement("td", null, address.buildings));
+      })))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Address",
         onClose: this.closeModal
-      }, React.createElement("p", null, "Please add the details of a new clinic service address. Several buildings can be separated with a comma."), React.createElement("form", {
+      }, _react["default"].createElement("p", null, "Please add the details of a new clinic service address. Several buildings can be separated with a comma."), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.addNewAddressForm = el;
         },
         onSubmit: this.addNewAddress
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "text",
         name: "place",
         placeholder: "Place",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "street",
         placeholder: "Street",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "buildings",
         placeholder: "Buildings",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Add"
       }))) : null);
@@ -43780,13 +45738,15 @@ var ClinicSettings = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return ClinicSettings;
-}(React.Component);
+}(_react["default"].Component);
 
 ClinicSettings.propTypes = {
   clinicName: _propTypes["default"].string,
   addressList: _propTypes["default"].arrayOf(_propTypes["default"].object),
   getAddressList: _propTypes["default"].func,
-  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object])
+  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  loadAccount: _propTypes["default"].func,
+  addNewAddress: _propTypes["default"].func
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -43817,7 +45777,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"redux":89}],117:[function(require,module,exports){
+},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"redux":92}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43825,19 +45785,21 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _account = require("../actions/account");
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _moment = _interopRequireDefault(require("moment"));
+
+var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
 
 var _reactRouterDom = require("react-router-dom");
 
-var _reactRedux = require("react-redux");
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
 var _Modal = _interopRequireDefault(require("./Modal"));
 
-var _moment = _interopRequireDefault(require("moment"));
+var _account = require("../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -43873,7 +45835,7 @@ var initialState = {
 var DoctorAccount = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorAccount, _React$Component);
 
-  function DoctorAccount(props) {
+  function DoctorAccount() {
     var _this;
 
     _classCallCheck(this, DoctorAccount);
@@ -43937,85 +45899,85 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
       var _this$props = this.props,
           account = _this$props.account,
           appointments = _this$props.appointments;
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "doctor-account-page account-page page-container"
-      }, React.createElement("p", null, this.props.error), account ? React.createElement(React.Fragment, null, React.createElement("h1", {
+      }, _react["default"].createElement("p", null, this.props.error), account ? _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("h1", {
         className: "page-title"
-      }, account.title, ". ", account.firstName, " ", account.lastName), React.createElement(_reactRouterDom.Link, {
+      }, account.title, ". ", account.firstName, " ", account.lastName), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/doctor-account/settings",
         className: "account-settings"
-      }, "Settings"), React.createElement("div", {
+      }, "Settings"), _react["default"].createElement("div", {
         className: "doctor-details"
-      }, React.createElement("p", null, "Specialisation: ", account.categoryName), React.createElement("p", null, "Room: ", account.room))) : null, React.createElement("section", {
+      }, _react["default"].createElement("p", null, "Specialisation: ", account.categoryName), _react["default"].createElement("p", null, "Room: ", account.room))) : null, _react["default"].createElement("section", {
         className: "data-section"
-      }, React.createElement("header", {
+      }, _react["default"].createElement("header", {
         className: "data-section-header"
-      }, React.createElement("h2", {
+      }, _react["default"].createElement("h2", {
         className: "data-section-title"
-      }, "Appointments"), React.createElement("button", {
+      }, "Appointments"), _react["default"].createElement("button", {
         className: "data-section-btn",
         onClick: this.openModal
-      }, "Add New")), appointments && appointments.length && React.createElement("table", {
+      }, "Add New")), appointments && appointments.length && _react["default"].createElement("table", {
         className: "data-table"
-      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Date"), React.createElement("th", null, "Time"), React.createElement("th", null, "Patient"))), React.createElement("tbody", null, appointments.map(function (appointment, index) {
+      }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Date"), _react["default"].createElement("th", null, "Time"), _react["default"].createElement("th", null, "Patient"))), _react["default"].createElement("tbody", null, appointments.map(function (appointment, index) {
         var datetime = (0, _moment["default"])(appointment.datetime);
         var date = datetime.format('DD/MMM/YYYY');
         var time = datetime.format('HH:mm');
-        return React.createElement("tr", {
+        return _react["default"].createElement("tr", {
           key: index
-        }, React.createElement("td", null, date), React.createElement("td", null, time), React.createElement("td", null, appointment.patient));
-      })))), this.state.isModalDisplayed ? React.createElement(_Modal["default"], {
+        }, _react["default"].createElement("td", null, date), _react["default"].createElement("td", null, time), _react["default"].createElement("td", null, appointment.patient));
+      })))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Appointment",
         onClose: this.closeModal
-      }, React.createElement("form", {
+      }, _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.appointmentForm = el;
         },
         onSubmit: this.addNewAppointment
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "date",
         name: "date",
         onChange: this.onChange
-      }), React.createElement("select", {
+      }), _react["default"].createElement("select", {
         name: "time",
         onChange: this.onChange
-      }, React.createElement("option", {
+      }, _react["default"].createElement("option", {
         val: "09:00"
-      }, "09:00"), React.createElement("option", {
+      }, "09:00"), _react["default"].createElement("option", {
         val: "09:30"
-      }, "09:30"), React.createElement("option", {
+      }, "09:30"), _react["default"].createElement("option", {
         val: "10:00"
-      }, "10:00"), React.createElement("option", {
+      }, "10:00"), _react["default"].createElement("option", {
         val: "10:30"
-      }, "10:30"), React.createElement("option", {
+      }, "10:30"), _react["default"].createElement("option", {
         val: "11:00"
-      }, "11:00"), React.createElement("option", {
+      }, "11:00"), _react["default"].createElement("option", {
         val: "11:30"
-      }, "11:30"), React.createElement("option", {
+      }, "11:30"), _react["default"].createElement("option", {
         val: "12:00"
-      }, "12:00"), React.createElement("option", {
+      }, "12:00"), _react["default"].createElement("option", {
         val: "12:30"
-      }, "12:30"), React.createElement("option", {
+      }, "12:30"), _react["default"].createElement("option", {
         val: "13:00"
-      }, "13:00"), React.createElement("option", {
+      }, "13:00"), _react["default"].createElement("option", {
         val: "13:30"
-      }, "13:30"), React.createElement("option", {
+      }, "13:30"), _react["default"].createElement("option", {
         val: "14:00"
-      }, "14:00"), React.createElement("option", {
+      }, "14:00"), _react["default"].createElement("option", {
         val: "14:30"
-      }, "14:30"), React.createElement("option", {
+      }, "14:30"), _react["default"].createElement("option", {
         val: "15:00"
-      }, "15:00"), React.createElement("option", {
+      }, "15:00"), _react["default"].createElement("option", {
         val: "15:30"
-      }, "15:30"), React.createElement("option", {
+      }, "15:30"), _react["default"].createElement("option", {
         val: "16:00"
-      }, "16:00"), React.createElement("option", {
+      }, "16:00"), _react["default"].createElement("option", {
         val: "16:30"
-      }, "16:30"), React.createElement("option", {
+      }, "16:30"), _react["default"].createElement("option", {
         val: "17:00"
-      }, "17:00"), React.createElement("option", {
+      }, "17:00"), _react["default"].createElement("option", {
         val: "17:30"
-      }, "17:30")), React.createElement("input", {
+      }, "17:30")), _react["default"].createElement("input", {
         type: "submit",
         value: "OK"
       }))) : null);
@@ -44023,10 +45985,12 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return DoctorAccount;
-}(React.Component);
+}(_react["default"].Component);
 
 DoctorAccount.propTypes = {
   account: _propTypes["default"].object,
+  appointments: _propTypes["default"].arrayOf(_propTypes["default"].object),
+  createNewAppointment: _propTypes["default"].func,
   error: _propTypes["default"].string,
   loadAccount: _propTypes["default"].func
 };
@@ -44056,13 +46020,15 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":127,"moment":40,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],118:[function(require,module,exports){
+},{"../actions/account":109,"./Modal":130,"moment":43,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -44099,7 +46065,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var DoctorCategories = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorCategories, _React$Component);
 
-  function DoctorCategories(props) {
+  function DoctorCategories() {
     var _this;
 
     _classCallCheck(this, DoctorCategories);
@@ -44148,33 +46114,33 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var categories = this.props.categories;
-      return React.createElement(React.Fragment, null, React.createElement("section", {
+      return _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("section", {
         className: "doctor-specialisations"
-      }, React.createElement("h2", {
+      }, _react["default"].createElement("h2", {
         className: "page-subtitle"
-      }, "Doctor Specialisations"), React.createElement("button", {
+      }, "Doctor Specialisations"), _react["default"].createElement("button", {
         onClick: this.showModal
-      }, "Add New"), React.createElement("p", {
+      }, "Add New"), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), categories && categories.length ? React.createElement("div", {
+      }, this.props.error), categories && categories.length ? _react["default"].createElement("div", {
         className: "doctor-specialisations-list"
-      }, React.createElement("ul", null, categories.map(function (category, index) {
+      }, _react["default"].createElement("ul", null, categories.map(function (category, index) {
         var link = '/clinic-account/category/' + category.categoryAlias;
-        return React.createElement("li", {
+        return _react["default"].createElement("li", {
           key: index
-        }, React.createElement(_reactRouterDom.Link, {
+        }, _react["default"].createElement(_reactRouterDom.Link, {
           to: link
         }, category.categoryName));
-      }))) : null), this.state.isModalDisplayed ? React.createElement(_Modal["default"], {
+      }))) : null), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Doctors Category",
         onClose: this.closeModal
-      }, React.createElement("form", {
+      }, _react["default"].createElement("form", {
         onSubmit: this.addNewCategory
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "text",
         placeholder: "Category Name",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Add"
       }))) : null);
@@ -44182,7 +46148,7 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return DoctorCategories;
-}(React.Component);
+}(_react["default"].Component);
 
 DoctorCategories.propTypes = {
   createNewCategory: _propTypes["default"].func,
@@ -44210,7 +46176,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],119:[function(require,module,exports){
+},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44218,15 +46184,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _account = require("../actions/account");
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _redux = require("redux");
 
 var _reactRedux = require("react-redux");
 
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
 var _Modal = _interopRequireDefault(require("./Modal"));
+
+var _account = require("../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -44257,7 +46225,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var DoctorSettings = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorSettings, _React$Component);
 
-  function DoctorSettings(props) {
+  function DoctorSettings() {
     var _this;
 
     _classCallCheck(this, DoctorSettings);
@@ -44280,7 +46248,7 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
     value: function componentDidMount() {
       this.props.getAddressList(); // load account data
 
-      if (!this.props.clinicName) {
+      if (!this.props.account) {
         this.props.loadAccount();
       }
     }
@@ -44337,57 +46305,57 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
 
       var account = this.props.account;
       var doctorName = account && "".concat(account.title, ". ").concat(account.firstName, " ").concat(account.lastName);
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "account-page page-container"
-      }, React.createElement("ul", {
+      }, _react["default"].createElement("ul", {
         className: "breadcrumbs"
-      }, React.createElement("li", null, React.createElement("a", {
+      }, _react["default"].createElement("li", null, _react["default"].createElement("a", {
         href: "/doctor-account"
-      }, doctorName), React.createElement("span", {
+      }, doctorName), _react["default"].createElement("span", {
         className: "separator"
-      }, ">")), React.createElement("li", null, "Settings")), React.createElement("h1", {
+      }, ">")), _react["default"].createElement("li", null, "Settings")), _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Settings"), React.createElement("section", {
+      }, "Settings"), _react["default"].createElement("section", {
         className: "address-cover data-section"
-      }, React.createElement("header", {
+      }, _react["default"].createElement("header", {
         className: "data-section-header"
-      }, React.createElement("h2", {
+      }, _react["default"].createElement("h2", {
         className: "data-section-title"
-      }, "Address Cover"), React.createElement("button", {
+      }, "Address Cover"), _react["default"].createElement("button", {
         className: "data-section-btn",
         onClick: this.openAddNewAddressModal
-      }, "Add")), React.createElement("p", {
+      }, "Add")), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), this.props.addressList && this.props.addressList.length && React.createElement("table", {
+      }, this.props.error), this.props.addressList && this.props.addressList.length && _react["default"].createElement("table", {
         className: "data-table"
-      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Place"), React.createElement("th", null, "Street"), React.createElement("th", null, "Buildings"))), React.createElement("tbody", null, this.props.addressList.map(function (address, index) {
-        return React.createElement("tr", {
+      }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Place"), _react["default"].createElement("th", null, "Street"), _react["default"].createElement("th", null, "Buildings"))), _react["default"].createElement("tbody", null, this.props.addressList.map(function (address, index) {
+        return _react["default"].createElement("tr", {
           key: index
-        }, React.createElement("td", null, address.place), React.createElement("td", null, address.street), React.createElement("td", null, address.buildings));
-      })))), this.state.isModalDisplayed ? React.createElement(_Modal["default"], {
+        }, _react["default"].createElement("td", null, address.place), _react["default"].createElement("td", null, address.street), _react["default"].createElement("td", null, address.buildings));
+      })))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Address",
         onClose: this.closeModal
-      }, React.createElement("p", null, "Please add the details of doctor's service address. Several buildings can be separated with a comma."), React.createElement("form", {
+      }, _react["default"].createElement("p", null, "Please add the details of doctor's service address. Several buildings can be separated with a comma."), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.addNewAddressForm = el;
         },
         onSubmit: this.addNewAddress
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "text",
         name: "place",
         placeholder: "Place",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "street",
         placeholder: "Street",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "buildings",
         placeholder: "Buildings",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Add"
       }))) : null);
@@ -44395,11 +46363,14 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return DoctorSettings;
-}(React.Component);
+}(_react["default"].Component);
 
 DoctorSettings.propTypes = {
+  account: _propTypes["default"].object,
   addressList: _propTypes["default"].arrayOf(_propTypes["default"].object),
   getAddressList: _propTypes["default"].func,
+  loadAccount: _propTypes["default"].func,
+  addNewAddress: _propTypes["default"].func,
   error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object])
 };
 
@@ -44431,7 +46402,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./Modal":127,"prop-types":48,"react-redux":70,"redux":89}],120:[function(require,module,exports){
+},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"redux":92}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44439,19 +46410,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _propTypes = _interopRequireDefault(require("prop-types"));
+var _react = _interopRequireDefault(require("react"));
 
-var _reactRouterDom = require("react-router-dom");
+var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
 
-var _account = require("../actions/account");
-
 var _Modal = _interopRequireDefault(require("./Modal"));
 
 var _DoctorsList = _interopRequireDefault(require("./DoctorsList"));
+
+var _account = require("../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -44487,7 +46458,7 @@ var initialState = {
 var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorsCategory, _React$Component);
 
-  function DoctorsCategory(props) {
+  function DoctorsCategory() {
     var _this;
 
     _classCallCheck(this, DoctorsCategory);
@@ -44564,67 +46535,67 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       var categoryName = this.props.activeCategory && this.props.activeCategory.categoryName;
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "account-page page-container"
-      }, React.createElement("ul", {
+      }, _react["default"].createElement("ul", {
         className: "breadcrumbs"
-      }, React.createElement("li", null, React.createElement("a", {
+      }, _react["default"].createElement("li", null, _react["default"].createElement("a", {
         href: "/clinic-account"
-      }, this.props.clinicName), React.createElement("span", {
+      }, this.props.clinicName), _react["default"].createElement("span", {
         className: "separator"
-      }, ">")), React.createElement("li", null, React.createElement("a", {
+      }, ">")), _react["default"].createElement("li", null, _react["default"].createElement("a", {
         href: "/clinic-account"
-      }, "Doctor Specialisations"), React.createElement("span", {
+      }, "Doctor Specialisations"), _react["default"].createElement("span", {
         className: "separator"
-      }, ">")), React.createElement("li", null, categoryName)), React.createElement("section", {
+      }, ">")), _react["default"].createElement("li", null, categoryName)), _react["default"].createElement("section", {
         className: "doctors data-section"
-      }, React.createElement("header", {
+      }, _react["default"].createElement("header", {
         className: "data-section-header"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "data-section-title"
-      }, categoryName), React.createElement("button", {
+      }, categoryName), _react["default"].createElement("button", {
         className: "data-section-btn",
         onClick: this.openInviteForm
-      }, "Invite")), React.createElement("p", {
+      }, "Invite")), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.activeCategoryError), React.createElement(_DoctorsList["default"], {
+      }, this.props.activeCategoryError), _react["default"].createElement(_DoctorsList["default"], {
         items: this.props.doctors
-      })), this.state.isInviteFormDisplayed ? React.createElement(_Modal["default"], {
+      })), this.state.isInviteFormDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Invite a Doctor",
         onClose: this.closeModal
-      }, React.createElement("form", {
+      }, _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.invitationForm = el;
         },
         onSubmit: this.inviteDoctor
-      }, React.createElement("p", {
+      }, _react["default"].createElement("p", {
         className: "error"
-      }, this.props.invitationError), React.createElement("input", {
+      }, this.props.invitationError), _react["default"].createElement("input", {
         type: "text",
         name: "title",
         placeholder: "Title",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "firstName",
         placeholder: "First Name",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "lastName",
         placeholder: "Last Name",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "room",
         placeholder: "Room",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "email",
         name: "email",
         placeholder: "Email",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Send Invitation"
       }))) : null);
@@ -44632,7 +46603,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return DoctorsCategory;
-}(React.Component);
+}(_react["default"].Component);
 
 DoctorsCategory.propTypes = {
   clinicName: _propTypes["default"].string,
@@ -44645,7 +46616,8 @@ DoctorsCategory.propTypes = {
   loadAccount: _propTypes["default"].func,
   loadCategory: _propTypes["default"].func,
   sendInvitation: _propTypes["default"].func,
-  resetInvitationError: _propTypes["default"].func
+  resetInvitationError: _propTypes["default"].func,
+  match: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(state) {
@@ -44681,13 +46653,15 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"./DoctorsList":121,"./Modal":127,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],121:[function(require,module,exports){
+},{"../actions/account":109,"./DoctorsList":124,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"redux":92}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -44724,20 +46698,20 @@ var DoctorsList = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var doctors = this.props.items;
-      return doctors && doctors.length ? React.createElement("table", {
+      return doctors && doctors.length ? _react["default"].createElement("table", {
         className: "data-table"
-      }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Last Name"), React.createElement("th", null, "First Name"), React.createElement("th", null, "Title"), React.createElement("th", null, "Room"), React.createElement("th", null, "Email"), React.createElement("th", null, "Status"))), React.createElement("tbody", null, doctors.map(function (doctor, index) {
+      }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Last Name"), _react["default"].createElement("th", null, "First Name"), _react["default"].createElement("th", null, "Title"), _react["default"].createElement("th", null, "Room"), _react["default"].createElement("th", null, "Email"), _react["default"].createElement("th", null, "Status"))), _react["default"].createElement("tbody", null, doctors.map(function (doctor, index) {
         var isDisabled = doctor.status === 'invited';
-        return React.createElement("tr", {
+        return _react["default"].createElement("tr", {
           key: index,
           className: isDisabled ? "disabled" : null
-        }, React.createElement("td", null, doctor.lastName), React.createElement("td", null, doctor.firstName), React.createElement("td", null, doctor.title), React.createElement("td", null, doctor.room), React.createElement("td", null, doctor.email), React.createElement("td", null, doctor.status));
+        }, _react["default"].createElement("td", null, doctor.lastName), _react["default"].createElement("td", null, doctor.firstName), _react["default"].createElement("td", null, doctor.title), _react["default"].createElement("td", null, doctor.room), _react["default"].createElement("td", null, doctor.email), _react["default"].createElement("td", null, doctor.status));
       }))) : null;
     }
   }]);
 
   return DoctorsList;
-}(React.Component);
+}(_react["default"].Component);
 
 DoctorsList.propTypes = {
   items: _propTypes["default"].arrayOf(_propTypes["default"].object)
@@ -44745,7 +46719,7 @@ DoctorsList.propTypes = {
 var _default = DoctorsList;
 exports["default"] = _default;
 
-},{"prop-types":48}],122:[function(require,module,exports){
+},{"prop-types":51,"react":90}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44753,8 +46727,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _React = _interopRequireDefault(require("React"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
 var Footer = function Footer() {
-  return React.createElement("footer", {
+  return _React["default"].createElement("footer", {
     className: "page-footer"
   }, "\xA92020 Alena Bayraktar");
 };
@@ -44762,28 +46740,30 @@ var Footer = function Footer() {
 var _default = Footer;
 exports["default"] = _default;
 
-},{}],123:[function(require,module,exports){
+},{"React":9}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _Logout = _interopRequireDefault(require("./Logout"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var Header = function Header() {
-  return React.createElement("header", {
+  return _react["default"].createElement("header", {
     className: "page-header"
-  }, "APPOINTMENT APP", React.createElement(_Logout["default"], null));
+  }, "APPOINTMENT APP", _react["default"].createElement(_Logout["default"], null));
 };
 
 var _default = Header;
 exports["default"] = _default;
 
-},{"./Logout":125}],124:[function(require,module,exports){
+},{"./Logout":128,"react":90}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44791,19 +46771,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _react = _interopRequireDefault(require("react"));
+
 var _reactRouterDom = require("react-router-dom");
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
 var Home = function Home() {
-  return React.createElement("main", {
+  return _react["default"].createElement("main", {
     className: "page-container home-page"
-  }, React.createElement("div", {
+  }, _react["default"].createElement("div", {
     className: "column column-new"
-  }, React.createElement(_reactRouterDom.Link, {
+  }, _react["default"].createElement(_reactRouterDom.Link, {
     className: "home-button",
     to: "/new-appointment"
-  }, "New Appointment")), React.createElement("div", {
+  }, "New Appointment")), _react["default"].createElement("div", {
     className: "column column-cancel"
-  }, React.createElement(_reactRouterDom.Link, {
+  }, _react["default"].createElement(_reactRouterDom.Link, {
     className: "home-button",
     to: "/cancel-appointment"
   }, "Cancel an appointment")));
@@ -44812,7 +46796,7 @@ var Home = function Home() {
 var _default = Home;
 exports["default"] = _default;
 
-},{"react-router-dom":81}],125:[function(require,module,exports){
+},{"react":90,"react-router-dom":84}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44820,9 +46804,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _jsCookie = _interopRequireDefault(require("js-cookie"));
+var _react = _interopRequireDefault(require("react"));
 
-var _reactRedux = require("react-redux");
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
 
 var _reactRouterDom = require("react-router-dom");
 
@@ -44849,12 +46835,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var Logout = /*#__PURE__*/function (_React$Component) {
   _inherits(Logout, _React$Component);
 
-  function Logout(props) {
+  function Logout() {
     var _this;
 
     _classCallCheck(this, Logout);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Logout).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Logout).call(this));
     _this.logout = _this.logout.bind(_assertThisInitialized(_this));
     return _this;
   }
@@ -44871,26 +46857,32 @@ var Logout = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var token = _jsCookie["default"].get('token');
 
-      return token ? React.createElement("button", {
+      return token ? _react["default"].createElement("button", {
         onClick: this.logout
       }, "Logout") : null;
     }
   }]);
 
   return Logout;
-}(React.Component);
+}(_react["default"].Component);
+
+Logout.propTypes = {
+  history: _propTypes["default"].object
+};
 
 var _default = (0, _reactRouterDom.withRouter)(Logout);
 
 exports["default"] = _default;
 
-},{"js-cookie":38,"react-redux":70,"react-router-dom":81}],126:[function(require,module,exports){
+},{"js-cookie":41,"prop-types":51,"react":90,"react-router-dom":84}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _reactRouterDom = require("react-router-dom");
 
@@ -44925,54 +46917,54 @@ var _NewAppointmentComplete = _interopRequireDefault(require("./NewAppointmentCo
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var Main = function Main() {
-  return React.createElement(_reactRouterDom.Switch, null, React.createElement(_reactRouterDom.Route, {
+  return _react["default"].createElement(_reactRouterDom.Switch, null, _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/",
     component: _Home["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/new-appointment",
     component: _NewAppointment["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/new-appointment/clinic/:clinicAlias",
     component: _ClinicDoctorCategories["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/new-appointment/clinic/:clinicAlias/:categoryAlias",
     component: _AvailableAppointments["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/new-appointment/clinic/:clinicAlias/:categoryAlias/complete",
     component: _NewAppointmentComplete["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/cancel-appointment",
     component: _CancelAppointment["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     path: "/register",
     component: _ClinicRegistration["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     path: "/admin",
     component: _SignIn["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/clinic-account",
     component: _ClinicAccountPage["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     path: "/clinic-account/category/:categoryAlias",
     component: _DoctorsCategory["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     path: "/clinic-account/settings",
     component: _ClinicSettings["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     path: '/accept-invitation/:token',
     component: _AcceptInvitation["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     exact: true,
     path: "/doctor-account",
     component: _DoctorAccount["default"]
-  }), React.createElement(_reactRouterDom.Route, {
+  }), _react["default"].createElement(_reactRouterDom.Route, {
     path: '/doctor-account/settings',
     component: _DoctorSettings["default"]
   }));
@@ -44981,13 +46973,15 @@ var Main = function Main() {
 var _default = Main;
 exports["default"] = _default;
 
-},{"./AcceptInvitation":109,"./AvailableAppointments":111,"./CancelAppointment":112,"./ClinicAccountPage":113,"./ClinicDoctorCategories":114,"./ClinicRegistration":115,"./ClinicSettings":116,"./DoctorAccount":117,"./DoctorSettings":119,"./DoctorsCategory":120,"./Home":124,"./NewAppointment":128,"./NewAppointmentComplete":129,"./SignIn":130,"react-router-dom":81}],127:[function(require,module,exports){
+},{"./AcceptInvitation":112,"./AvailableAppointments":114,"./CancelAppointment":115,"./ClinicAccountPage":116,"./ClinicDoctorCategories":117,"./ClinicRegistration":118,"./ClinicSettings":119,"./DoctorAccount":120,"./DoctorSettings":122,"./DoctorsCategory":123,"./Home":127,"./NewAppointment":131,"./NewAppointmentComplete":132,"./SignIn":133,"react":90,"react-router-dom":84}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -45023,20 +47017,20 @@ var Modal = /*#__PURE__*/function (_React$Component) {
   _createClass(Modal, [{
     key: "render",
     value: function render() {
-      return React.createElement("div", {
+      return _react["default"].createElement("div", {
         className: "modal-blackout"
-      }, React.createElement("div", {
+      }, _react["default"].createElement("div", {
         className: "modal"
-      }, React.createElement("header", null, React.createElement("h3", {
+      }, _react["default"].createElement("header", null, _react["default"].createElement("h3", {
         className: "modal-title"
-      }, this.props.title), this.props.onClose ? React.createElement("button", {
+      }, this.props.title), this.props.onClose ? _react["default"].createElement("button", {
         onClick: this.props.onClose
       }, "X") : null), this.props.children));
     }
   }]);
 
   return Modal;
-}(React.Component);
+}(_react["default"].Component);
 
 Modal.propTypes = {
   title: _propTypes["default"].string,
@@ -45046,13 +47040,15 @@ Modal.propTypes = {
 var _default = Modal;
 exports["default"] = _default;
 
-},{"prop-types":48}],128:[function(require,module,exports){
+},{"prop-types":51,"react":90}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
@@ -45093,7 +47089,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var NewAppointment = /*#__PURE__*/function (_React$Component) {
   _inherits(NewAppointment, _React$Component);
 
-  function NewAppointment(props) {
+  function NewAppointment() {
     var _this;
 
     _classCallCheck(this, NewAppointment);
@@ -45135,60 +47131,61 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Enter your home address"), React.createElement("form", {
+      }, "Enter your home address"), _react["default"].createElement("form", {
         action: "#",
         className: "address-form",
         onSubmit: this.searchClinic
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "text",
         name: "place",
         placeholder: "place",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "street",
         placeholder: "street",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "building",
         placeholder: "building",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Search"
-      })), this.props.error && React.createElement("p", {
-        "class": "error"
-      }, this.props.error), this.props.clinics.length ? React.createElement("section", {
+      })), this.props.error && _react["default"].createElement("p", {
+        className: "error"
+      }, this.props.error), this.props.clinics.length ? _react["default"].createElement("section", {
         className: "search-results"
-      }, React.createElement("h2", {
+      }, _react["default"].createElement("h2", {
         className: "page-subtitle"
-      }, "Search results"), React.createElement("ul", {
+      }, "Search results"), _react["default"].createElement("ul", {
         className: "search-results-list category-list"
       }, this.props.clinics.map(function (clinic, index) {
         var url = '/new-appointment/clinic/' + clinic.alias; // change to alias
 
-        return React.createElement("li", {
+        return _react["default"].createElement("li", {
           key: index
-        }, React.createElement(_reactRouterDom.Link, {
+        }, _react["default"].createElement(_reactRouterDom.Link, {
           to: url,
           onClick: _this2.memorizeClinic.bind(_this2, event, clinic._id)
-        }, clinic.name), clinic.address && React.createElement("p", null, "Address: ", clinic.address), clinic.phoneNumber && React.createElement("p", null, "Phone Number: ", clinic.phoneNumber));
+        }, clinic.name), clinic.address && _react["default"].createElement("p", null, "Address: ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, "Phone Number: ", clinic.phoneNumber));
       }))) : null);
     }
   }]);
 
   return NewAppointment;
-}(React.Component);
+}(_react["default"].Component);
 
 NewAppointment.propTypes = {
   clinics: _propTypes["default"].arrayOf(_propTypes["default"].object),
   error: _propTypes["default"].string,
-  searchClinic: _propTypes["default"].func
+  searchClinic: _propTypes["default"].func,
+  saveClinic: _propTypes["default"].func
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -45214,7 +47211,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(New
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],129:[function(require,module,exports){
+},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45222,17 +47219,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _redux = require("redux");
+var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _moment = _interopRequireDefault(require("moment"));
+
+var _redux = require("redux");
 
 var _reactRouterDom = require("react-router-dom");
 
 var _reactRedux = require("react-redux");
 
 var _appointments = require("../actions/appointments");
-
-var _moment = _interopRequireDefault(require("moment"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -45263,7 +47262,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
   _inherits(NewAppointmentComplete, _React$Component);
 
-  function NewAppointmentComplete(props) {
+  function NewAppointmentComplete() {
     var _this;
 
     _classCallCheck(this, NewAppointmentComplete);
@@ -45288,15 +47287,15 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
       var weekday = date.format('ddd');
       var doctor = this.props.selectedAppointment.doctor;
       var doctorLabel = "".concat(doctor.title, ". ").concat(doctor.firstName, " ").concat(doctor.lastName, ", room: ").concat(doctor.room);
-      return React.createElement("div", {
+      return _react["default"].createElement("div", {
         className: "patient-selection-info"
-      }, React.createElement("div", {
+      }, _react["default"].createElement("div", {
         className: "patient-selection-date"
-      }, month, React.createElement("span", {
+      }, month, _react["default"].createElement("span", {
         className: "day"
-      }, day), weekday), React.createElement("div", {
+      }, day), weekday), _react["default"].createElement("div", {
         className: "patient-selection-time"
-      }, time), React.createElement("div", {
+      }, time), _react["default"].createElement("div", {
         className: "patient-selection-doctor"
       }, doctorLabel));
     }
@@ -45322,50 +47321,50 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var appointment = this.props.selectedAppointment;
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container"
-      }, this.props.registrationCode ? React.createElement(React.Fragment, null, React.createElement("h1", {
+      }, this.props.registrationCode ? _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("h1", {
         className: "page-title"
-      }, "Success!"), React.createElement("p", {
+      }, "Success!"), _react["default"].createElement("p", {
         className: "appointment-notification"
-      }, "We have sent you an SMS with the details of your appointment."), React.createElement("div", {
+      }, "We have sent you an SMS with the details of your appointment."), _react["default"].createElement("div", {
         className: "appointment-receipt"
-      }, React.createElement("p", {
+      }, _react["default"].createElement("p", {
         className: "order-number"
-      }, "Order #", React.createElement("span", null, this.props.registrationCode)), React.createElement("p", {
+      }, "Order #", _react["default"].createElement("span", null, this.props.registrationCode)), _react["default"].createElement("p", {
         className: "order-datetime"
-      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), React.createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), React.createElement("p", null, "Room: ", appointment.doctor.room), React.createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName)), React.createElement("p", {
+      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), _react["default"].createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), _react["default"].createElement("p", null, "Room: ", appointment.doctor.room), _react["default"].createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName)), _react["default"].createElement("p", {
         className: "new-appointment-finish"
-      }, React.createElement(_reactRouterDom.Link, {
+      }, _react["default"].createElement(_reactRouterDom.Link, {
         to: "/"
-      }, "Finish"))) : React.createElement(React.Fragment, null, React.createElement("div", {
+      }, "Finish"))) : _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("div", {
         className: "patient-selection"
-      }, React.createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: "patient-selection-label page-title"
-      }, "Your Selection:"), this.props.selectedAppointment && this.drawSelectedAppointment()), React.createElement("h2", {
+      }, "Your Selection:"), this.props.selectedAppointment && this.drawSelectedAppointment()), _react["default"].createElement("h2", {
         className: "patient-details-form-title page-subtitle"
-      }, "Please, enter your details to finish registration"), React.createElement("p", {
+      }, "Please, enter your details to finish registration"), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), React.createElement("form", {
+      }, this.props.error), _react["default"].createElement("form", {
         action: "#",
         className: "patient-details-form",
         onSubmit: this.completeRegistration
-      }, React.createElement("input", {
+      }, _react["default"].createElement("input", {
         type: "text",
         name: "firstName",
         placeholder: "First Name",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "lastName",
         placeholder: "Last Name",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "tel",
         name: "contactNumber",
         placeholder: "Contact Number",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Register"
       }))));
@@ -45373,7 +47372,14 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return NewAppointmentComplete;
-}(React.Component);
+}(_react["default"].Component);
+
+NewAppointmentComplete.propTypes = {
+  selectedAppointment: _propTypes["default"].object,
+  registrationCode: _propTypes["default"].string,
+  error: _propTypes["default"].string,
+  completeRegistration: _propTypes["default"].func
+};
 
 var mapStateToProps = function mapStateToProps(_ref) {
   var appointments = _ref.appointments;
@@ -45396,7 +47402,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(New
 
 exports["default"] = _default;
 
-},{"../actions/appointments":107,"moment":40,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],130:[function(require,module,exports){
+},{"../actions/appointments":110,"moment":43,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45404,11 +47410,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
 var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _reactRouterDom = require("react-router-dom");
 
@@ -45451,7 +47459,7 @@ var initialState = {
 var SignIn = /*#__PURE__*/function (_React$Component) {
   _inherits(SignIn, _React$Component);
 
-  function SignIn(props) {
+  function SignIn() {
     var _this;
 
     _classCallCheck(this, SignIn);
@@ -45467,7 +47475,7 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
 
   _createClass(SignIn, [{
     key: "componentDidUpdate",
-    value: function componentDidUpdate(prevProps) {
+    value: function componentDidUpdate() {
       if (this.props.isAuthenticated) {
         var url = this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
         this.props.history.push(url);
@@ -45528,45 +47536,47 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       var isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
-      return React.createElement("main", {
+      return _react["default"].createElement("main", {
         className: "page-container"
-      }, React.createElement("form", {
+      }, _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.signinForm = el;
         },
         className: "sign-in-form",
         onSubmit: this.handleSubmit
-      }, this.props.error ? React.createElement("p", {
+      }, this.props.error ? _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error) : null, React.createElement("input", {
+      }, this.props.error) : null, _react["default"].createElement("input", {
         type: "email",
         name: "email",
         placeholder: "email",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "password",
         name: "password",
         placeholder: "password",
         onChange: this.onChange
-      }), React.createElement("input", {
+      }), _react["default"].createElement("input", {
         type: "submit",
         value: "Sign-In",
         disabled: isSubmitDisabled
-      }), React.createElement("p", null, "OR"), React.createElement(_reactRouterDom.Link, {
+      }), _react["default"].createElement("p", null, "OR"), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/register"
       }, "Register a new clinic account")));
     }
   }]);
 
   return SignIn;
-}(React.Component);
+}(_react["default"].Component);
 
 SignIn.propTypes = {
   isPending: _propTypes["default"].bool,
   isAuthenticated: _propTypes["default"].bool,
   error: _propTypes["default"].string,
   requestSignIn: _propTypes["default"].func.isRequired,
-  resetError: _propTypes["default"].func.isRequired
+  resetError: _propTypes["default"].func.isRequired,
+  accountType: _propTypes["default"].string,
+  history: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -45594,7 +47604,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":106,"prop-types":48,"react-redux":70,"react-router-dom":81,"redux":89}],131:[function(require,module,exports){
+},{"../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],134:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -45607,7 +47617,7 @@ exports.API_URL = API_URL;
 
 }).call(this,require('_process'))
 
-},{"_process":44}],132:[function(require,module,exports){
+},{"_process":47}],135:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45699,7 +47709,7 @@ exports.CANCEL_APPOINTMENT_SUCCESS = CANCEL_APPOINTMENT_SUCCESS;
 var CANCEL_APPOINTMENT_ERROR = 'CANCEL_APPOINTMENT_ERROR';
 exports.CANCEL_APPOINTMENT_ERROR = CANCEL_APPOINTMENT_ERROR;
 
-},{}],133:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 "use strict";
 
 var _reactRedux = require("react-redux");
@@ -45718,7 +47728,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":110,"./store":142,"react-dom":52,"react-redux":70,"react-router-dom":81}],134:[function(require,module,exports){
+},{"./components/App":113,"./store":145,"react-dom":55,"react-redux":73,"react-router-dom":84}],137:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45818,7 +47828,7 @@ var appointmentsReducer = function appointmentsReducer() {
 var _default = appointmentsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],135:[function(require,module,exports){
+},{"../constants/action-types":135}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45875,7 +47885,7 @@ var clinicRegistrationReducer = function clinicRegistrationReducer() {
 var _default = clinicRegistrationReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],136:[function(require,module,exports){
+},{"../constants/action-types":135}],139:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45919,7 +47929,7 @@ var clinicSettingsReducer = function clinicSettingsReducer() {
 var _default = clinicSettingsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],137:[function(require,module,exports){
+},{"../constants/action-types":135}],140:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45964,7 +47974,7 @@ var doctorAppointmentsReducer = function doctorAppointmentsReducer() {
 var _default = doctorAppointmentsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],138:[function(require,module,exports){
+},{"../constants/action-types":135}],141:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46083,7 +48093,7 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 var _default = doctorCategoriesReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],139:[function(require,module,exports){
+},{"../constants/action-types":135}],142:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46127,7 +48137,7 @@ var doctorSettingsReducer = function doctorSettingsReducer() {
 var _default = doctorSettingsReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],140:[function(require,module,exports){
+},{"../constants/action-types":135}],143:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46165,7 +48175,7 @@ var rootReducer = (0, _redux.combineReducers)({
 var _default = rootReducer;
 exports["default"] = _default;
 
-},{"./appointments":134,"./clinic-registration":135,"./clinic-settings":136,"./doctor-appointments":137,"./doctor-categories":138,"./doctor-settings":139,"./sign-in":141,"redux":89}],141:[function(require,module,exports){
+},{"./appointments":137,"./clinic-registration":138,"./clinic-settings":139,"./doctor-appointments":140,"./doctor-categories":141,"./doctor-settings":142,"./sign-in":144,"redux":92}],144:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46238,7 +48248,7 @@ var signInReducer = function signInReducer() {
 var _default = signInReducer;
 exports["default"] = _default;
 
-},{"../constants/action-types":132}],142:[function(require,module,exports){
+},{"../constants/action-types":135}],145:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46258,7 +48268,7 @@ var store = (0, _redux.createStore)(_root["default"], (0, _redux.applyMiddleware
 var _default = store;
 exports["default"] = _default;
 
-},{"./reducers/root":140,"redux":89,"redux-thunk":88}],143:[function(require,module,exports){
+},{"./reducers/root":143,"redux":92,"redux-thunk":91}],146:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46334,7 +48344,7 @@ var requestCancelAppointment = function requestCancelAppointment(orderNumber) {
 
 exports.requestCancelAppointment = requestCancelAppointment;
 
-},{"../config.js":131,"axios":7,"js-cookie":38}],144:[function(require,module,exports){
+},{"../config.js":134,"axios":10,"js-cookie":41}],147:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46377,7 +48387,7 @@ var searchClinicByHomeAddress = function searchClinicByHomeAddress(params) {
 exports.searchClinicByHomeAddress = searchClinicByHomeAddress;
 
 var getClinicAddressCover = function getClinicAddressCover() {
-  return _axios["default"].get(_config.API_URL + '/clnic-address-cover', {
+  return _axios["default"].get(_config.API_URL + '/clinic-address-cover', {
     headers: {
       'x-access-token': getAuthToken()
     }
@@ -46396,7 +48406,7 @@ var addNewClinicAddress = function addNewClinicAddress(details) {
 
 exports.addNewClinicAddress = addNewClinicAddress;
 
-},{"../config.js":131,"axios":7,"js-cookie":38}],145:[function(require,module,exports){
+},{"../config.js":134,"axios":10,"js-cookie":41}],148:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46525,7 +48535,7 @@ var addNewDoctorAddressCover = function addNewDoctorAddressCover(details) {
 
 exports.addNewDoctorAddressCover = addNewDoctorAddressCover;
 
-},{"../config.js":131,"axios":7,"js-cookie":38}],146:[function(require,module,exports){
+},{"../config.js":134,"axios":10,"js-cookie":41}],149:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46563,6 +48573,6 @@ var requestAccountData = function requestAccountData() {
 
 exports.requestAccountData = requestAccountData;
 
-},{"../config.js":131,"axios":7,"js-cookie":38}]},{},[133])
+},{"../config.js":134,"axios":10,"js-cookie":41}]},{},[136])
 
 //# sourceMappingURL=bundle.js.map

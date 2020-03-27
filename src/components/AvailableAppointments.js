@@ -1,11 +1,12 @@
-import { bindActionCreators } from 'redux';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import {loadAppointments, saveAppointment} from '../actions/appointments';
 import moment from 'moment';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {loadAppointments, saveAppointment} from '../actions/appointments';
 
 class AvailableAppointments extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.formatAppointments = this.formatAppointments.bind(this);
@@ -25,7 +26,7 @@ class AvailableAppointments extends React.Component {
     formatAppointments(src) {
         this.appointmentsTree = {};
 
-        src.map((appointment, index) => {
+        src.map((appointment) => {
             const date = moment(appointment.datetime);
             const year = date.year();
             const month = date.format('MMMM');
@@ -133,10 +134,9 @@ class AvailableAppointments extends React.Component {
 
     drawCalendar() {
         const years = Object.keys(this.appointmentsTree);
-        const calendarMonthsLabels = [];
         const html = [];
 
-        years.forEach((year, index) => {
+        years.forEach((year) => {
             const months = Object.keys(this.appointmentsTree[year]);
 
             months.forEach((month, index) => {
@@ -174,7 +174,17 @@ class AvailableAppointments extends React.Component {
             </main>
         )
     }
-};
+}
+
+AvailableAppointments.propTypes = {
+    appointments: PropTypes.arrayOf(PropTypes.object),
+    categoriesWithFilters: PropTypes.arrayOf(PropTypes.string),
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    loadAppointments: PropTypes.func,
+    saveAppointment: PropTypes.func,
+    location: PropTypes.object,
+    history: PropTypes.object
+}
 
 const mapStateToProps = ({appointments}) => ({
     categoriesWithFilters: appointments.categoriesWithFilters,

@@ -1,12 +1,13 @@
-import { bindActionCreators } from 'redux';
+import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
+import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { completeRegistration } from '../actions/appointments';
-import moment from 'moment';
 
 class NewAppointmentComplete extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {
@@ -103,6 +104,13 @@ class NewAppointmentComplete extends React.Component {
             </main>
         )
     }
+}
+
+NewAppointmentComplete.propTypes = {
+    selectedAppointment: PropTypes.object,
+    registrationCode: PropTypes.string,
+    error: PropTypes.string,
+    completeRegistration: PropTypes.func
 }
 
 const mapStateToProps = ({appointments}) => ({

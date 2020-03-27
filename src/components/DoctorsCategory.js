@@ -1,10 +1,15 @@
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { loadAccount, loadCategory, sendInvitation, resetInvitationError } from '../actions/account';
 import Modal from './Modal';
 import DoctorsList from './DoctorsList';
+import {
+    loadAccount,
+    loadCategory,
+    sendInvitation,
+    resetInvitationError 
+} from '../actions/account';
 
 const initialState = {
     isInviteFormDisplayed: false,
@@ -12,7 +17,7 @@ const initialState = {
 };
 
 class DoctorsCategory extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {...initialState};
@@ -79,11 +84,11 @@ class DoctorsCategory extends React.Component {
                 <ul className="breadcrumbs">
                     <li>
                         <a href="/clinic-account">{this.props.clinicName}</a>
-                        <span className="separator">></span>
+                        <span className="separator">&gt;</span>
                     </li>
                     <li>
                         <a href="/clinic-account">Doctor Specialisations</a>
-                        <span className="separator">></span>
+                        <span className="separator">&gt;</span>
                     </li>
                     <li>{categoryName}</li>
                 </ul>
@@ -127,7 +132,8 @@ DoctorsCategory.propTypes = {
     loadAccount: PropTypes.func,
     loadCategory: PropTypes.func,
     sendInvitation: PropTypes.func,
-    resetInvitationError: PropTypes.func
+    resetInvitationError: PropTypes.func,
+    match: PropTypes.object
 }
 
 const mapStateToProps = (state) => ({

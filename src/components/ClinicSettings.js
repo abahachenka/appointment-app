@@ -1,11 +1,16 @@
-import {loadAccount, getAddressList, addNewAddress} from '../actions/account';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import Modal from './Modal';
+import {
+    loadAccount, 
+    getAddressList, 
+    addNewAddress
+} from '../actions/account';
 
 class ClinicSettings extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {
@@ -71,7 +76,7 @@ class ClinicSettings extends React.Component {
                 <ul className="breadcrumbs">
                     <li>
                         <a href="/clinic-account">{this.props.clinicName}</a>
-                        <span className="separator">></span>
+                        <span className="separator">&gt;</span>
                     </li>
                     <li>Settings</li>
                 </ul>
@@ -129,7 +134,9 @@ ClinicSettings.propTypes = {
     clinicName: PropTypes.string,
     addressList: PropTypes.arrayOf(PropTypes.object),
     getAddressList: PropTypes.func,
-    error: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    loadAccount: PropTypes.func,
+    addNewAddress: PropTypes.func
 }
 
 const mapStateToProps = ({signIn, clinicSettings}) => ({

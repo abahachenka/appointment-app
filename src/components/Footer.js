@@ -1,3 +1,5 @@
+import React from 'React';
+
 const Footer = () => (
     <footer className="page-footer">
         &copy;2020 Alena Bayraktar 

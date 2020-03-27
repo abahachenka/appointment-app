@@ -1,6 +1,7 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {requestUserSignIn, resetSignInError} from '../actions/account';
 
@@ -13,7 +14,7 @@ const initialState = {
 }
 
 class SignIn extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {...initialState};
@@ -24,7 +25,7 @@ class SignIn extends React.Component {
         this.resetForm = this.resetForm.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
         if (this.props.isAuthenticated) {
             const url = this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
             
@@ -95,7 +96,9 @@ SignIn.propTypes = {
     isAuthenticated: PropTypes.bool,
     error: PropTypes.string,
     requestSignIn: PropTypes.func.isRequired,
-    resetError: PropTypes.func.isRequired
+    resetError: PropTypes.func.isRequired,
+    accountType: PropTypes.string,
+    history: PropTypes.object
 }
 
 const mapStateToProps = ({signIn}) => ({

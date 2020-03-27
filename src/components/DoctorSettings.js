@@ -1,15 +1,16 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import Modal from './Modal';
 import {
     loadAccount, 
     getDoctorAddressList, 
     addNewDoctorAddress
 } from '../actions/account';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Modal from './Modal';
 
 class DoctorSettings extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {
@@ -28,7 +29,7 @@ class DoctorSettings extends React.Component {
         this.props.getAddressList();
 
         // load account data
-        if (!this.props.clinicName) {
+        if (!this.props.account) {
             this.props.loadAccount();
         }
     }
@@ -78,7 +79,7 @@ class DoctorSettings extends React.Component {
                 <ul className="breadcrumbs">
                     <li>
                         <a href="/doctor-account">{doctorName}</a>
-                        <span className="separator">></span>
+                        <span className="separator">&gt;</span>
                     </li>
                     <li>Settings</li>
                 </ul>
@@ -118,7 +119,7 @@ class DoctorSettings extends React.Component {
                 </section>
                 {this.state.isModalDisplayed ? (
                     <Modal title="Add New Address" onClose={this.closeModal}>
-                        <p>Please add the details of doctor's service address. Several buildings can be separated with a comma.</p>
+                        <p>Please add the details of doctor&#39;s service address. Several buildings can be separated with a comma.</p>
                         <form ref={(el) => this.addNewAddressForm = el} onSubmit={this.addNewAddress}>
                             <input type="text" name="place" placeholder="Place" onChange={this.onChange}/>
                             <input type="text" name="street" placeholder="Street" onChange={this.onChange}/>
@@ -133,8 +134,11 @@ class DoctorSettings extends React.Component {
 }
 
 DoctorSettings.propTypes = {
+    account: PropTypes.object,
     addressList: PropTypes.arrayOf(PropTypes.object),
     getAddressList: PropTypes.func,
+    loadAccount: PropTypes.func,
+    addNewAddress: PropTypes.func,
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 }
 

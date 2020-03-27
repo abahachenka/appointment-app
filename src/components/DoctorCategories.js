@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -6,7 +7,7 @@ import {createNewDoctorCategory} from '../actions/account';
 import Modal from './Modal';
 
 class DoctorCategories extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {

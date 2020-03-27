@@ -1,7 +1,8 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { registerClinic, resetRegistrationError } from '../actions/clinic-registration';
 import { bindActionCreators } from 'redux';
-import PropTypes from 'prop-types';
 
 const initialState = {
     clinic: {
@@ -15,7 +16,7 @@ const initialState = {
 }
 
 class ClinicRegistration extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {...initialState};
@@ -80,7 +81,7 @@ class ClinicRegistration extends React.Component {
         
         return (
             <main className="page-container">
-                <h1 className="page-title">Register a clinic's account</h1>
+                <h1 className="page-title">Register a clinic&lsquo;s account</h1>
                 <form ref={(el) => this.registrationForm = el} className="clinic-registration-form" onSubmit={this.handleSubmit} >
                     <p className="error">{this.props.error}</p>
                     <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} />

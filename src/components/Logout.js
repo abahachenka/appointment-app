@@ -1,10 +1,11 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
-import { connect } from 'react-redux';
-import {Redirect, withRouter} from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 class Logout extends React.Component {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
 
         this.logout = this.logout.bind(this);
     }
@@ -21,6 +22,10 @@ class Logout extends React.Component {
             <button onClick={this.logout}>Logout</button>
         ): null;
     }
+}
+
+Logout.propTypes = {
+    history: PropTypes.object
 }
 
 export default withRouter(Logout);

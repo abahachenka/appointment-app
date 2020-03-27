@@ -14,7 +14,7 @@ export const searchClinicByHomeAddress = (params) => {
 }
 
 export const getClinicAddressCover = () => {
-    return axios.get(API_URL + '/clnic-address-cover', {
+    return axios.get(API_URL + '/clinic-address-cover', {
         headers: {
             'x-access-token': getAuthToken()
         }

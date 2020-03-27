@@ -1,10 +1,11 @@
-import { bindActionCreators } from 'redux';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {cancelAppointment} from '../actions/appointments';
+import { cancelAppointment } from '../actions/appointments';
 
 class CancelAppointment extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
 
         this.state = {
@@ -17,7 +18,9 @@ class CancelAppointment extends React.Component {
     }
 
     onChange(event) {
-        this.state.orderNumber = event.target.value;
+        this.setState({
+            orderNumber: event.target.value
+        });
     }
 
     cancelAppointment(event) {
@@ -58,7 +61,8 @@ class CancelAppointment extends React.Component {
 
 CancelAppointment.propTypes = {
     error: PropTypes.string,
-    cancelAppointment: PropTypes.func
+    cancelAppointment: PropTypes.func,
+    isCancelled: PropTypes.bool
 }
 
 const mapStateToProps = ({appointments}) => ({
