@@ -1,11 +1,15 @@
 import React from 'react';
 import Logout from './Logout';
+import { Link } from 'react-router-dom';
 
 const Header = () => (
     <header className="page-header">
-        APPOINTMENT APP
-
-        <Logout />
+        <div className="page-container">
+            <Link to="/">
+                <img src="/img/logo.png" alt="" className="logo" />
+            </Link>
+            <Logout />
+        </div>
     </header>
 )
 

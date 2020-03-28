@@ -34,7 +34,7 @@ body {
 
 .page-container {
     flex: 1;
-    padding: 30px;
+    padding: $block-padding;
     width: 1140px;
     box-sizing: border-box;
     margin: 0 auto;
@@ -42,14 +42,16 @@ body {
 
 .page-title {
     text-align: center;
-    text-transform: capitalize;
+    text-transform: uppercase;
     font-weight: normal;
-    font-size: 30px;
+    font-size: 28px;
+    color: $dark-violet;
 }
 
 .page-subtitle {
     font-size: 26px;
     font-weight: normal;
+    color: $dark-violet;
 }
 
 .error {
@@ -61,8 +63,10 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    margin-top: 35px;
 
     li {
-        flex: 0 0 45%;
+        flex: 0 0 30%;
+        margin: 0 0 40px;
     }
 }

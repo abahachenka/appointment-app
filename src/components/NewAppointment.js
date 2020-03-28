@@ -31,18 +31,31 @@ class NewAppointment extends React.Component {
         }));
     }
 
+    onClinicSelect(event, url) {
+        this.props.history.push(url);
+    }
+
     memorizeClinic(event, clinicId) {
         this.props.saveClinic(clinicId);
     }
 
     render() {
         return (
-            <main className="page-container">
+            <main className="page-container address-search">
                 <h1 className="page-title">Enter your home address</h1>
                 <form action="#" className="address-form" onSubmit={this.searchClinic}>
-                    <input type="text" name="place" placeholder="place" onChange={this.onChange} />
-                    <input type="text" name="street" placeholder="street" onChange={this.onChange} />
-                    <input type="text" name="building" placeholder="building" onChange={this.onChange} />
+                    <input type="text" name="place" list="cities" placeholder="Place" onChange={this.onChange} />
+                    <datalist id="cities">
+                        <option value="Minsk" />
+                        <option value="Homel" />
+                        <option value="Mogilev" />
+                        <option value="Brest" />
+                        <option value="Vitebsk" />
+                        <option value="Grodno" />
+                    </datalist>
+
+                    <input type="text" name="street" placeholder="Street" onChange={this.onChange} />
+                    <input type="text" name="building" placeholder="Building" onChange={this.onChange} />
                     <input type="submit" value="Search" />
                 </form>
 
@@ -58,10 +71,14 @@ class NewAppointment extends React.Component {
                                 const url = '/new-appointment/clinic/' + clinic.alias; // change to alias
 
                                 return (
-                                    <li key={index}>
-                                        <Link to={url} onClick={this.memorizeClinic.bind(this, event, clinic._id)}>{clinic.name}</Link>
-                                        {clinic.address && (<p>Address: {clinic.address}</p>)} 
-                                        {clinic.phoneNumber && (<p>Phone Number: {clinic.phoneNumber}</p>)}
+                                    <li key={index} onClick={this.onClinicSelect.bind(this, event, url)}>
+                                        <h3 className="category-name">
+                                            <Link to={url} onClick={this.memorizeClinic.bind(this, event, clinic._id)}>
+                                                {clinic.name}
+                                            </Link>
+                                        </h3>
+                                        {clinic.address && (<p><strong>Address:</strong> {clinic.address}</p>)} 
+                                        {clinic.phoneNumber && (<p><strong>Phone Number:</strong> {clinic.phoneNumber}</p>)}
                                     </li>
                                 )
                             })}

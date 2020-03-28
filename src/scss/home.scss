@@ -37,10 +37,11 @@
 
 .column-cancel {
     .home-button {
-        background: $danger;
+        background: $white;
+        color: $primary;
 
         &:hover {
-            background: $danger-hover;
+            background: $light;
         }
     }
 }

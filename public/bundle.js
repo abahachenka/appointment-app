@@ -45276,6 +45276,11 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
       this.props.saveDoctorCategory(categoryId);
     }
   }, {
+    key: "onCategorySelect",
+    value: function onCategorySelect(event, url) {
+      this.props.history.push(url);
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this = this;
@@ -45287,12 +45292,16 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
       }, "What kind of doctor do you need to visit?"), this.props.categories && this.props.categories.length ? _react["default"].createElement("ul", {
         className: "doctor-specialisations-list category-list"
       }, this.props.categories.map(function (category, index) {
+        var url = _this.props.location.pathname + '/' + category.categoryAlias;
         return _react["default"].createElement("li", {
-          key: index
+          key: index,
+          onClick: _this.onCategorySelect.bind(_this, event, url)
+        }, _react["default"].createElement("h2", {
+          className: "category-name"
         }, _react["default"].createElement(_reactRouterDom.Link, {
-          to: _this.props.location.pathname + '/' + category.categoryAlias,
+          to: url,
           onClick: _this.saveCategory.bind(_this, event, category._id)
-        }, category.categoryName));
+        }, category.categoryName)));
       })) : null);
     }
   }]);
@@ -46752,18 +46761,28 @@ var _react = _interopRequireDefault(require("react"));
 
 var _Logout = _interopRequireDefault(require("./Logout"));
 
+var _reactRouterDom = require("react-router-dom");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var Header = function Header() {
   return _react["default"].createElement("header", {
     className: "page-header"
-  }, "APPOINTMENT APP", _react["default"].createElement(_Logout["default"], null));
+  }, _react["default"].createElement("div", {
+    className: "page-container"
+  }, _react["default"].createElement(_reactRouterDom.Link, {
+    to: "/"
+  }, _react["default"].createElement("img", {
+    src: "/img/logo.png",
+    alt: "",
+    className: "logo"
+  })), _react["default"].createElement(_Logout["default"], null)));
 };
 
 var _default = Header;
 exports["default"] = _default;
 
-},{"./Logout":128,"react":90}],127:[function(require,module,exports){
+},{"./Logout":128,"react":90,"react-router-dom":84}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46790,7 +46809,7 @@ var Home = function Home() {
   }, _react["default"].createElement(_reactRouterDom.Link, {
     className: "home-button",
     to: "/cancel-appointment"
-  }, "Cancel an appointment")));
+  }, "Cancel Appointment")));
 };
 
 var _default = Home;
@@ -47122,6 +47141,11 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
       });
     }
   }, {
+    key: "onClinicSelect",
+    value: function onClinicSelect(event, url) {
+      this.props.history.push(url);
+    }
+  }, {
     key: "memorizeClinic",
     value: function memorizeClinic(event, clinicId) {
       this.props.saveClinic(clinicId);
@@ -47132,7 +47156,7 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       return _react["default"].createElement("main", {
-        className: "page-container"
+        className: "page-container address-search"
       }, _react["default"].createElement("h1", {
         className: "page-title"
       }, "Enter your home address"), _react["default"].createElement("form", {
@@ -47142,17 +47166,32 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("input", {
         type: "text",
         name: "place",
-        placeholder: "place",
+        list: "cities",
+        placeholder: "Place",
         onChange: this.onChange
-      }), _react["default"].createElement("input", {
+      }), _react["default"].createElement("datalist", {
+        id: "cities"
+      }, _react["default"].createElement("option", {
+        value: "Minsk"
+      }), _react["default"].createElement("option", {
+        value: "Homel"
+      }), _react["default"].createElement("option", {
+        value: "Mogilev"
+      }), _react["default"].createElement("option", {
+        value: "Brest"
+      }), _react["default"].createElement("option", {
+        value: "Vitebsk"
+      }), _react["default"].createElement("option", {
+        value: "Grodno"
+      })), _react["default"].createElement("input", {
         type: "text",
         name: "street",
-        placeholder: "street",
+        placeholder: "Street",
         onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "text",
         name: "building",
-        placeholder: "building",
+        placeholder: "Building",
         onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "submit",
@@ -47169,11 +47208,14 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
         var url = '/new-appointment/clinic/' + clinic.alias; // change to alias
 
         return _react["default"].createElement("li", {
-          key: index
+          key: index,
+          onClick: _this2.onClinicSelect.bind(_this2, event, url)
+        }, _react["default"].createElement("h3", {
+          className: "category-name"
         }, _react["default"].createElement(_reactRouterDom.Link, {
           to: url,
           onClick: _this2.memorizeClinic.bind(_this2, event, clinic._id)
-        }, clinic.name), clinic.address && _react["default"].createElement("p", null, "Address: ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, "Phone Number: ", clinic.phoneNumber));
+        }, clinic.name)), clinic.address && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Address:"), " ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Phone Number:"), " ", clinic.phoneNumber));
       }))) : null);
     }
   }]);

@@ -7,7 +7,7 @@ const Home = () => (
             <Link className="home-button" to="/new-appointment">New Appointment</Link>
         </div>
         <div className="column column-cancel">
-            <Link className="home-button" to="/cancel-appointment">Cancel an appointment</Link>
+            <Link className="home-button" to="/cancel-appointment">Cancel Appointment</Link>
         </div>
     </main>
 )

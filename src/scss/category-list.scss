@@ -10,8 +10,20 @@
         box-shadow: $block-shadow;
 
         &:hover {
-            background: $primary-light;
+            background: $light;
             cursor: pointer;
         }
+    }
+}
+
+.category-name {
+    font-size: 22px;
+    font-weight: 400;
+    margin: 0;
+    text-transform: capitalize;
+
+    a {
+        text-decoration: none;
+        color: $primary-dark;
     }
 }

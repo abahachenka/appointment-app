@@ -1,10 +1,16 @@
 .page-header {
-  padding: 20px;
   color: #fff;
-  background: #4784EB;
+  background: #73c5ff;
   font-size: 24px;
-  text-align: center;
-  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.3); }
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.3); }
+  .page-header .page-container {
+    padding: 20px; }
+
+.logo {
+  width: 120px;
+  vertical-align: top;
+  display: block;
+  margin: 0 auto; }
 
 .home-page {
   display: flex;
@@ -30,22 +36,26 @@
   border: none; }
 
 .column-new .home-button {
-  background: #4784EB; }
+  background: #73c5ff; }
   .column-new .home-button:hover {
-    background: #3e79dc; }
+    background: #68b6ec; }
 
 .column-cancel .home-button {
-  background: #d87373; }
+  background: #fff;
+  color: #73c5ff; }
   .column-cancel .home-button:hover {
-    background: #dc5858; }
+    background: #f6f6f6; }
+
+.address-search .page-title {
+  margin-top: 35px; }
 
 .address-form {
-  margin: 30px 0;
+  margin: 50px 0;
   display: flex;
   justify-content: space-between;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   padding: 20px;
-  background: #c8dcfd; }
+  background: #73c5ff; }
   .address-form input {
     font-size: 16px;
     height: 35px;
@@ -57,11 +67,12 @@
     padding: 1px 5px; }
   .address-form input[type="submit"] {
     padding: 10px 30px;
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
-    line-height: 1; }
+    border: 1px solid #fff;
+    line-height: 0.7; }
     .address-form input[type="submit"]:hover {
-      background: #3e79dc; }
+      background: #68b6ec; }
 
 .search-results {
   margin: 50px 0 25px; }
@@ -76,11 +87,20 @@
     border: none;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
     .category-list li:hover {
-      background: #c8dcfd;
+      background: #f6f6f6;
       cursor: pointer; }
 
+.category-name {
+  font-size: 22px;
+  font-weight: 400;
+  margin: 0;
+  text-transform: capitalize; }
+  .category-name a {
+    text-decoration: none;
+    color: #0892f3; }
+
 .page-footer {
-  background: #000;
+  background: #312a6b;
   padding: 20px;
   color: #fff;
   font: 14px 'Roboto Condensed';
@@ -131,7 +151,7 @@
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
     margin-bottom: 20px; }
     .appointment-options li:hover {
-      background: #c8dcfd;
+      background: #f6f6f6;
       cursor: pointer; }
   .appointment-options .time {
     flex: 0 1 10%;
@@ -155,7 +175,7 @@
 .patient-selection-info {
   display: flex;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
-  background: #c8dcfd;
+  background: #d9efff;
   width: 50%;
   margin: 30px auto; }
 
@@ -203,12 +223,12 @@
     padding: 1px 5px;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
   .patient-details-form input[type="submit"] {
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
     margin: auto;
     width: 120px; }
     .patient-details-form input[type="submit"]:hover {
-      background: #3e79dc;
+      background: #68b6ec;
       cursor: pointer; }
 
 .appointment-notification {
@@ -244,13 +264,13 @@
   text-align: center; }
   .new-appointment-finish a {
     padding: 10px 30px;
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
     line-height: 1;
     text-decoration: none;
     display: inline-block; }
     .new-appointment-finish a:hover {
-      background: #3e79dc; }
+      background: #68b6ec; }
 
 .cancel-appointment-form {
   display: flex;
@@ -267,11 +287,11 @@
     width: 170px; }
   .cancel-appointment-form input[type="submit"] {
     color: #fff;
-    background: #4784EB;
+    background: #73c5ff;
     padding: 10px 20px;
     line-height: 1; }
     .cancel-appointment-form input[type="submit"]:hover {
-      background: #3e79dc; }
+      background: #68b6ec; }
 
 .cancel-sample {
   width: 350px;
@@ -295,11 +315,11 @@
     margin-bottom: 20px; }
   .sign-in-form input[type="submit"] {
     border: none;
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
     margin-bottom: 5px; }
     .sign-in-form input[type="submit"]:not([disabled]):hover {
-      background: #3e79dc;
+      background: #68b6ec;
       cursor: pointer; }
   .sign-in-form input[disabled] {
     background: #f0f0f0;
@@ -318,11 +338,11 @@
     margin-bottom: 20px;
     padding: 1px 5px; }
   .clinic-registration-form input[type="submit"] {
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
     border: none; }
     .clinic-registration-form input[type="submit"]:not([disabled]):hover {
-      background: #3e79dc;
+      background: #68b6ec;
       cursor: pointer; }
   .clinic-registration-form input[disabled] {
     background: #f0f0f0;
@@ -361,14 +381,14 @@
     position: absolute;
     right: 0;
     top: 10px;
-    background: #4784EB;
+    background: #73c5ff;
     border: none;
     color: #fff;
     height: 35px;
     font-size: 16px;
     width: 100px; }
     .doctor-specialisations button:hover {
-      background: #3e79dc; }
+      background: #68b6ec; }
 
 .breadcrumbs {
   padding: 0; }
@@ -430,11 +450,11 @@
     -webkit-border-radius: 0; }
   .modal input[type="submit"] {
     border: none;
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
     margin: 0; }
     .modal input[type="submit"]:hover {
-      background: #3e79dc;
+      background: #68b6ec;
       cursor: pointer; }
 
 .modal-success-message {
@@ -444,7 +464,7 @@
   .modal-success-message .button {
     text-decoration: none;
     display: inline-block;
-    background: #4784EB;
+    background: #73c5ff;
     color: #fff;
     border: none;
     width: 100%;
@@ -468,8 +488,8 @@
     .data-table td:last-child {
       border: 0; }
   .data-table tbody tr:not(.disabled):hover td {
-    background: #c8dcfd;
-    border-color: #c8dcfd;
+    background: #d9efff;
+    border-color: #d9efff;
     cursor: pointer; }
 
 .data-section-header {
@@ -489,10 +509,10 @@
   height: 35px;
   font-size: 16px;
   color: #fff;
-  background: #4784EB;
+  background: #73c5ff;
   border: none; }
   .data-section-btn:hover {
-    background: #3e79dc;
+    background: #68b6ec;
     cursor: pointer; }
 
 .doctor-account-page .page-title {
@@ -520,20 +540,22 @@ body {
 
 .page-container {
   flex: 1;
-  padding: 30px;
+  padding: 20px;
   width: 1140px;
   box-sizing: border-box;
   margin: 0 auto; }
 
 .page-title {
   text-align: center;
-  text-transform: capitalize;
+  text-transform: uppercase;
   font-weight: normal;
-  font-size: 30px; }
+  font-size: 28px;
+  color: #312a6b; }
 
 .page-subtitle {
   font-size: 26px;
-  font-weight: normal; }
+  font-weight: normal;
+  color: #312a6b; }
 
 .error {
   color: #d87373;
@@ -542,8 +564,10 @@ body {
 .doctor-specialisations-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around; }
+  justify-content: space-around;
+  margin-top: 35px; }
   .doctor-specialisations-list li {
-    flex: 0 0 45%; }
+    flex: 0 0 30%;
+    margin: 0 0 40px; }
 
 /*# sourceMappingURL=index.css.map */

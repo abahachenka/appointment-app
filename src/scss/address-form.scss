@@ -1,10 +1,16 @@
+.address-search {
+    .page-title {
+        margin-top: 35px;
+    }
+}
+
 .address-form {
-    margin: 30px 0;
+    margin: 50px 0;
     display: flex;
     justify-content: space-between;
     box-shadow: $block-shadow;
     padding: $block-padding;
-    background: $primary-light;
+    background: $primary;
 
     input {
         font-size: $input-font-size;
@@ -23,7 +29,8 @@
         padding: 10px 30px;
         background: $primary;
         color: $white;
-        line-height: 1;
+        border: 1px solid $white;
+        line-height: 0.7;
 
         &:hover {
             background: $primary-hover;

@@ -1,8 +1,18 @@
 .page-header {
-    padding: $block-padding;
     color: $white;
     background: $primary;
     font-size: 24px;
-    text-align: center;
-    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 5px rgba(0, 0, 0, 0.3);
+
+    .page-container {
+        padding: $block-padding;
+    }
 }
+
+.logo {
+    width: 120px;
+    vertical-align: top;
+    display: block;
+    margin: 0 auto;
+}
+

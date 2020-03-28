@@ -14,6 +14,10 @@ class ClinicDoctorCategories extends React.Component {
         this.props.saveDoctorCategory(categoryId);
     }
 
+    onCategorySelect(event, url) {
+        this.props.history.push(url);
+    }
+
     render() {
         return (
             <main className="page-container">
@@ -21,13 +25,17 @@ class ClinicDoctorCategories extends React.Component {
                 {this.props.categories && this.props.categories.length ? (
                     <ul className="doctor-specialisations-list category-list">
                         {this.props.categories.map((category, index) => {
+                            const url = this.props.location.pathname + '/' + category.categoryAlias;
+
                             return (
-                                <li key={index}>
-                                    <Link 
-                                        to={this.props.location.pathname + '/' + category.categoryAlias} 
-                                        onClick={this.saveCategory.bind(this, event, category._id)}>
-                                        {category.categoryName}
-                                    </Link>
+                                <li key={index} onClick={this.onCategorySelect.bind(this, event, url)}>
+                                    <h2 className="category-name">
+                                        <Link 
+                                            to={url} 
+                                            onClick={this.saveCategory.bind(this, event, category._id)}>
+                                            {category.categoryName}
+                                        </Link>
+                                    </h2>
                                 </li>
                             )
                         })}
