@@ -12,8 +12,8 @@ module.exports = {
         output: 'bundle.js'
     },
     scss: {
-        src: './static/scss/index.scss',
+        src: './src/scss/index.scss',
         dest: './public/',
-        watch: './static/scss/**/*.scss'
+        watch: './src/scss/**/*.scss'
     }
 };
