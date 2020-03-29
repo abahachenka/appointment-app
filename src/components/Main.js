@@ -14,6 +14,7 @@ import CancelAppointment from './CancelAppointment';
 import ClinicDoctorCategories from './ClinicDoctorCategories';
 import AvailableAppointments from './AvailableAppointments';
 import NewAppointmentComplete from './NewAppointmentComplete';
+import NotFound from './NotFound';
 
 const Main = () => (
     <Switch>
@@ -31,6 +32,7 @@ const Main = () => (
         <Route path={'/accept-invitation/:token'} component={AcceptInvitation} />
         <Route exact path='/doctor-account' component={DoctorAccount} />
         <Route path={'/doctor-account/settings'} component={DoctorSettings} />
+        <Route component={NotFound} />
     </Switch>
 )
 
