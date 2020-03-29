@@ -43706,7 +43706,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.accountLogout = exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.logout = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.accountLogout = exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.requestUserSignIn = exports.logout = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -43759,27 +43759,6 @@ var resetSignInError = function resetSignInError() {
 };
 
 exports.resetSignInError = resetSignInError;
-
-var requestUserSignIn = function requestUserSignIn(accountData) {
-  return function (dispatch) {
-    dispatch(signInPending());
-    (0, _userApi.requestSignIn)(accountData).then(function (resp) {
-      var token = resp && resp.data && resp.data.token;
-
-      if (token) {
-        _jsCookie["default"].set('token', token);
-
-        dispatch(signInSuccess(resp.data.accountType));
-      } else {
-        dispatch(signInError('Something went wrong'));
-      }
-    })["catch"](function (err) {
-      dispatch(signInError(err.message));
-    });
-  };
-};
-
-exports.requestUserSignIn = requestUserSignIn;
 
 var loadAccountSuccess = function loadAccountSuccess(account) {
   return {
@@ -44027,12 +44006,33 @@ var logout = function logout() {
 
 exports.logout = logout;
 
+var requestUserSignIn = function requestUserSignIn(accountData) {
+  return function (dispatch) {
+    dispatch(signInPending());
+    (0, _userApi.requestSignIn)(accountData).then(function (resp) {
+      var token = resp && resp.data && resp.data.token;
+
+      if (token) {
+        _jsCookie["default"].set('token', token);
+
+        dispatch(signInSuccess(resp.data.accountType));
+      } else {
+        dispatch(signInError('Something went wrong'));
+      }
+    })["catch"](function (err) {
+      dispatch(signInError(err.response.data));
+    });
+  };
+};
+
+exports.requestUserSignIn = requestUserSignIn;
+
 var loadDoctorAppointments = function loadDoctorAppointments() {
   return function (dispatch) {
     (0, _appointmentsApi.getDoctorAppointments)().then(function (resp) {
       dispatch(loadDoctorAppointmentsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorAppointmentsError(err));
+      dispatch(loadDoctorAppointmentsError(err.response.data));
     });
   };
 };
@@ -44050,7 +44050,7 @@ var loadAccount = function loadAccount() {
 
       dispatch(loadAccountSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadAccountError(err.message));
+      dispatch(loadAccountError(err.response.data));
     });
   };
 };
@@ -44063,7 +44063,7 @@ var createNewDoctorCategory = function createNewDoctorCategory(categoryName) {
       dispatch(createNewDoctorCategorySuccess());
       dispatch(loadDoctorCategories());
     })["catch"](function (err) {
-      dispatch(createNewDoctorCategoryError(err.message));
+      dispatch(createNewDoctorCategoryError(err.response.data));
     });
   };
 };
@@ -44075,7 +44075,7 @@ var loadDoctorCategories = function loadDoctorCategories() {
     (0, _doctorsApi.getDoctorCategories)().then(function (resp) {
       dispatch(loadDoctorCategoriesSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoriesError(err.message));
+      dispatch(loadDoctorCategoriesError(err.response.data));
     });
   };
 };
@@ -44087,7 +44087,7 @@ var loadDoctors = function loadDoctors(categoryId) {
     (0, _doctorsApi.getDoctors)(categoryId).then(function (resp) {
       dispatch(loadDoctorsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorsError(err.message));
+      dispatch(loadDoctorsError(err.response.data));
     });
   };
 };
@@ -44101,7 +44101,7 @@ var loadCategory = function loadCategory(alias) {
       dispatch(loadDoctorCategorySuccess(category));
       dispatch(loadDoctors(category._id));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoryError(err.message));
+      dispatch(loadDoctorCategoryError(err.response.data));
     });
   };
 };
@@ -44116,7 +44116,7 @@ var sendInvitation = function sendInvitation(categoryId, invitation) {
       dispatch(sendInvitationSuccess());
       dispatch(loadDoctors(categoryId));
     })["catch"](function (err) {
-      dispatch(sendInvitationError(err.message));
+      dispatch(sendInvitationError(err.response.data));
     });
   };
 };
@@ -44128,7 +44128,7 @@ var checkInvitationToken = function checkInvitationToken(token) {
     (0, _doctorsApi.requestInvitationTokenCheck)(token).then(function () {
       dispatch(checkInvitationTokenSuccess());
     })["catch"](function (err) {
-      dispatch(checkInvitationTokenError(err));
+      dispatch(checkInvitationTokenError(err.response.data));
     });
   };
 };
@@ -44140,7 +44140,7 @@ var activateAccount = function activateAccount(token, password) {
     (0, _doctorsApi.updateDoctorsAccount)(token, password).then(function () {
       dispatch(activateAccountSuccess());
     })["catch"](function (err) {
-      dispatch(activateAccountSuccess(err));
+      dispatch(activateAccountSuccess(err.response.data));
     });
   };
 };
@@ -44152,7 +44152,7 @@ var getAddressList = function getAddressList() {
     (0, _clinicsApi.getClinicAddressCover)().then(function (resp) {
       dispatch(getAddressListSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(getAddressListError(err));
+      dispatch(getAddressListError(err.response.data));
     });
   };
 };
@@ -44164,7 +44164,7 @@ var getDoctorAddressList = function getDoctorAddressList() {
     (0, _doctorsApi.getDoctorAddressCover)().then(function (resp) {
       dispatch(getDoctorAddressListSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(getDoctorAddressListError(err));
+      dispatch(getDoctorAddressListError(err.response.data));
     });
   };
 };
@@ -44176,7 +44176,7 @@ var addNewAddress = function addNewAddress(details) {
     (0, _clinicsApi.addNewClinicAddress)(details).then(function () {
       dispatch(getAddressList());
     })["catch"](function (err) {
-      console.log(err);
+      console.log(err.response.data);
     });
   };
 };
@@ -44188,7 +44188,7 @@ var addNewDoctorAddress = function addNewDoctorAddress(details) {
     (0, _doctorsApi.addNewDoctorAddressCover)(details).then(function () {
       dispatch(getDoctorAddressList());
     })["catch"](function (err) {
-      console.log(err);
+      console.log(err.response.data);
     });
   };
 };
@@ -44200,7 +44200,7 @@ var createNewAppointment = function createNewAppointment(appointment) {
     (0, _appointmentsApi.addNewAppointment)(appointment).then(function () {
       dispatch(loadDoctorAppointments());
     })["catch"](function (err) {
-      console.log(err);
+      console.log(err.response.data);
     });
   };
 };
@@ -44367,7 +44367,7 @@ var searchClinic = function searchClinic(params) {
     (0, _clinicsApi.searchClinicByHomeAddress)(params).then(function (resp) {
       dispatch(searchClinicSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(searchClinicError(err));
+      dispatch(searchClinicError(err.response.data));
     });
   };
 };
@@ -44381,7 +44381,7 @@ var loadDoctorCategories = function loadDoctorCategories() {
     (0, _doctorsApi.getDoctorCategories)(clinicId).then(function (resp) {
       dispatch(loadDoctorCategoriesSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoriesError(err));
+      dispatch(loadDoctorCategoriesError(err.response.data));
     });
   };
 };
@@ -44417,7 +44417,7 @@ var loadAppointments = function loadAppointments(filter) {
     (0, _appointmentsApi.getDoctorAppointments)(categoryId, address).then(function (resp) {
       dispatch(loadAppointmentsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadAppointmentsError(err));
+      dispatch(loadAppointmentsError(err.response.data));
     });
   };
 };
@@ -44429,7 +44429,7 @@ var completeRegistration = function completeRegistration(patient, appointment) {
     (0, _appointmentsApi.registerAppointment)(patient, appointment).then(function (resp) {
       dispatch(registrationSuccess(resp.data.orderNumber));
     })["catch"](function (err) {
-      dispatch(registrationError(err));
+      dispatch(registrationError(err.response.data));
     });
   };
 };
@@ -44441,7 +44441,7 @@ var cancelAppointment = function cancelAppointment(orderNumber) {
     (0, _appointmentsApi.requestCancelAppointment)(orderNumber).then(function () {
       dispatch(cancelAppointmentSuccess());
     })["catch"](function (err) {
-      dispatch(cancelAppointmentError(err.message));
+      dispatch(cancelAppointmentError(err.response.data));
     });
   };
 };
@@ -44501,7 +44501,7 @@ var registerClinic = function registerClinic(clinic) {
     (0, _clinicsApi.createClinic)(clinic).then(function () {
       dispatch(registerClinicSuccess());
     })["catch"](function (err) {
-      dispatch(registerClinicError(err.message));
+      dispatch(registerClinicError(err.response.data));
     });
   };
 };

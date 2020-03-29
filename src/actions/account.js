@@ -75,27 +75,6 @@ export const resetSignInError = () => ({
     type: SIGN_IN_RESET_ERROR
 });
 
-export const requestUserSignIn = (accountData) => {
-    return dispatch => {
-        dispatch(signInPending());
-        
-        requestSignIn(accountData)
-            .then(resp => {
-                const token = resp && resp.data && resp.data.token;
-
-                if (token) {
-                    Cookies.set('token', token);
-                    dispatch(signInSuccess(resp.data.accountType));
-                } else {
-                    dispatch(signInError('Something went wrong'));
-                }
-            })
-            .catch(err => {
-                dispatch(signInError(err.message));
-            });
-    }
-}
-
 export const loadAccountSuccess = (account) => ({
     type: ACCOUNT_LOAD_SUCCESS,
     payload: {
@@ -246,6 +225,27 @@ export const logout = () => ({
     type: ACCOUNT_LOGOUT
 });
 
+export const requestUserSignIn = (accountData) => {
+    return dispatch => {
+        dispatch(signInPending());
+        
+        requestSignIn(accountData)
+            .then(resp => {
+                const token = resp && resp.data && resp.data.token;
+
+                if (token) {
+                    Cookies.set('token', token);
+                    dispatch(signInSuccess(resp.data.accountType));
+                } else {
+                    dispatch(signInError('Something went wrong'));
+                }
+            })
+            .catch(err => {
+                dispatch(signInError(err.response.data));
+            });
+    }
+}
+
 export const loadDoctorAppointments = () => {
     return dispatch => {
         getDoctorAppointments()
@@ -253,7 +253,7 @@ export const loadDoctorAppointments = () => {
                 dispatch(loadDoctorAppointmentsSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorAppointmentsError(err));
+                dispatch(loadDoctorAppointmentsError(err.response.data));
             });
     }
 };
@@ -270,7 +270,7 @@ export const loadAccount = () => {
                 dispatch(loadAccountSuccess(resp.data))
             })
             .catch(err => {
-                dispatch(loadAccountError(err.message));
+                dispatch(loadAccountError(err.response.data));
             });
     }
 }
@@ -283,7 +283,7 @@ export const createNewDoctorCategory = (categoryName) => {
                 dispatch(loadDoctorCategories());
             })
             .catch(err => {
-                dispatch(createNewDoctorCategoryError(err.message));
+                dispatch(createNewDoctorCategoryError(err.response.data));
             });
     }
 }
@@ -295,7 +295,7 @@ export const loadDoctorCategories = () => {
                 dispatch(loadDoctorCategoriesSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorCategoriesError(err.message));
+                dispatch(loadDoctorCategoriesError(err.response.data));
             });
     }
 }
@@ -307,7 +307,7 @@ export const loadDoctors = (categoryId) => {
                 dispatch(loadDoctorsSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorsError(err.message));
+                dispatch(loadDoctorsError(err.response.data));
             });
     }
 }
@@ -321,7 +321,7 @@ export const loadCategory = (alias) => {
                 dispatch(loadDoctors(category._id))
             })
             .catch(err => {
-                dispatch(loadDoctorCategoryError(err.message))
+                dispatch(loadDoctorCategoryError(err.response.data))
             });
     }
 }
@@ -335,7 +335,7 @@ export const sendInvitation = (categoryId, invitation) => {
                 dispatch(loadDoctors(categoryId));
             })
             .catch(err => {
-                dispatch(sendInvitationError(err.message));
+                dispatch(sendInvitationError(err.response.data));
             });
     }
 }
@@ -347,7 +347,7 @@ export const checkInvitationToken = (token) => {
                 dispatch(checkInvitationTokenSuccess());
             })
             .catch(err => {
-                dispatch(checkInvitationTokenError(err));
+                dispatch(checkInvitationTokenError(err.response.data));
             });
     }
 }
@@ -359,7 +359,7 @@ export const activateAccount = (token, password) => {
                 dispatch(activateAccountSuccess());
             })
             .catch(err => {
-                dispatch(activateAccountSuccess(err));
+                dispatch(activateAccountSuccess(err.response.data));
             });
     }
 }
@@ -371,7 +371,7 @@ export const getAddressList = () => {
                 dispatch(getAddressListSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(getAddressListError(err));
+                dispatch(getAddressListError(err.response.data));
             });
     }
 }
@@ -383,7 +383,7 @@ export const getDoctorAddressList = () => {
                 dispatch(getDoctorAddressListSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(getDoctorAddressListError(err));
+                dispatch(getDoctorAddressListError(err.response.data));
             });
     }
 }
@@ -395,7 +395,7 @@ export const addNewAddress = (details) => {
                 dispatch(getAddressList());
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.response.data);
             });
     }
 }
@@ -407,7 +407,7 @@ export const addNewDoctorAddress = (details) => {
                 dispatch(getDoctorAddressList());
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.response.data);
             });
     }
 }
@@ -419,7 +419,7 @@ export const createNewAppointment = (appointment) => {
                 dispatch(loadDoctorAppointments());
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.response.data);
             });
     }
 }

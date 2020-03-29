@@ -34,7 +34,7 @@ export const registerClinic = (clinic) => {
                 dispatch(registerClinicSuccess());
             })
             .catch(err => {
-                dispatch(registerClinicError(err.message));
+                dispatch(registerClinicError(err.response.data));
             });
     }
 }

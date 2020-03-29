@@ -108,7 +108,7 @@ export const searchClinic = (params) => {
                 dispatch(searchClinicSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(searchClinicError(err));
+                dispatch(searchClinicError(err.response.data));
             });
     }
 }
@@ -122,7 +122,7 @@ export const loadDoctorCategories = () => {
                 dispatch(loadDoctorCategoriesSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorCategoriesError(err));
+                dispatch(loadDoctorCategoriesError(err.response.data));
             });
     }
 }
@@ -153,7 +153,7 @@ export const loadAppointments = (filter) => {
                 dispatch(loadAppointmentsSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadAppointmentsError(err));
+                dispatch(loadAppointmentsError(err.response.data));
             });
     }
 }
@@ -165,7 +165,7 @@ export const completeRegistration = (patient, appointment) => {
                 dispatch(registrationSuccess(resp.data.orderNumber));
             })
             .catch(err => {
-                dispatch(registrationError(err));
+                dispatch(registrationError(err.response.data));
             });
     }
 }
@@ -177,7 +177,7 @@ export const cancelAppointment = orderNumber => {
                 dispatch(cancelAppointmentSuccess());
             })
             .catch(err => {
-                dispatch(cancelAppointmentError(err.message));
+                dispatch(cancelAppointmentError(err.response.data));
             });
     }
 }
