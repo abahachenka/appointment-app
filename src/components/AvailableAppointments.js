@@ -20,7 +20,12 @@ class AvailableAppointments extends React.Component {
     }
 
     componentDidMount() {
-        this.props.loadAppointments();
+        if (!this.props.selectedCategory) {
+            this.props.history.push('/new-appointment');
+            return;
+        }
+
+        this.props.loadAppointments(this.props.selectedCategory._id);
     }
 
     formatAppointments(src) {
@@ -106,11 +111,11 @@ class AvailableAppointments extends React.Component {
     }
 
     showDistrictDoctorAppointments() {
-        this.props.loadAppointments({district: true});
+        this.props.loadAppointments(this.props.selectedCategory._id, {address: this.props.userHomeAddress});
     }
 
     showAllAppointments() {
-        this.props.loadAppointments();
+        this.props.loadAppointments(this.props.selectedCategory._id);
     }
 
     drawFilters() {
@@ -177,23 +182,27 @@ class AvailableAppointments extends React.Component {
 }
 
 AvailableAppointments.propTypes = {
+    selectedCategory: PropTypes.object,
     appointments: PropTypes.arrayOf(PropTypes.object),
     categoriesWithFilters: PropTypes.arrayOf(PropTypes.string),
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     loadAppointments: PropTypes.func,
     saveAppointment: PropTypes.func,
     location: PropTypes.object,
-    history: PropTypes.object
+    history: PropTypes.object,
+    userHomeAddress: PropTypes.object
 }
 
 const mapStateToProps = ({appointments}) => ({
+    userHomeAddress: appointments.userHomeAddress,
+    selectedCategory: appointments.selectedDoctorCategory,
     categoriesWithFilters: appointments.categoriesWithFilters,
     appointments: appointments.doctorAppointments,
     error: appointments.doctorAppointmentsError
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    loadAppointments: (filter) => loadAppointments(filter),
+    loadAppointments: (categoryId, filter) => loadAppointments(categoryId, filter),
     saveAppointment: (appointment) => saveAppointment(appointment)
 }, dispatch);
 

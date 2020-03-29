@@ -9,12 +9,18 @@ import {
     APPOINTMENT_REGISTRATION_SUCCESS,
     APPOINTMENT_REGISTRATION_ERROR,
     CANCEL_APPOINTMENT_SUCCESS,
-    CANCEL_APPOINTMENT_ERROR
+    CANCEL_APPOINTMENT_ERROR,
+    SAVE_SELECTED_CLINIC,
+    SAVE_SELECTED_DOCTOR_CATEGORY,
+    SAVE_USER_HOME_ADDRESS
 } from '../constants/action-types';
 
 const initialState = {
+    userHomeAddress: null,
     clinics: [],
+    selectedClinic: null,
     doctorCategories: [],
+    selectedDoctorCategory: null,
     error: '',
     doctorCategoriesError: '',
     doctorAppointments: [],
@@ -98,6 +104,24 @@ const appointmentsReducer = (state = initialState, action) => {
                 ...state,
                 isAppointmentCancelled: false,
                 cancelError: action.payload.error
+            }
+
+        case SAVE_SELECTED_CLINIC: 
+            return {
+                ...state,
+                selectedClinic: action.payload.clinic
+            }
+
+        case SAVE_SELECTED_DOCTOR_CATEGORY: 
+            return {
+                ...state,
+                selectedDoctorCategory: action.payload.category
+            }
+
+        case SAVE_USER_HOME_ADDRESS: 
+            return {
+                ...state,
+                userHomeAddress: action.payload.address
             }
             
         default:

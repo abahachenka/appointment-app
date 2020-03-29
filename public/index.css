@@ -566,7 +566,7 @@ a {
     background: #73c5ff;
     cursor: pointer; }
 
-input {
+input:not([type="radio"]) {
   height: 35px;
   font-size: 16px; }
 

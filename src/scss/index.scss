@@ -75,7 +75,7 @@ a {
     }
 }
 
-input {
+input:not([type="radio"]) {
     height: $input-height;
     font-size: $input-font-size;
 }

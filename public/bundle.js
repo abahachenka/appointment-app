@@ -44223,9 +44223,7 @@ exports.accountLogout = accountLogout;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.cancelAppointment = exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.cancelAppointmentError = exports.cancelAppointmentSuccess = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
-
-var _jsCookie = _interopRequireDefault(require("js-cookie"));
+exports.cancelAppointment = exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.saveSelectedDoctorCategory = exports.saveSelectedClinic = exports.cancelAppointmentError = exports.cancelAppointmentSuccess = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
 
 var _appointmentsApi = require("../utils/appointments-api");
 
@@ -44234,8 +44232,6 @@ var _clinicsApi = require("../utils/clinics-api");
 var _doctorsApi = require("../utils/doctors-api");
 
 var _actionTypes = require("../constants/action-types");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var searchClinicSuccess = function searchClinicSuccess(clinics) {
   return {
@@ -44355,69 +44351,93 @@ var cancelAppointmentError = function cancelAppointmentError(error) {
 
 exports.cancelAppointmentError = cancelAppointmentError;
 
+var saveSelectedClinic = function saveSelectedClinic(clinic) {
+  return {
+    type: _actionTypes.SAVE_SELECTED_CLINIC,
+    payload: {
+      clinic: clinic
+    }
+  };
+};
+
+exports.saveSelectedClinic = saveSelectedClinic;
+
+var saveSelectedDoctorCategory = function saveSelectedDoctorCategory(category) {
+  return {
+    type: _actionTypes.SAVE_SELECTED_DOCTOR_CATEGORY,
+    payload: {
+      category: category
+    }
+  };
+};
+
+exports.saveSelectedDoctorCategory = saveSelectedDoctorCategory;
+
 var saveUserHomeAddress = function saveUserHomeAddress(address) {
-  _jsCookie["default"].set('userAddress', address.place + ',' + address.street + ',' + address.building);
+  return {
+    type: _actionTypes.SAVE_USER_HOME_ADDRESS,
+    payload: {
+      address: address
+    }
+  };
 };
 
 exports.saveUserHomeAddress = saveUserHomeAddress;
 
 var searchClinic = function searchClinic(params) {
   return function (dispatch) {
-    saveUserHomeAddress(params);
+    dispatch(saveUserHomeAddress(params));
     (0, _clinicsApi.searchClinicByHomeAddress)(params).then(function (resp) {
       dispatch(searchClinicSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(searchClinicError(err.response.data));
+      dispatch(searchClinicError(err.response && err.response.data));
     });
   };
 };
 
 exports.searchClinic = searchClinic;
 
-var loadDoctorCategories = function loadDoctorCategories() {
+var loadDoctorCategories = function loadDoctorCategories(clinicId) {
   return function (dispatch) {
-    var clinicId = _jsCookie["default"].get('newAppointmentClinicId');
-
     (0, _doctorsApi.getDoctorCategories)(clinicId).then(function (resp) {
       dispatch(loadDoctorCategoriesSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoriesError(err.response.data));
+      dispatch(loadDoctorCategoriesError(err.response && err.response.data));
     });
   };
 };
 
 exports.loadDoctorCategories = loadDoctorCategories;
 
-var saveClinic = function saveClinic(clinicId) {
-  return function () {
-    _jsCookie["default"].set('newAppointmentClinicId', clinicId);
+var saveClinic = function saveClinic(clinic) {
+  return function (dispatch) {
+    dispatch(saveSelectedClinic(clinic));
   };
 };
 
 exports.saveClinic = saveClinic;
 
-var saveDoctorCategory = function saveDoctorCategory(categoryId) {
-  return function () {
-    _jsCookie["default"].set('newAppointmentCategoryId', categoryId);
+var saveDoctorCategory = function saveDoctorCategory(category) {
+  return function (dispatch) {
+    dispatch(saveSelectedDoctorCategory(category));
   };
 };
 
 exports.saveDoctorCategory = saveDoctorCategory;
 
-var loadAppointments = function loadAppointments(filter) {
+var loadAppointments = function loadAppointments(categoryId, filter) {
   return function (dispatch) {
-    var categoryId = _jsCookie["default"].get('newAppointmentCategoryId');
-
     var address = '';
 
     if (filter) {
-      address = _jsCookie["default"].get('userAddress');
+      address = "".concat(filter.address.place, ",").concat(filter.address.street, ",").concat(filter.address.building);
+      console.log(address);
     }
 
     (0, _appointmentsApi.getDoctorAppointments)(categoryId, address).then(function (resp) {
       dispatch(loadAppointmentsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadAppointmentsError(err.response.data));
+      dispatch(loadAppointmentsError(err.response && err.response.data));
     });
   };
 };
@@ -44429,7 +44449,7 @@ var completeRegistration = function completeRegistration(patient, appointment) {
     (0, _appointmentsApi.registerAppointment)(patient, appointment).then(function (resp) {
       dispatch(registrationSuccess(resp.data.orderNumber));
     })["catch"](function (err) {
-      dispatch(registrationError(err.response.data));
+      dispatch(registrationError(err.response && err.response.data));
     });
   };
 };
@@ -44441,14 +44461,14 @@ var cancelAppointment = function cancelAppointment(orderNumber) {
     (0, _appointmentsApi.requestCancelAppointment)(orderNumber).then(function () {
       dispatch(cancelAppointmentSuccess());
     })["catch"](function (err) {
-      dispatch(cancelAppointmentError(err.response.data));
+      dispatch(cancelAppointmentError(err.response && err.response.data));
     });
   };
 };
 
 exports.cancelAppointment = cancelAppointment;
 
-},{"../constants/action-types":136,"../utils/appointments-api":147,"../utils/clinics-api":148,"../utils/doctors-api":149,"js-cookie":41}],111:[function(require,module,exports){
+},{"../constants/action-types":136,"../utils/appointments-api":147,"../utils/clinics-api":148,"../utils/doctors-api":149}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44785,7 +44805,12 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
   _createClass(AvailableAppointments, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.props.loadAppointments();
+      if (!this.props.selectedCategory) {
+        this.props.history.push('/new-appointment');
+        return;
+      }
+
+      this.props.loadAppointments(this.props.selectedCategory._id);
     }
   }, {
     key: "formatAppointments",
@@ -44874,14 +44899,14 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "showDistrictDoctorAppointments",
     value: function showDistrictDoctorAppointments() {
-      this.props.loadAppointments({
-        district: true
+      this.props.loadAppointments(this.props.selectedCategory._id, {
+        address: this.props.userHomeAddress
       });
     }
   }, {
     key: "showAllAppointments",
     value: function showAllAppointments() {
-      this.props.loadAppointments();
+      this.props.loadAppointments(this.props.selectedCategory._id);
     }
   }, {
     key: "drawFilters",
@@ -44947,18 +44972,22 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
 }(_react["default"].Component);
 
 AvailableAppointments.propTypes = {
+  selectedCategory: _propTypes["default"].object,
   appointments: _propTypes["default"].arrayOf(_propTypes["default"].object),
   categoriesWithFilters: _propTypes["default"].arrayOf(_propTypes["default"].string),
   error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
   loadAppointments: _propTypes["default"].func,
   saveAppointment: _propTypes["default"].func,
   location: _propTypes["default"].object,
-  history: _propTypes["default"].object
+  history: _propTypes["default"].object,
+  userHomeAddress: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
   var appointments = _ref.appointments;
   return {
+    userHomeAddress: appointments.userHomeAddress,
+    selectedCategory: appointments.selectedDoctorCategory,
     categoriesWithFilters: appointments.categoriesWithFilters,
     appointments: appointments.doctorAppointments,
     error: appointments.doctorAppointmentsError
@@ -44967,8 +44996,8 @@ var mapStateToProps = function mapStateToProps(_ref) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
-    loadAppointments: function loadAppointments(filter) {
-      return (0, _appointments.loadAppointments)(filter);
+    loadAppointments: function loadAppointments(categoryId, filter) {
+      return (0, _appointments.loadAppointments)(categoryId, filter);
     },
     saveAppointment: function saveAppointment(appointment) {
       return (0, _appointments.saveAppointment)(appointment);
@@ -45286,16 +45315,18 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
   _createClass(ClinicDoctorCategories, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.props.loadCategories();
-    }
-  }, {
-    key: "saveCategory",
-    value: function saveCategory(event, categoryId) {
-      this.props.saveDoctorCategory(categoryId);
+      if (!this.props.selectedClinic) {
+        this.props.history.push('/new-appointment');
+        return;
+      }
+
+      var clinicId = this.props.selectedClinic._id;
+      this.props.loadCategories(clinicId);
     }
   }, {
     key: "onCategorySelect",
-    value: function onCategorySelect(event, url) {
+    value: function onCategorySelect(event, category, url) {
+      this.props.saveDoctorCategory(category);
       this.props.history.push(url);
     }
   }, {
@@ -45313,12 +45344,11 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
         var url = _this.props.location.pathname + '/' + category.categoryAlias;
         return _react["default"].createElement("li", {
           key: index,
-          onClick: _this.onCategorySelect.bind(_this, event, url)
+          onClick: _this.onCategorySelect.bind(_this, event, category, url)
         }, _react["default"].createElement("h2", {
           className: "category-name"
         }, _react["default"].createElement(_reactRouterDom.Link, {
-          to: url,
-          onClick: _this.saveCategory.bind(_this, event, category._id)
+          to: url
         }, category.categoryName)));
       })) : null);
     }
@@ -45330,6 +45360,7 @@ var ClinicDoctorCategories = /*#__PURE__*/function (_React$Component) {
 ClinicDoctorCategories.propTypes = {
   categories: _propTypes["default"].array,
   error: _propTypes["default"].string,
+  selectedClinic: _propTypes["default"].object,
   saveDoctorCategory: _propTypes["default"].func,
   loadCategories: _propTypes["default"].func,
   location: _propTypes["default"].object,
@@ -45339,6 +45370,7 @@ ClinicDoctorCategories.propTypes = {
 var mapStateToProps = function mapStateToProps(_ref) {
   var appointments = _ref.appointments;
   return {
+    selectedClinic: appointments.selectedClinic,
     categories: appointments.doctorCategories,
     error: appointments.doctorCategoriesError
   };
@@ -45346,11 +45378,11 @@ var mapStateToProps = function mapStateToProps(_ref) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
-    saveDoctorCategory: function saveDoctorCategory(categoryId) {
-      return (0, _appointments.saveDoctorCategory)(categoryId);
+    saveDoctorCategory: function saveDoctorCategory(category) {
+      return (0, _appointments.saveDoctorCategory)(category);
     },
-    loadCategories: function loadCategories() {
-      return (0, _appointments.loadDoctorCategories)();
+    loadCategories: function loadCategories(clinicId) {
+      return (0, _appointments.loadDoctorCategories)(clinicId);
     }
   }, dispatch);
 };
@@ -47163,15 +47195,17 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
     };
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.searchClinic = _this.searchClinic.bind(_assertThisInitialized(_this));
-
-    window.onbeforeunload = function () {
-      return 'Your progress will be lost!';
-    };
-
     return _this;
   }
 
   _createClass(NewAppointment, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      window.onbeforeunload = function () {
+        return 'Your progress will be lost!';
+      };
+    }
+  }, {
     key: "searchClinic",
     value: function searchClinic(event) {
       event.preventDefault();
@@ -47191,13 +47225,9 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "onClinicSelect",
-    value: function onClinicSelect(event, url) {
+    value: function onClinicSelect(event, clinic, url) {
+      this.props.saveClinic(clinic);
       this.props.history.push(url);
-    }
-  }, {
-    key: "memorizeClinic",
-    value: function memorizeClinic(event, clinicId) {
-      this.props.saveClinic(clinicId);
     }
   }, {
     key: "render",
@@ -47258,12 +47288,11 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
 
         return _react["default"].createElement("li", {
           key: index,
-          onClick: _this2.onClinicSelect.bind(_this2, event, url)
+          onClick: _this2.onClinicSelect.bind(_this2, event, clinic, url)
         }, _react["default"].createElement("h3", {
           className: "category-name"
         }, _react["default"].createElement(_reactRouterDom.Link, {
-          to: url,
-          onClick: _this2.memorizeClinic.bind(_this2, event, clinic._id)
+          to: url
         }, clinic.name)), clinic.address && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Address:"), " ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Phone Number:"), " ", clinic.phoneNumber));
       }))) : null);
     }
@@ -47370,6 +47399,13 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
   }
 
   _createClass(NewAppointmentComplete, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (!this.props.selectedAppointment) {
+        this.props.history.push('/new-appointment');
+      }
+    }
+  }, {
     key: "drawSelectedAppointment",
     value: function drawSelectedAppointment() {
       var date = (0, _moment["default"])(this.props.selectedAppointment.datetime);
@@ -47470,7 +47506,8 @@ NewAppointmentComplete.propTypes = {
   selectedAppointment: _propTypes["default"].object,
   registrationCode: _propTypes["default"].string,
   error: _propTypes["default"].string,
-  completeRegistration: _propTypes["default"].func
+  completeRegistration: _propTypes["default"].func,
+  history: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -47739,7 +47776,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.SAVE_SELECTED_DOCTOR_CATEGORY = exports.SAVE_SELECTED_CLINIC = exports.SAVE_USER_HOME_ADDRESS = exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -47826,6 +47863,12 @@ var CANCEL_APPOINTMENT_ERROR = 'CANCEL_APPOINTMENT_ERROR';
 exports.CANCEL_APPOINTMENT_ERROR = CANCEL_APPOINTMENT_ERROR;
 var ACCOUNT_LOGOUT = 'ACCOUNT_LOGOUT';
 exports.ACCOUNT_LOGOUT = ACCOUNT_LOGOUT;
+var SAVE_USER_HOME_ADDRESS = 'SAVE_USER_HOME_ADDRESS';
+exports.SAVE_USER_HOME_ADDRESS = SAVE_USER_HOME_ADDRESS;
+var SAVE_SELECTED_CLINIC = 'SAVE_SELECTED_CLINIC';
+exports.SAVE_SELECTED_CLINIC = SAVE_SELECTED_CLINIC;
+var SAVE_SELECTED_DOCTOR_CATEGORY = 'SAVE_SELECTED_DOCTOR_CATEGORY';
+exports.SAVE_SELECTED_DOCTOR_CATEGORY = SAVE_SELECTED_DOCTOR_CATEGORY;
 
 },{}],137:[function(require,module,exports){
 "use strict";
@@ -47863,8 +47906,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var initialState = {
+  userHomeAddress: null,
   clinics: [],
+  selectedClinic: null,
   doctorCategories: [],
+  selectedDoctorCategory: null,
   error: '',
   doctorCategoriesError: '',
   doctorAppointments: [],
@@ -47936,6 +47982,21 @@ var appointmentsReducer = function appointmentsReducer() {
       return _objectSpread({}, state, {
         isAppointmentCancelled: false,
         cancelError: action.payload.error
+      });
+
+    case _actionTypes.SAVE_SELECTED_CLINIC:
+      return _objectSpread({}, state, {
+        selectedClinic: action.payload.clinic
+      });
+
+    case _actionTypes.SAVE_SELECTED_DOCTOR_CATEGORY:
+      return _objectSpread({}, state, {
+        selectedDoctorCategory: action.payload.category
+      });
+
+    case _actionTypes.SAVE_USER_HOME_ADDRESS:
+      return _objectSpread({}, state, {
+        userHomeAddress: action.payload.address
       });
 
     default:

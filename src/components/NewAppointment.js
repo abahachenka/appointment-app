@@ -15,8 +15,10 @@ class NewAppointment extends React.Component {
 
         this.onChange = this.onChange.bind(this);
         this.searchClinic = this.searchClinic.bind(this);
+    }
 
-        window.onbeforeunload = function() {
+    componentDidMount() {
+        window.onbeforeunload = () => {
             return 'Your progress will be lost!';
         }
     }
@@ -35,12 +37,9 @@ class NewAppointment extends React.Component {
         }));
     }
 
-    onClinicSelect(event, url) {
+    onClinicSelect(event, clinic, url) {
+        this.props.saveClinic(clinic);
         this.props.history.push(url);
-    }
-
-    memorizeClinic(event, clinicId) {
-        this.props.saveClinic(clinicId);
     }
 
     render() {
@@ -75,9 +74,9 @@ class NewAppointment extends React.Component {
                                 const url = '/new-appointment/clinic/' + clinic.alias; // change to alias
 
                                 return (
-                                    <li key={index} onClick={this.onClinicSelect.bind(this, event, url)}>
+                                    <li key={index} onClick={this.onClinicSelect.bind(this, event, clinic, url)}>
                                         <h3 className="category-name">
-                                            <Link to={url} onClick={this.memorizeClinic.bind(this, event, clinic._id)}>
+                                            <Link to={url}>
                                                 {clinic.name}
                                             </Link>
                                         </h3>

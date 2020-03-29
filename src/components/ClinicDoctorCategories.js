@@ -7,14 +7,17 @@ import {loadDoctorCategories, saveDoctorCategory} from '../actions/appointments'
 
 class ClinicDoctorCategories extends React.Component {
     componentDidMount() {
-        this.props.loadCategories();
+        if (!this.props.selectedClinic) {
+            this.props.history.push('/new-appointment');
+            return;
+        }
+
+        const clinicId = this.props.selectedClinic._id;
+        this.props.loadCategories(clinicId);
     }
 
-    saveCategory(event, categoryId) {
-        this.props.saveDoctorCategory(categoryId);
-    }
-
-    onCategorySelect(event, url) {
+    onCategorySelect(event, category, url) {
+        this.props.saveDoctorCategory(category);
         this.props.history.push(url);
     }
 
@@ -28,11 +31,9 @@ class ClinicDoctorCategories extends React.Component {
                             const url = this.props.location.pathname + '/' + category.categoryAlias;
 
                             return (
-                                <li key={index} onClick={this.onCategorySelect.bind(this, event, url)}>
+                                <li key={index} onClick={this.onCategorySelect.bind(this, event, category, url)}>
                                     <h2 className="category-name">
-                                        <Link 
-                                            to={url} 
-                                            onClick={this.saveCategory.bind(this, event, category._id)}>
+                                        <Link to={url}>
                                             {category.categoryName}
                                         </Link>
                                     </h2>
@@ -49,6 +50,7 @@ class ClinicDoctorCategories extends React.Component {
 ClinicDoctorCategories.propTypes = {
     categories: PropTypes.array,
     error: PropTypes.string,
+    selectedClinic: PropTypes.object,
     saveDoctorCategory: PropTypes.func,
     loadCategories: PropTypes.func,
     location: PropTypes.object,
@@ -56,13 +58,14 @@ ClinicDoctorCategories.propTypes = {
 };
 
 const mapStateToProps = ({appointments}) => ({
+    selectedClinic: appointments.selectedClinic,
     categories: appointments.doctorCategories,
     error: appointments.doctorCategoriesError
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    saveDoctorCategory: (categoryId) => saveDoctorCategory(categoryId),
-    loadCategories: () => loadDoctorCategories()
+    saveDoctorCategory: (category) => saveDoctorCategory(category),
+    loadCategories: (clinicId) => loadDoctorCategories(clinicId)
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ClinicDoctorCategories);

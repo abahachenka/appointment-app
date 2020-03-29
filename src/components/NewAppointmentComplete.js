@@ -19,6 +19,12 @@ class NewAppointmentComplete extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
+    componentDidMount() {
+        if (!this.props.selectedAppointment) {
+            this.props.history.push('/new-appointment');
+        }
+    }
+
     drawSelectedAppointment() {
         const date = moment(this.props.selectedAppointment.datetime);
         const month = date.format('MMMM');
@@ -110,7 +116,8 @@ NewAppointmentComplete.propTypes = {
     selectedAppointment: PropTypes.object,
     registrationCode: PropTypes.string,
     error: PropTypes.string,
-    completeRegistration: PropTypes.func
+    completeRegistration: PropTypes.func,
+    history: PropTypes.object
 }
 
 const mapStateToProps = ({appointments}) => ({

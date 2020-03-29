@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie';
-
 import {
     getDoctorAppointments, 
     registerAppointment,
@@ -19,7 +17,10 @@ import {
     APPOINTMENT_REGISTRATION_SUCCESS,
     APPOINTMENT_REGISTRATION_ERROR,
     CANCEL_APPOINTMENT_SUCCESS,
-    CANCEL_APPOINTMENT_ERROR
+    CANCEL_APPOINTMENT_ERROR,
+    SAVE_SELECTED_CLINIC,
+    SAVE_SELECTED_DOCTOR_CATEGORY,
+    SAVE_USER_HOME_ADDRESS
 } from '../constants/action-types';
 
 export const searchClinicSuccess = clinics => ({
@@ -71,7 +72,7 @@ export const saveAppointment = id => ({
     }
 });
 
-export const registrationSuccess = (code) => ({
+export const registrationSuccess = code => ({
     type: APPOINTMENT_REGISTRATION_SUCCESS,
     payload: {
         code
@@ -89,63 +90,79 @@ export const cancelAppointmentSuccess = () => ({
     type: CANCEL_APPOINTMENT_SUCCESS
 });
 
-export const cancelAppointmentError = (error) => ({
+export const cancelAppointmentError = error => ({
     type: CANCEL_APPOINTMENT_ERROR,
     payload: {
         error
     }
 });
 
-export const saveUserHomeAddress = address => {
-    Cookies.set('userAddress', address.place + ',' + address.street + ',' + address.building);
-};
+export const saveSelectedClinic = clinic => ({
+    type: SAVE_SELECTED_CLINIC,
+    payload: {
+        clinic
+    }
+});
 
-export const searchClinic = (params) => {
+export const saveSelectedDoctorCategory = category => ({
+    type: SAVE_SELECTED_DOCTOR_CATEGORY,
+    payload: {
+        category
+    }
+});
+
+export const saveUserHomeAddress = address => ({
+    type: SAVE_USER_HOME_ADDRESS,
+    payload: {
+        address
+    }
+});
+
+export const searchClinic = params => {
     return dispatch => {
-        saveUserHomeAddress(params);
+        dispatch(saveUserHomeAddress(params));
+
         searchClinicByHomeAddress(params)
             .then(resp => {
                 dispatch(searchClinicSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(searchClinicError(err.response.data));
+                dispatch(searchClinicError(err.response && err.response.data));
             });
     }
 }
 
-export const loadDoctorCategories = () => {
+export const loadDoctorCategories = clinicId => {
     return dispatch => {
-        const clinicId = Cookies.get('newAppointmentClinicId');
-
         getDoctorCategories(clinicId)
             .then(resp => {
                 dispatch(loadDoctorCategoriesSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadDoctorCategoriesError(err.response.data));
+                dispatch(loadDoctorCategoriesError(err.response && err.response.data));
             });
     }
 }
 
-export const saveClinic = (clinicId) => {
-    return () => {
-        Cookies.set('newAppointmentClinicId', clinicId);
-    }
-}
-
-export const saveDoctorCategory = (categoryId) => {
-    return () => {
-        Cookies.set('newAppointmentCategoryId', categoryId);
-    }
-}
-
-export const loadAppointments = (filter) => {
+export const saveClinic = clinic => {
     return dispatch => {
-        const categoryId = Cookies.get('newAppointmentCategoryId');
+        dispatch(saveSelectedClinic(clinic));
+    }
+}
+
+export const saveDoctorCategory = (category) => {
+    return dispatch => {
+        dispatch(saveSelectedDoctorCategory(category))
+    }
+}
+
+export const loadAppointments = (categoryId, filter) => {
+    return dispatch => {
         let address = '';
 
         if (filter) {
-            address = Cookies.get('userAddress');
+            address = `${filter.address.place},${filter.address.street},${filter.address.building}`;
+            console.log(address);
         }
 
         getDoctorAppointments(categoryId, address)
@@ -153,7 +170,7 @@ export const loadAppointments = (filter) => {
                 dispatch(loadAppointmentsSuccess(resp.data));
             })
             .catch(err => {
-                dispatch(loadAppointmentsError(err.response.data));
+                dispatch(loadAppointmentsError(err.response && err.response.data));
             });
     }
 }
@@ -165,7 +182,7 @@ export const completeRegistration = (patient, appointment) => {
                 dispatch(registrationSuccess(resp.data.orderNumber));
             })
             .catch(err => {
-                dispatch(registrationError(err.response.data));
+                dispatch(registrationError(err.response && err.response.data));
             });
     }
 }
@@ -177,7 +194,7 @@ export const cancelAppointment = orderNumber => {
                 dispatch(cancelAppointmentSuccess());
             })
             .catch(err => {
-                dispatch(cancelAppointmentError(err.response.data));
+                dispatch(cancelAppointmentError(err.response && err.response.data));
             });
     }
 }
