@@ -16,3 +16,22 @@
     margin: 0 auto;
 }
 
+.logout {
+    position: absolute;
+    right: 20px;
+    top: 40px;
+
+    button {
+        border: 1px solid $white;
+        padding: 10px 15px;
+        color: $white;
+        background: transparent;
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover {
+            background: $primary-hover;
+        }
+    }
+}
+

@@ -12,6 +12,20 @@
   display: block;
   margin: 0 auto; }
 
+.logout {
+  position: absolute;
+  right: 20px;
+  top: 40px; }
+  .logout button {
+    border: 1px solid #fff;
+    padding: 10px 15px;
+    color: #fff;
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer; }
+    .logout button:hover {
+      background: #68b6ec; }
+
 .home-page {
   display: flex;
   align-items: center; }
@@ -529,7 +543,8 @@ a {
   padding: 20px;
   width: 1140px;
   box-sizing: border-box;
-  margin: 0 auto; }
+  margin: 0 auto;
+  position: relative; }
 
 .page-title {
   text-align: center;

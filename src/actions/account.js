@@ -49,7 +49,8 @@ import {
     GET_DOCTOR_ADDRESS_LIST_SUCCESS,
     GET_DOCTOR_ADDRESS_LIST_ERROR,
     LOAD_DOCTOR_APPOINTMENT_SUCCESS,
-    LOAD_DOCTOR_APPOINTMENT_ERROR
+    LOAD_DOCTOR_APPOINTMENT_ERROR,
+    ACCOUNT_LOGOUT
 } from '../constants/action-types';
 
 export const signInPending = () => ({
@@ -241,6 +242,10 @@ export const loadDoctorAppointmentsError = (error) => ({
     }
 });
 
+export const logout = () => ({
+    type: ACCOUNT_LOGOUT
+});
+
 export const loadDoctorAppointments = () => {
     return dispatch => {
         getDoctorAppointments()
@@ -416,5 +421,12 @@ export const createNewAppointment = (appointment) => {
             .catch(err => {
                 console.log(err);
             });
+    }
+}
+
+export const accountLogout = () => {
+    return dispatch => {
+        dispatch(logout());
+        Cookies.remove('token');
     }
 }

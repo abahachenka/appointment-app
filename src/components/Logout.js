@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Cookies from 'js-cookie';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router-dom';
+import { accountLogout } from '../actions/account';
 
 class Logout extends React.Component {
     constructor() {
@@ -11,21 +13,30 @@ class Logout extends React.Component {
     }
 
     logout() {
-        Cookies.remove('token');
+        this.props.accountLogout();
         this.props.history.push('/admin');
     }
 
     render() {
-        const token = Cookies.get('token');
-
-        return token ? (
-            <button onClick={this.logout}>Logout</button>
+        return this.props.account ? (
+            <div className="logout">
+                <button onClick={this.logout}>Logout</button>
+            </div>
         ): null;
     }
 }
 
 Logout.propTypes = {
+    account: PropTypes.object,
     history: PropTypes.object
 }
 
-export default withRouter(Logout);
+const mapStateToProps = ({signIn}) => ({
+    account: signIn.account
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+    accountLogout: () => accountLogout()
+}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Logout));

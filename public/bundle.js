@@ -43706,7 +43706,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.accountLogout = exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.logout = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.requestUserSignIn = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -44019,6 +44019,14 @@ var loadDoctorAppointmentsError = function loadDoctorAppointmentsError(error) {
 
 exports.loadDoctorAppointmentsError = loadDoctorAppointmentsError;
 
+var logout = function logout() {
+  return {
+    type: _actionTypes.ACCOUNT_LOGOUT
+  };
+};
+
+exports.logout = logout;
+
 var loadDoctorAppointments = function loadDoctorAppointments() {
   return function (dispatch) {
     (0, _appointmentsApi.getDoctorAppointments)().then(function (resp) {
@@ -44198,6 +44206,16 @@ var createNewAppointment = function createNewAppointment(appointment) {
 };
 
 exports.createNewAppointment = createNewAppointment;
+
+var accountLogout = function accountLogout() {
+  return function (dispatch) {
+    dispatch(logout());
+
+    _jsCookie["default"].remove('token');
+  };
+};
+
+exports.accountLogout = accountLogout;
 
 },{"../constants/action-types":135,"../utils/appointments-api":146,"../utils/clinics-api":147,"../utils/doctors-api":148,"../utils/user-api":149,"js-cookie":41}],110:[function(require,module,exports){
 "use strict";
@@ -46828,9 +46846,13 @@ var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
-var _jsCookie = _interopRequireDefault(require("js-cookie"));
+var _reactRedux = require("react-redux");
+
+var _redux = require("redux");
 
 var _reactRouterDom = require("react-router-dom");
+
+var _account = require("../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -46868,18 +46890,17 @@ var Logout = /*#__PURE__*/function (_React$Component) {
   _createClass(Logout, [{
     key: "logout",
     value: function logout() {
-      _jsCookie["default"].remove('token');
-
+      this.props.accountLogout();
       this.props.history.push('/admin');
     }
   }, {
     key: "render",
     value: function render() {
-      var token = _jsCookie["default"].get('token');
-
-      return token ? _react["default"].createElement("button", {
+      return this.props.account ? _react["default"].createElement("div", {
+        className: "logout"
+      }, _react["default"].createElement("button", {
         onClick: this.logout
-      }, "Logout") : null;
+      }, "Logout")) : null;
     }
   }]);
 
@@ -46887,14 +46908,30 @@ var Logout = /*#__PURE__*/function (_React$Component) {
 }(_react["default"].Component);
 
 Logout.propTypes = {
+  account: _propTypes["default"].object,
   history: _propTypes["default"].object
 };
 
-var _default = (0, _reactRouterDom.withRouter)(Logout);
+var mapStateToProps = function mapStateToProps(_ref) {
+  var signIn = _ref.signIn;
+  return {
+    account: signIn.account
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    accountLogout: function accountLogout() {
+      return (0, _account.accountLogout)();
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _reactRouterDom.withRouter)(Logout));
 
 exports["default"] = _default;
 
-},{"js-cookie":41,"prop-types":51,"react":90,"react-router-dom":84}],129:[function(require,module,exports){
+},{"../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47667,7 +47704,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -47752,6 +47789,8 @@ var CANCEL_APPOINTMENT_SUCCESS = 'CANCEL_APPOINTMENT_SUCCESS';
 exports.CANCEL_APPOINTMENT_SUCCESS = CANCEL_APPOINTMENT_SUCCESS;
 var CANCEL_APPOINTMENT_ERROR = 'CANCEL_APPOINTMENT_ERROR';
 exports.CANCEL_APPOINTMENT_ERROR = CANCEL_APPOINTMENT_ERROR;
+var ACCOUNT_LOGOUT = 'ACCOUNT_LOGOUT';
+exports.ACCOUNT_LOGOUT = ACCOUNT_LOGOUT;
 
 },{}],136:[function(require,module,exports){
 "use strict";
@@ -48281,6 +48320,13 @@ var signInReducer = function signInReducer() {
       {
         return _objectSpread({}, state, {
           error: action.payload.error
+        });
+      }
+
+    case _actionTypes.ACCOUNT_LOGOUT:
+      {
+        return _objectSpread({}, state, {
+          account: null
         });
       }
 

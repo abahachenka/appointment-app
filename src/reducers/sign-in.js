@@ -4,7 +4,8 @@ import {
     SIGN_IN_ERROR,
     SIGN_IN_RESET_ERROR,
     ACCOUNT_LOAD_SUCCESS,
-    ACCOUNT_LOAD_ERROR
+    ACCOUNT_LOAD_ERROR,
+    ACCOUNT_LOGOUT
 } from '../constants/action-types';
 
 const initialState = {
@@ -52,6 +53,12 @@ const signInReducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: action.payload.error
+            }
+        }
+        case ACCOUNT_LOGOUT: {
+            return {
+                ...state,
+                account: null
             }
         }
         default: 
