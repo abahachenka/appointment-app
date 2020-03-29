@@ -15,6 +15,10 @@ class NewAppointment extends React.Component {
 
         this.onChange = this.onChange.bind(this);
         this.searchClinic = this.searchClinic.bind(this);
+
+        window.onbeforeunload = function() {
+            return 'Your progress will be lost!';
+        }
     }
 
     searchClinic(event) {

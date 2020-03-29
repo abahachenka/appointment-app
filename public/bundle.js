@@ -47159,6 +47159,11 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
     };
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.searchClinic = _this.searchClinic.bind(_assertThisInitialized(_this));
+
+    window.onbeforeunload = function () {
+      return 'Your progress will be lost!';
+    };
+
     return _this;
   }
 
