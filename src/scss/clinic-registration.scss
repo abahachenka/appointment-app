@@ -14,20 +14,4 @@
         margin-bottom: 20px;
         padding: 1px 5px;
     }
-
-    input[type="submit"] {
-        background: $primary;
-        color: $white;
-        border: none;
-
-        &:not([disabled]):hover {
-            background: $primary-hover;
-            cursor: pointer;
-        }
-    }
-
-    input[disabled] {
-        background: $disabled;
-        color: $disabled-text;
-    }
 }

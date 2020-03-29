@@ -45522,6 +45522,7 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
       }), _react["default"].createElement("input", {
         type: "submit",
         value: "Register",
+        className: "button-primary",
         disabled: isSubmitDisabled
       })));
     }
@@ -47601,6 +47602,7 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
       }), _react["default"].createElement("input", {
         type: "submit",
         value: "Sign-In",
+        className: "button-primary",
         disabled: isSubmitDisabled
       }), _react["default"].createElement("p", null, "OR"), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/register"

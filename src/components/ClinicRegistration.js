@@ -90,7 +90,7 @@ class ClinicRegistration extends React.Component {
                     <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
                     <input type="password" name="password" placeholder="Password" onChange={this.onChange} />
                     <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} />
-                    <input type="submit" value="Register" disabled={isSubmitDisabled}/>
+                    <input type="submit" value="Register" className="button-primary" disabled={isSubmitDisabled}/>
                 </form>
             </main>
         )

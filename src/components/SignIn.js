@@ -82,7 +82,7 @@ class SignIn extends React.Component {
                     {this.props.error ? (<p className="error">{this.props.error}</p>) : null}
                     <input type="email" name="email" placeholder="email" onChange={this.onChange} />
                     <input type="password" name="password" placeholder="password" onChange={this.onChange} />
-                    <input type="submit" value="Sign-In" disabled={isSubmitDisabled} />
+                    <input type="submit" value="Sign-In" className="button-primary" disabled={isSubmitDisabled} />
                     <p>OR</p>
                     <Link to="/register">Register a new clinic account</Link>
                 </form>

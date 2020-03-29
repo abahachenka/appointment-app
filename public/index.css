@@ -38,12 +38,14 @@
 .column-new .home-button {
   background: #73c5ff; }
   .column-new .home-button:hover {
+    color: #fff;
     background: #68b6ec; }
 
 .column-cancel .home-button {
   background: #fff;
   color: #73c5ff; }
   .column-cancel .home-button:hover {
+    color: #73c5ff;
     background: #f6f6f6; }
 
 .address-search .page-title {
@@ -306,24 +308,13 @@
   margin: 100px auto;
   text-align: center; }
   .sign-in-form input {
-    height: 35px;
-    font-size: 16px;
     width: 100%; }
   .sign-in-form input[type="email"],
   .sign-in-form input[type="password"] {
     padding: 1px 5px;
     margin-bottom: 20px; }
   .sign-in-form input[type="submit"] {
-    border: none;
-    background: #73c5ff;
-    color: #fff;
     margin-bottom: 5px; }
-    .sign-in-form input[type="submit"]:not([disabled]):hover {
-      background: #68b6ec;
-      cursor: pointer; }
-  .sign-in-form input[disabled] {
-    background: #f0f0f0;
-    color: #888; }
 
 .clinic-registration-form {
   width: 300px;
@@ -337,16 +328,6 @@
   .clinic-registration-form input:not([type="submit"]) {
     margin-bottom: 20px;
     padding: 1px 5px; }
-  .clinic-registration-form input[type="submit"] {
-    background: #73c5ff;
-    color: #fff;
-    border: none; }
-    .clinic-registration-form input[type="submit"]:not([disabled]):hover {
-      background: #68b6ec;
-      cursor: pointer; }
-  .clinic-registration-form input[disabled] {
-    background: #f0f0f0;
-    color: #888; }
 
 .account-page {
   position: relative; }
@@ -489,8 +470,7 @@
       border: 0; }
   .data-table tbody tr:not(.disabled):hover td {
     background: #d9efff;
-    border-color: #d9efff;
-    cursor: pointer; }
+    border-color: #d9efff; }
 
 .data-section-header {
   position: relative; }
@@ -530,8 +510,14 @@
 
 body {
   font: 14px 'Roboto Condensed';
-  color: #000;
+  color: #312a6b;
   margin: 0; }
+
+a {
+  color: #0892f3; }
+  a:hover {
+    color: #68b6ec;
+    text-decoration: none; }
 
 .page-wrapper {
   display: flex;
@@ -556,6 +542,22 @@ body {
   font-size: 26px;
   font-weight: normal;
   color: #312a6b; }
+
+.button-primary {
+  background: #4bb1f9;
+  color: #fff;
+  border: none; }
+  .button-primary:not([disabled]):hover {
+    background: #73c5ff;
+    cursor: pointer; }
+
+input {
+  height: 35px;
+  font-size: 16px; }
+
+input[disabled] {
+  background: #f0f0f0;
+  color: #888; }
 
 .error {
   color: #d87373;

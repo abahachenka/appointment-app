@@ -22,8 +22,17 @@
 }
 body {
     font: 14px 'Roboto Condensed';
-    color: $dark;
+    color: $dark-violet;
     margin: 0;
+}
+
+a {
+    color: $primary-dark;
+
+    &:hover {
+        color: $primary-hover;
+        text-decoration: none;
+    }
 }
 
 .page-wrapper {
@@ -52,6 +61,27 @@ body {
     font-size: 26px;
     font-weight: normal;
     color: $dark-violet;
+}
+
+.button-primary {
+    background: $primary-button;
+    color: $white;
+    border: none;
+
+    &:not([disabled]):hover {
+        background: $primary;
+        cursor: pointer;
+    }
+}
+
+input {
+    height: $input-height;
+    font-size: $input-font-size;
+}
+
+input[disabled] {
+    background: $disabled;
+    color: $disabled-text;
 }
 
 .error {
