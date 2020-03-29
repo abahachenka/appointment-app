@@ -45071,7 +45071,7 @@ var CancelAppointment = /*#__PURE__*/function (_React$Component) {
       })), _react["default"].createElement("div", {
         className: "cancel-sample"
       }, _react["default"].createElement("img", {
-        src: "img/cancel-sample.png",
+        src: "img/cancel-sample.jpg",
         alt: ""
       })));
     }

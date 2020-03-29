@@ -51,7 +51,7 @@ class CancelAppointment extends React.Component {
                 </form>
 
                 <div className="cancel-sample">
-                    <img src="img/cancel-sample.png" alt="" />
+                    <img src="img/cancel-sample.jpg" alt="" />
                 </div>
 
             </main>
