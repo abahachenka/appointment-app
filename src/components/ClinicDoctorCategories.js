@@ -51,7 +51,8 @@ ClinicDoctorCategories.propTypes = {
     error: PropTypes.string,
     saveDoctorCategory: PropTypes.func,
     loadCategories: PropTypes.func,
-    location: PropTypes.object
+    location: PropTypes.object,
+    history: PropTypes.object
 };
 
 const mapStateToProps = ({appointments}) => ({

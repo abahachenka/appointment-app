@@ -95,7 +95,8 @@ NewAppointment.propTypes = {
     clinics: PropTypes.arrayOf(PropTypes.object),
     error: PropTypes.string,
     searchClinic: PropTypes.func,
-    saveClinic: PropTypes.func
+    saveClinic: PropTypes.func,
+    history: PropTypes.object
 }
 
 const mapStateToProps = ({appointments}) => ({

@@ -45332,7 +45332,8 @@ ClinicDoctorCategories.propTypes = {
   error: _propTypes["default"].string,
   saveDoctorCategory: _propTypes["default"].func,
   loadCategories: _propTypes["default"].func,
-  location: _propTypes["default"].object
+  location: _propTypes["default"].object,
+  history: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -46909,7 +46910,8 @@ var Logout = /*#__PURE__*/function (_React$Component) {
 
 Logout.propTypes = {
   account: _propTypes["default"].object,
-  history: _propTypes["default"].object
+  history: _propTypes["default"].object,
+  accountLogout: _propTypes["default"].func
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -47265,7 +47267,8 @@ NewAppointment.propTypes = {
   clinics: _propTypes["default"].arrayOf(_propTypes["default"].object),
   error: _propTypes["default"].string,
   searchClinic: _propTypes["default"].func,
-  saveClinic: _propTypes["default"].func
+  saveClinic: _propTypes["default"].func,
+  history: _propTypes["default"].object
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {

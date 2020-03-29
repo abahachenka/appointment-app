@@ -28,7 +28,8 @@ class Logout extends React.Component {
 
 Logout.propTypes = {
     account: PropTypes.object,
-    history: PropTypes.object
+    history: PropTypes.object,
+    accountLogout: PropTypes.func
 }
 
 const mapStateToProps = ({signIn}) => ({
