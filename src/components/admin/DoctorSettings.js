@@ -7,7 +7,7 @@ import {
     loadAccount, 
     getDoctorAddressList, 
     addNewDoctorAddress
-} from '../actions/account';
+} from '../../actions/account';
 
 class DoctorSettings extends React.Component {
     constructor() {

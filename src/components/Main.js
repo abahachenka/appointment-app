@@ -1,19 +1,23 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+
+// admin components
+import ClinicRegistration from './admin/ClinicRegistration';
+import ClinicAccountPage from './admin/ClinicAccountPage';
+import DoctorAccount from './admin/DoctorAccount';
+import DoctorsCategory from './admin/DoctorsCategory';
+import SignIn from './admin/SignIn';
+import AcceptInvitation from './admin/AcceptInvitation';
+import ClinicSettings from './admin/ClinicSettings';
+import DoctorSettings from './admin/DoctorSettings';
+
+// user components
 import Home from './Home';
-import ClinicRegistration from './ClinicRegistration';
-import ClinicAccountPage from './ClinicAccountPage';
-import DoctorAccount from './DoctorAccount';
-import DoctorsCategory from './DoctorsCategory';
-import SignIn from './SignIn';
-import AcceptInvitation from './AcceptInvitation';
-import ClinicSettings from './ClinicSettings';
-import DoctorSettings from './DoctorSettings';
 import NewAppointment from './NewAppointment';
-import CancelAppointment from './CancelAppointment';
 import ClinicDoctorCategories from './ClinicDoctorCategories';
 import AvailableAppointments from './AvailableAppointments';
 import NewAppointmentComplete from './NewAppointmentComplete';
+import CancelAppointment from './CancelAppointment';
 import NotFound from './NotFound';
 
 const Main = () => (

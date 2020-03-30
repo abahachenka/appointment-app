@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { withRouter } from 'react-router-dom';
-import { accountLogout } from '../actions/account';
+import { accountLogout } from '../../actions/account';
 
 class Logout extends React.Component {
     constructor() {

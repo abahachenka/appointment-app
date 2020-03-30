@@ -9,7 +9,7 @@ import {
     loadCategory,
     sendInvitation,
     resetInvitationError 
-} from '../actions/account';
+} from '../../actions/account';
 
 const initialState = {
     isInviteFormDisplayed: false,

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {createNewDoctorCategory} from '../actions/account';
+import {createNewDoctorCategory} from '../../actions/account';
 import Modal from './Modal';
 
 class DoctorCategories extends React.Component {

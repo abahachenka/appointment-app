@@ -1,5 +1,5 @@
 import React from 'react';
-import Logout from './Logout';
+import Logout from './admin/Logout';
 import { Link } from 'react-router-dom';
 
 const Header = () => (

@@ -44538,195 +44538,6 @@ exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-var _Modal = _interopRequireDefault(require("./Modal"));
-
-var _reactRouterDom = require("react-router-dom");
-
-var _account = require("../actions/account");
-
-var _redux = require("redux");
-
-var _reactRedux = require("react-redux");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var initialState = {
-  account: null,
-  isSuccessMessageDisplayed: false
-};
-
-var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
-  _inherits(AcceptInvitation, _React$Component);
-
-  function AcceptInvitation() {
-    var _this;
-
-    _classCallCheck(this, AcceptInvitation);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(AcceptInvitation).call(this));
-    _this.state = _objectSpread({}, initialState);
-    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
-    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(AcceptInvitation, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      var token = this.props.match.params.token; //check token
-
-      this.props.checkInvitationToken(token);
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate(prevProps) {
-      if (this.props.isInvitationAccepted && this.props.isInvitationAccepted !== prevProps.isInvitationAccepted) {
-        this.setState({
-          isSuccessMessageDisplayed: true
-        });
-      }
-    }
-  }, {
-    key: "handleSubmit",
-    value: function handleSubmit(event) {
-      event.preventDefault();
-      var token = this.props.match.params.token;
-      var _this$state$account = this.state.account,
-          password = _this$state$account.password,
-          confirmPassword = _this$state$account.confirmPassword;
-
-      if (token && password === confirmPassword) {
-        this.props.activateAccount(token, password);
-      } else {
-        alert('Something went wrong');
-      }
-    }
-  }, {
-    key: "onChange",
-    value: function onChange(event) {
-      var _event$target = event.target,
-          name = _event$target.name,
-          value = _event$target.value;
-      this.setState(function (prevState) {
-        return {
-          account: _objectSpread({}, prevState.account, _defineProperty({}, name, value))
-        };
-      });
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this2 = this;
-
-      return _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("main", {
-        className: "home-page page-container"
-      }), _react["default"].createElement(_Modal["default"], {
-        title: "Accept Invitation"
-      }, !this.state.isSuccessMessageDisplayed && this.props.isTokenValid && _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("p", null, "You have been invited to create a doctors account. Please, finish your registration."), _react["default"].createElement("p", {
-        className: "error"
-      }, this.props.acceptInvitationError), _react["default"].createElement("form", {
-        ref: function ref(el) {
-          return _this2.acceptInvitationForm = el;
-        },
-        onSubmit: this.handleSubmit
-      }, _react["default"].createElement("input", {
-        type: "password",
-        name: "password",
-        placeholder: "Password",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "password",
-        name: "confirmPassword",
-        placeholder: "Confirm Password",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "submit",
-        value: "Register"
-      }))), this.state.isSuccessMessageDisplayed && _react["default"].createElement("div", {
-        className: "modal-success-message"
-      }, _react["default"].createElement("p", null, "Your account has been successfully activated. ", _react["default"].createElement("br", null), "Now you may sign-in."), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
-        to: "/admin",
-        className: "button"
-      }, "OK"))), this.props.isTokenValid === false && _react["default"].createElement("div", null, _react["default"].createElement("p", null, "The link is invalid!"), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
-        to: "/",
-        className: "button"
-      }, "Close")))));
-    }
-  }]);
-
-  return AcceptInvitation;
-}(_react["default"].Component);
-
-AcceptInvitation.propTypes = {
-  activateAccount: _propTypes["default"].func,
-  isInvitationAccepted: _propTypes["default"].bool,
-  acceptInvitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
-  match: _propTypes["default"].object,
-  checkInvitationToken: _propTypes["default"].func,
-  isTokenValid: _propTypes["default"].bool
-};
-
-var mapStateToProps = function mapStateToProps(_ref) {
-  var doctorCategories = _ref.doctorCategories;
-  return {
-    isTokenValid: doctorCategories.isInvitationTokenValid,
-    isInvitationAccepted: doctorCategories.isInvitationAccepted,
-    acceptInvitationError: doctorCategories.acceptInvitationError,
-    error: doctorCategories.invitationTokenError
-  };
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({
-    activateAccount: function activateAccount(token, password) {
-      return (0, _account.activateAccount)(token, password);
-    },
-    checkInvitationToken: function checkInvitationToken(token) {
-      return (0, _account.checkInvitationToken)(token);
-    }
-  }, dispatch);
-};
-
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(AcceptInvitation);
-
-exports["default"] = _default;
-
-},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],113:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
 var _Header = _interopRequireDefault(require("./Header"));
 
 var _Footer = _interopRequireDefault(require("./Footer"));
@@ -44742,7 +44553,7 @@ var App = function App() {
 var _default = App;
 exports["default"] = _default;
 
-},{"./Footer":125,"./Header":126,"./Main":129,"react":90}],114:[function(require,module,exports){
+},{"./Footer":116,"./Header":117,"./Main":119,"react":90}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45009,7 +44820,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Ava
 
 exports["default"] = _default;
 
-},{"../actions/appointments":110,"moment":43,"prop-types":51,"react":90,"react-redux":73,"redux":92}],115:[function(require,module,exports){
+},{"../actions/appointments":110,"moment":43,"prop-types":51,"react":90,"react-redux":73,"redux":92}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45153,117 +44964,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Can
 
 exports["default"] = _default;
 
-},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"redux":92}],116:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-var _reactRouterDom = require("react-router-dom");
-
-var _reactRedux = require("react-redux");
-
-var _redux = require("redux");
-
-var _account = require("../actions/account");
-
-var _DoctorCategories = _interopRequireDefault(require("./DoctorCategories"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
-  _inherits(ClinicAccountPage, _React$Component);
-
-  function ClinicAccountPage() {
-    _classCallCheck(this, ClinicAccountPage);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(ClinicAccountPage).apply(this, arguments));
-  }
-
-  _createClass(ClinicAccountPage, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.props.loadAccount();
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      if (!this.props.account) {
-        this.props.history.push('/admin');
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var account = this.props.account;
-      return _react["default"].createElement("main", {
-        className: "account-page page-container"
-      }, _react["default"].createElement("h1", {
-        className: "page-title"
-      }, account && account.name), _react["default"].createElement(_reactRouterDom.Link, {
-        to: "/clinic-account/settings",
-        className: "account-settings"
-      }, "Settings"), _react["default"].createElement(_DoctorCategories["default"], null));
-    }
-  }]);
-
-  return ClinicAccountPage;
-}(_react["default"].Component);
-
-ClinicAccountPage.propTypes = {
-  isAuthenticated: _propTypes["default"].bool,
-  account: _propTypes["default"].object,
-  loadAccount: _propTypes["default"].func,
-  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
-  history: _propTypes["default"].object
-};
-
-var mapStateToProps = function mapStateToProps(_ref) {
-  var signIn = _ref.signIn;
-  return {
-    isAuthenticated: signIn.isAuthenticated,
-    account: signIn.account,
-    error: signIn.error
-  };
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({
-    loadAccount: function loadAccount() {
-      return (0, _account.loadAccount)();
-    }
-  }, dispatch);
-};
-
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ClinicAccountPage);
-
-exports["default"] = _default;
-
-},{"../actions/account":109,"./DoctorCategories":121,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],117:[function(require,module,exports){
+},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"redux":92}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45391,7 +45092,917 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],118:[function(require,module,exports){
+},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],116:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _React = _interopRequireDefault(require("React"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Footer = function Footer() {
+  return _React["default"].createElement("footer", {
+    className: "page-footer"
+  }, "\xA92020 Alena Bayraktar");
+};
+
+var _default = Footer;
+exports["default"] = _default;
+
+},{"React":9}],117:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _Logout = _interopRequireDefault(require("./admin/Logout"));
+
+var _reactRouterDom = require("react-router-dom");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Header = function Header() {
+  return _react["default"].createElement("header", {
+    className: "page-header"
+  }, _react["default"].createElement("div", {
+    className: "page-container"
+  }, _react["default"].createElement(_reactRouterDom.Link, {
+    to: "/"
+  }, _react["default"].createElement("img", {
+    src: "/img/logo.png",
+    alt: "",
+    className: "logo"
+  })), _react["default"].createElement(_Logout["default"], null)));
+};
+
+var _default = Header;
+exports["default"] = _default;
+
+},{"./admin/Logout":132,"react":90,"react-router-dom":84}],118:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _reactRouterDom = require("react-router-dom");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Home = function Home() {
+  return _react["default"].createElement("main", {
+    className: "page-container home-page"
+  }, _react["default"].createElement("div", {
+    className: "column column-new"
+  }, _react["default"].createElement(_reactRouterDom.Link, {
+    className: "home-button",
+    to: "/new-appointment"
+  }, "New Appointment")), _react["default"].createElement("div", {
+    className: "column column-cancel"
+  }, _react["default"].createElement(_reactRouterDom.Link, {
+    className: "home-button",
+    to: "/cancel-appointment"
+  }, "Cancel Appointment")));
+};
+
+var _default = Home;
+exports["default"] = _default;
+
+},{"react":90,"react-router-dom":84}],119:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _reactRouterDom = require("react-router-dom");
+
+var _ClinicRegistration = _interopRequireDefault(require("./admin/ClinicRegistration"));
+
+var _ClinicAccountPage = _interopRequireDefault(require("./admin/ClinicAccountPage"));
+
+var _DoctorAccount = _interopRequireDefault(require("./admin/DoctorAccount"));
+
+var _DoctorsCategory = _interopRequireDefault(require("./admin/DoctorsCategory"));
+
+var _SignIn = _interopRequireDefault(require("./admin/SignIn"));
+
+var _AcceptInvitation = _interopRequireDefault(require("./admin/AcceptInvitation"));
+
+var _ClinicSettings = _interopRequireDefault(require("./admin/ClinicSettings"));
+
+var _DoctorSettings = _interopRequireDefault(require("./admin/DoctorSettings"));
+
+var _Home = _interopRequireDefault(require("./Home"));
+
+var _NewAppointment = _interopRequireDefault(require("./NewAppointment"));
+
+var _ClinicDoctorCategories = _interopRequireDefault(require("./ClinicDoctorCategories"));
+
+var _AvailableAppointments = _interopRequireDefault(require("./AvailableAppointments"));
+
+var _NewAppointmentComplete = _interopRequireDefault(require("./NewAppointmentComplete"));
+
+var _CancelAppointment = _interopRequireDefault(require("./CancelAppointment"));
+
+var _NotFound = _interopRequireDefault(require("./NotFound"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+// admin components
+// user components
+var Main = function Main() {
+  return _react["default"].createElement(_reactRouterDom.Switch, null, _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/",
+    component: _Home["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/new-appointment",
+    component: _NewAppointment["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/new-appointment/clinic/:clinicAlias",
+    component: _ClinicDoctorCategories["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/new-appointment/clinic/:clinicAlias/:categoryAlias",
+    component: _AvailableAppointments["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/new-appointment/clinic/:clinicAlias/:categoryAlias/complete",
+    component: _NewAppointmentComplete["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/cancel-appointment",
+    component: _CancelAppointment["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    path: "/register",
+    component: _ClinicRegistration["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    path: "/admin",
+    component: _SignIn["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/clinic-account",
+    component: _ClinicAccountPage["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    path: "/clinic-account/category/:categoryAlias",
+    component: _DoctorsCategory["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    path: "/clinic-account/settings",
+    component: _ClinicSettings["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    path: '/accept-invitation/:token',
+    component: _AcceptInvitation["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    exact: true,
+    path: "/doctor-account",
+    component: _DoctorAccount["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    path: '/doctor-account/settings',
+    component: _DoctorSettings["default"]
+  }), _react["default"].createElement(_reactRouterDom.Route, {
+    component: _NotFound["default"]
+  }));
+};
+
+var _default = Main;
+exports["default"] = _default;
+
+},{"./AvailableAppointments":113,"./CancelAppointment":114,"./ClinicDoctorCategories":115,"./Home":118,"./NewAppointment":120,"./NewAppointmentComplete":121,"./NotFound":122,"./admin/AcceptInvitation":123,"./admin/ClinicAccountPage":124,"./admin/ClinicRegistration":125,"./admin/ClinicSettings":126,"./admin/DoctorAccount":127,"./admin/DoctorSettings":129,"./admin/DoctorsCategory":130,"./admin/SignIn":134,"react":90,"react-router-dom":84}],120:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _reactRouterDom = require("react-router-dom");
+
+var _reactRedux = require("react-redux");
+
+var _redux = require("redux");
+
+var _appointments = require("../actions/appointments");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var NewAppointment = /*#__PURE__*/function (_React$Component) {
+  _inherits(NewAppointment, _React$Component);
+
+  function NewAppointment() {
+    var _this;
+
+    _classCallCheck(this, NewAppointment);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(NewAppointment).call(this));
+    _this.state = {
+      search: null
+    };
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.searchClinic = _this.searchClinic.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(NewAppointment, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      window.onbeforeunload = function () {
+        return 'Your progress will be lost!';
+      };
+    }
+  }, {
+    key: "searchClinic",
+    value: function searchClinic(event) {
+      event.preventDefault();
+      this.props.searchClinic(this.state.search);
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          search: _objectSpread({}, prevState.search, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "onClinicSelect",
+    value: function onClinicSelect(event, clinic, url) {
+      this.props.saveClinic(clinic);
+      this.props.history.push(url);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      return _react["default"].createElement("main", {
+        className: "page-container address-search"
+      }, _react["default"].createElement("h1", {
+        className: "page-title"
+      }, "Enter your home address"), _react["default"].createElement("form", {
+        action: "#",
+        className: "address-form",
+        onSubmit: this.searchClinic
+      }, _react["default"].createElement("input", {
+        type: "text",
+        name: "place",
+        list: "cities",
+        placeholder: "Place",
+        onChange: this.onChange
+      }), _react["default"].createElement("datalist", {
+        id: "cities"
+      }, _react["default"].createElement("option", {
+        value: "Minsk"
+      }), _react["default"].createElement("option", {
+        value: "Homel"
+      }), _react["default"].createElement("option", {
+        value: "Mogilev"
+      }), _react["default"].createElement("option", {
+        value: "Brest"
+      }), _react["default"].createElement("option", {
+        value: "Vitebsk"
+      }), _react["default"].createElement("option", {
+        value: "Grodno"
+      })), _react["default"].createElement("input", {
+        type: "text",
+        name: "street",
+        placeholder: "Street",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "text",
+        name: "building",
+        placeholder: "Building",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "submit",
+        value: "Search"
+      })), this.props.error && _react["default"].createElement("p", {
+        className: "error"
+      }, this.props.error), this.props.clinics.length ? _react["default"].createElement("section", {
+        className: "search-results"
+      }, _react["default"].createElement("h2", {
+        className: "page-subtitle"
+      }, "Search results"), _react["default"].createElement("ul", {
+        className: "search-results-list category-list"
+      }, this.props.clinics.map(function (clinic, index) {
+        var url = '/new-appointment/clinic/' + clinic.alias; // change to alias
+
+        return _react["default"].createElement("li", {
+          key: index,
+          onClick: _this2.onClinicSelect.bind(_this2, event, clinic, url)
+        }, _react["default"].createElement("h3", {
+          className: "category-name"
+        }, _react["default"].createElement(_reactRouterDom.Link, {
+          to: url
+        }, clinic.name)), clinic.address && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Address:"), " ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Phone Number:"), " ", clinic.phoneNumber));
+      }))) : null);
+    }
+  }]);
+
+  return NewAppointment;
+}(_react["default"].Component);
+
+NewAppointment.propTypes = {
+  clinics: _propTypes["default"].arrayOf(_propTypes["default"].object),
+  error: _propTypes["default"].string,
+  searchClinic: _propTypes["default"].func,
+  saveClinic: _propTypes["default"].func,
+  history: _propTypes["default"].object
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var appointments = _ref.appointments;
+  return {
+    clinics: appointments.clinics,
+    error: appointments.error
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    searchClinic: function searchClinic(params) {
+      return (0, _appointments.searchClinic)(params);
+    },
+    saveClinic: function saveClinic(clinicId) {
+      return (0, _appointments.saveClinic)(clinicId);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NewAppointment);
+
+exports["default"] = _default;
+
+},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],121:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _moment = _interopRequireDefault(require("moment"));
+
+var _redux = require("redux");
+
+var _reactRouterDom = require("react-router-dom");
+
+var _reactRedux = require("react-redux");
+
+var _appointments = require("../actions/appointments");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
+  _inherits(NewAppointmentComplete, _React$Component);
+
+  function NewAppointmentComplete() {
+    var _this;
+
+    _classCallCheck(this, NewAppointmentComplete);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(NewAppointmentComplete).call(this));
+    _this.state = {
+      patient: null
+    };
+    _this.drawSelectedAppointment = _this.drawSelectedAppointment.bind(_assertThisInitialized(_this));
+    _this.completeRegistration = _this.completeRegistration.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(NewAppointmentComplete, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (!this.props.selectedAppointment) {
+        this.props.history.push('/new-appointment');
+      }
+    }
+  }, {
+    key: "drawSelectedAppointment",
+    value: function drawSelectedAppointment() {
+      var date = (0, _moment["default"])(this.props.selectedAppointment.datetime);
+      var month = date.format('MMMM');
+      var time = date.format('hh:mm');
+      var day = date.format('DD');
+      var weekday = date.format('ddd');
+      var doctor = this.props.selectedAppointment.doctor;
+      var doctorLabel = "".concat(doctor.title, ". ").concat(doctor.firstName, " ").concat(doctor.lastName, ", room: ").concat(doctor.room);
+      return _react["default"].createElement("div", {
+        className: "patient-selection-info"
+      }, _react["default"].createElement("div", {
+        className: "patient-selection-date"
+      }, month, _react["default"].createElement("span", {
+        className: "day"
+      }, day), weekday), _react["default"].createElement("div", {
+        className: "patient-selection-time"
+      }, time), _react["default"].createElement("div", {
+        className: "patient-selection-doctor"
+      }, doctorLabel));
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          patient: _objectSpread({}, prevState.patient, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "completeRegistration",
+    value: function completeRegistration(event) {
+      event.preventDefault();
+      this.props.completeRegistration(this.state.patient, this.props.selectedAppointment);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var appointment = this.props.selectedAppointment;
+      return _react["default"].createElement("main", {
+        className: "page-container"
+      }, this.props.registrationCode ? _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("h1", {
+        className: "page-title"
+      }, "Success!"), _react["default"].createElement("p", {
+        className: "appointment-notification"
+      }, "We have sent you an SMS with the details of your appointment."), _react["default"].createElement("div", {
+        className: "appointment-receipt"
+      }, _react["default"].createElement("p", {
+        className: "order-number"
+      }, "Order #", _react["default"].createElement("span", null, this.props.registrationCode)), _react["default"].createElement("p", {
+        className: "order-datetime"
+      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), _react["default"].createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), _react["default"].createElement("p", null, "Room: ", appointment.doctor.room), _react["default"].createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName)), _react["default"].createElement("p", {
+        className: "new-appointment-finish"
+      }, _react["default"].createElement(_reactRouterDom.Link, {
+        to: "/"
+      }, "Finish"))) : _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("div", {
+        className: "patient-selection"
+      }, _react["default"].createElement("h1", {
+        className: "patient-selection-label page-title"
+      }, "Your Selection:"), this.props.selectedAppointment && this.drawSelectedAppointment()), _react["default"].createElement("h2", {
+        className: "patient-details-form-title page-subtitle"
+      }, "Please, enter your details to finish registration"), _react["default"].createElement("p", {
+        className: "error"
+      }, this.props.error), _react["default"].createElement("form", {
+        action: "#",
+        className: "patient-details-form",
+        onSubmit: this.completeRegistration
+      }, _react["default"].createElement("input", {
+        type: "text",
+        name: "firstName",
+        placeholder: "First Name",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "text",
+        name: "lastName",
+        placeholder: "Last Name",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "tel",
+        name: "contactNumber",
+        placeholder: "Contact Number",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "submit",
+        value: "Register"
+      }))));
+    }
+  }]);
+
+  return NewAppointmentComplete;
+}(_react["default"].Component);
+
+NewAppointmentComplete.propTypes = {
+  selectedAppointment: _propTypes["default"].object,
+  registrationCode: _propTypes["default"].string,
+  error: _propTypes["default"].string,
+  completeRegistration: _propTypes["default"].func,
+  history: _propTypes["default"].object
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var appointments = _ref.appointments;
+  return {
+    selectedAppointment: appointments.selectedAppointment,
+    registrationCode: appointments.registrationCode,
+    error: appointments.registrationError
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    completeRegistration: function completeRegistration(patient, appointment) {
+      return (0, _appointments.completeRegistration)(patient, appointment);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NewAppointmentComplete);
+
+exports["default"] = _default;
+
+},{"../actions/appointments":110,"moment":43,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],122:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var NotFound = function NotFound() {
+  return _react["default"].createElement("main", {
+    className: "page-container"
+  }, _react["default"].createElement("h1", {
+    className: "page-title"
+  }, "404"), _react["default"].createElement("p", null, "Page not found"));
+};
+
+var _default = NotFound;
+exports["default"] = _default;
+
+},{"react":90}],123:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _Modal = _interopRequireDefault(require("./Modal"));
+
+var _reactRouterDom = require("react-router-dom");
+
+var _account = require("../../actions/account");
+
+var _redux = require("redux");
+
+var _reactRedux = require("react-redux");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var initialState = {
+  account: null,
+  isSuccessMessageDisplayed: false
+};
+
+var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
+  _inherits(AcceptInvitation, _React$Component);
+
+  function AcceptInvitation() {
+    var _this;
+
+    _classCallCheck(this, AcceptInvitation);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(AcceptInvitation).call(this));
+    _this.state = _objectSpread({}, initialState);
+    _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(AcceptInvitation, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var token = this.props.match.params.token; //check token
+
+      this.props.checkInvitationToken(token);
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.props.isInvitationAccepted && this.props.isInvitationAccepted !== prevProps.isInvitationAccepted) {
+        this.setState({
+          isSuccessMessageDisplayed: true
+        });
+      }
+    }
+  }, {
+    key: "handleSubmit",
+    value: function handleSubmit(event) {
+      event.preventDefault();
+      var token = this.props.match.params.token;
+      var _this$state$account = this.state.account,
+          password = _this$state$account.password,
+          confirmPassword = _this$state$account.confirmPassword;
+
+      if (token && password === confirmPassword) {
+        this.props.activateAccount(token, password);
+      } else {
+        alert('Something went wrong');
+      }
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(event) {
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      this.setState(function (prevState) {
+        return {
+          account: _objectSpread({}, prevState.account, _defineProperty({}, name, value))
+        };
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      return _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("main", {
+        className: "home-page page-container"
+      }), _react["default"].createElement(_Modal["default"], {
+        title: "Accept Invitation"
+      }, !this.state.isSuccessMessageDisplayed && this.props.isTokenValid && _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("p", null, "You have been invited to create a doctors account. Please, finish your registration."), _react["default"].createElement("p", {
+        className: "error"
+      }, this.props.acceptInvitationError), _react["default"].createElement("form", {
+        ref: function ref(el) {
+          return _this2.acceptInvitationForm = el;
+        },
+        onSubmit: this.handleSubmit
+      }, _react["default"].createElement("input", {
+        type: "password",
+        name: "password",
+        placeholder: "Password",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "password",
+        name: "confirmPassword",
+        placeholder: "Confirm Password",
+        onChange: this.onChange
+      }), _react["default"].createElement("input", {
+        type: "submit",
+        value: "Register"
+      }))), this.state.isSuccessMessageDisplayed && _react["default"].createElement("div", {
+        className: "modal-success-message"
+      }, _react["default"].createElement("p", null, "Your account has been successfully activated. ", _react["default"].createElement("br", null), "Now you may sign-in."), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
+        to: "/admin",
+        className: "button"
+      }, "OK"))), this.props.isTokenValid === false && _react["default"].createElement("div", null, _react["default"].createElement("p", null, "The link is invalid!"), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
+        to: "/",
+        className: "button"
+      }, "Close")))));
+    }
+  }]);
+
+  return AcceptInvitation;
+}(_react["default"].Component);
+
+AcceptInvitation.propTypes = {
+  activateAccount: _propTypes["default"].func,
+  isInvitationAccepted: _propTypes["default"].bool,
+  acceptInvitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  match: _propTypes["default"].object,
+  checkInvitationToken: _propTypes["default"].func,
+  isTokenValid: _propTypes["default"].bool
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var doctorCategories = _ref.doctorCategories;
+  return {
+    isTokenValid: doctorCategories.isInvitationTokenValid,
+    isInvitationAccepted: doctorCategories.isInvitationAccepted,
+    acceptInvitationError: doctorCategories.acceptInvitationError,
+    error: doctorCategories.invitationTokenError
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    activateAccount: function activateAccount(token, password) {
+      return (0, _account.activateAccount)(token, password);
+    },
+    checkInvitationToken: function checkInvitationToken(token) {
+      return (0, _account.checkInvitationToken)(token);
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(AcceptInvitation);
+
+exports["default"] = _default;
+
+},{"../../actions/account":109,"./Modal":133,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],124:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _reactRouterDom = require("react-router-dom");
+
+var _reactRedux = require("react-redux");
+
+var _redux = require("redux");
+
+var _account = require("../../actions/account");
+
+var _DoctorCategories = _interopRequireDefault(require("./DoctorCategories"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
+  _inherits(ClinicAccountPage, _React$Component);
+
+  function ClinicAccountPage() {
+    _classCallCheck(this, ClinicAccountPage);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ClinicAccountPage).apply(this, arguments));
+  }
+
+  _createClass(ClinicAccountPage, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.loadAccount();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      if (!this.props.account) {
+        this.props.history.push('/admin');
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var account = this.props.account;
+      return _react["default"].createElement("main", {
+        className: "account-page page-container"
+      }, _react["default"].createElement("h1", {
+        className: "page-title"
+      }, account && account.name), _react["default"].createElement(_reactRouterDom.Link, {
+        to: "/clinic-account/settings",
+        className: "account-settings"
+      }, "Settings"), _react["default"].createElement(_DoctorCategories["default"], null));
+    }
+  }]);
+
+  return ClinicAccountPage;
+}(_react["default"].Component);
+
+ClinicAccountPage.propTypes = {
+  isAuthenticated: _propTypes["default"].bool,
+  account: _propTypes["default"].object,
+  loadAccount: _propTypes["default"].func,
+  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  history: _propTypes["default"].object
+};
+
+var mapStateToProps = function mapStateToProps(_ref) {
+  var signIn = _ref.signIn;
+  return {
+    isAuthenticated: signIn.isAuthenticated,
+    account: signIn.account,
+    error: signIn.error
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return (0, _redux.bindActionCreators)({
+    loadAccount: function loadAccount() {
+      return (0, _account.loadAccount)();
+    }
+  }, dispatch);
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ClinicAccountPage);
+
+exports["default"] = _default;
+
+},{"../../actions/account":109,"./DoctorCategories":128,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45405,7 +46016,7 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _reactRedux = require("react-redux");
 
-var _clinicRegistration = require("../actions/clinic-registration");
+var _clinicRegistration = require("../../actions/clinic-registration");
 
 var _redux = require("redux");
 
@@ -45614,7 +46225,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/clinic-registration":111,"prop-types":51,"react":90,"react-redux":73,"redux":92}],119:[function(require,module,exports){
+},{"../../actions/clinic-registration":111,"prop-types":51,"react":90,"react-redux":73,"redux":92}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45632,7 +46243,7 @@ var _redux = require("redux");
 
 var _Modal = _interopRequireDefault(require("./Modal"));
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -45838,7 +46449,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"redux":92}],120:[function(require,module,exports){
+},{"../../actions/account":109,"./Modal":133,"prop-types":51,"react":90,"react-redux":73,"redux":92}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45860,7 +46471,7 @@ var _reactRouterDom = require("react-router-dom");
 
 var _Modal = _interopRequireDefault(require("./Modal"));
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -46081,7 +46692,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"./Modal":130,"moment":43,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],121:[function(require,module,exports){
+},{"../../actions/account":109,"./Modal":133,"moment":43,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46099,7 +46710,7 @@ var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 var _Modal = _interopRequireDefault(require("./Modal"));
 
@@ -46237,7 +46848,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],122:[function(require,module,exports){
+},{"../../actions/account":109,"./Modal":133,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46255,7 +46866,7 @@ var _reactRedux = require("react-redux");
 
 var _Modal = _interopRequireDefault(require("./Modal"));
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -46463,7 +47074,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"redux":92}],123:[function(require,module,exports){
+},{"../../actions/account":109,"./Modal":133,"prop-types":51,"react":90,"react-redux":73,"redux":92}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46483,7 +47094,7 @@ var _Modal = _interopRequireDefault(require("./Modal"));
 
 var _DoctorsList = _interopRequireDefault(require("./DoctorsList"));
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -46714,7 +47325,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Doc
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"./DoctorsList":124,"./Modal":130,"prop-types":51,"react":90,"react-redux":73,"redux":92}],124:[function(require,module,exports){
+},{"../../actions/account":109,"./DoctorsList":131,"./Modal":133,"prop-types":51,"react":90,"react-redux":73,"redux":92}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46780,94 +47391,7 @@ DoctorsList.propTypes = {
 var _default = DoctorsList;
 exports["default"] = _default;
 
-},{"prop-types":51,"react":90}],125:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _React = _interopRequireDefault(require("React"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var Footer = function Footer() {
-  return _React["default"].createElement("footer", {
-    className: "page-footer"
-  }, "\xA92020 Alena Bayraktar");
-};
-
-var _default = Footer;
-exports["default"] = _default;
-
-},{"React":9}],126:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _Logout = _interopRequireDefault(require("./Logout"));
-
-var _reactRouterDom = require("react-router-dom");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var Header = function Header() {
-  return _react["default"].createElement("header", {
-    className: "page-header"
-  }, _react["default"].createElement("div", {
-    className: "page-container"
-  }, _react["default"].createElement(_reactRouterDom.Link, {
-    to: "/"
-  }, _react["default"].createElement("img", {
-    src: "/img/logo.png",
-    alt: "",
-    className: "logo"
-  })), _react["default"].createElement(_Logout["default"], null)));
-};
-
-var _default = Header;
-exports["default"] = _default;
-
-},{"./Logout":128,"react":90,"react-router-dom":84}],127:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _reactRouterDom = require("react-router-dom");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var Home = function Home() {
-  return _react["default"].createElement("main", {
-    className: "page-container home-page"
-  }, _react["default"].createElement("div", {
-    className: "column column-new"
-  }, _react["default"].createElement(_reactRouterDom.Link, {
-    className: "home-button",
-    to: "/new-appointment"
-  }, "New Appointment")), _react["default"].createElement("div", {
-    className: "column column-cancel"
-  }, _react["default"].createElement(_reactRouterDom.Link, {
-    className: "home-button",
-    to: "/cancel-appointment"
-  }, "Cancel Appointment")));
-};
-
-var _default = Home;
-exports["default"] = _default;
-
-},{"react":90,"react-router-dom":84}],128:[function(require,module,exports){
+},{"prop-types":51,"react":90}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46885,7 +47409,7 @@ var _redux = require("redux");
 
 var _reactRouterDom = require("react-router-dom");
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -46965,110 +47489,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0,
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],129:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _reactRouterDom = require("react-router-dom");
-
-var _Home = _interopRequireDefault(require("./Home"));
-
-var _ClinicRegistration = _interopRequireDefault(require("./ClinicRegistration"));
-
-var _ClinicAccountPage = _interopRequireDefault(require("./ClinicAccountPage"));
-
-var _DoctorAccount = _interopRequireDefault(require("./DoctorAccount"));
-
-var _DoctorsCategory = _interopRequireDefault(require("./DoctorsCategory"));
-
-var _SignIn = _interopRequireDefault(require("./SignIn"));
-
-var _AcceptInvitation = _interopRequireDefault(require("./AcceptInvitation"));
-
-var _ClinicSettings = _interopRequireDefault(require("./ClinicSettings"));
-
-var _DoctorSettings = _interopRequireDefault(require("./DoctorSettings"));
-
-var _NewAppointment = _interopRequireDefault(require("./NewAppointment"));
-
-var _CancelAppointment = _interopRequireDefault(require("./CancelAppointment"));
-
-var _ClinicDoctorCategories = _interopRequireDefault(require("./ClinicDoctorCategories"));
-
-var _AvailableAppointments = _interopRequireDefault(require("./AvailableAppointments"));
-
-var _NewAppointmentComplete = _interopRequireDefault(require("./NewAppointmentComplete"));
-
-var _NotFound = _interopRequireDefault(require("./NotFound"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var Main = function Main() {
-  return _react["default"].createElement(_reactRouterDom.Switch, null, _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/",
-    component: _Home["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/new-appointment",
-    component: _NewAppointment["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/new-appointment/clinic/:clinicAlias",
-    component: _ClinicDoctorCategories["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/new-appointment/clinic/:clinicAlias/:categoryAlias",
-    component: _AvailableAppointments["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/new-appointment/clinic/:clinicAlias/:categoryAlias/complete",
-    component: _NewAppointmentComplete["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/cancel-appointment",
-    component: _CancelAppointment["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    path: "/register",
-    component: _ClinicRegistration["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    path: "/admin",
-    component: _SignIn["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/clinic-account",
-    component: _ClinicAccountPage["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    path: "/clinic-account/category/:categoryAlias",
-    component: _DoctorsCategory["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    path: "/clinic-account/settings",
-    component: _ClinicSettings["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    path: '/accept-invitation/:token',
-    component: _AcceptInvitation["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    exact: true,
-    path: "/doctor-account",
-    component: _DoctorAccount["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    path: '/doctor-account/settings',
-    component: _DoctorSettings["default"]
-  }), _react["default"].createElement(_reactRouterDom.Route, {
-    component: _NotFound["default"]
-  }));
-};
-
-var _default = Main;
-exports["default"] = _default;
-
-},{"./AcceptInvitation":112,"./AvailableAppointments":114,"./CancelAppointment":115,"./ClinicAccountPage":116,"./ClinicDoctorCategories":117,"./ClinicRegistration":118,"./ClinicSettings":119,"./DoctorAccount":120,"./DoctorSettings":122,"./DoctorsCategory":123,"./Home":127,"./NewAppointment":131,"./NewAppointmentComplete":132,"./NotFound":133,"./SignIn":134,"react":90,"react-router-dom":84}],130:[function(require,module,exports){
+},{"../../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47135,426 +47556,7 @@ Modal.propTypes = {
 var _default = Modal;
 exports["default"] = _default;
 
-},{"prop-types":51,"react":90}],131:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-var _reactRouterDom = require("react-router-dom");
-
-var _reactRedux = require("react-redux");
-
-var _redux = require("redux");
-
-var _appointments = require("../actions/appointments");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var NewAppointment = /*#__PURE__*/function (_React$Component) {
-  _inherits(NewAppointment, _React$Component);
-
-  function NewAppointment() {
-    var _this;
-
-    _classCallCheck(this, NewAppointment);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(NewAppointment).call(this));
-    _this.state = {
-      search: null
-    };
-    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
-    _this.searchClinic = _this.searchClinic.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(NewAppointment, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      window.onbeforeunload = function () {
-        return 'Your progress will be lost!';
-      };
-    }
-  }, {
-    key: "searchClinic",
-    value: function searchClinic(event) {
-      event.preventDefault();
-      this.props.searchClinic(this.state.search);
-    }
-  }, {
-    key: "onChange",
-    value: function onChange(event) {
-      var _event$target = event.target,
-          name = _event$target.name,
-          value = _event$target.value;
-      this.setState(function (prevState) {
-        return {
-          search: _objectSpread({}, prevState.search, _defineProperty({}, name, value))
-        };
-      });
-    }
-  }, {
-    key: "onClinicSelect",
-    value: function onClinicSelect(event, clinic, url) {
-      this.props.saveClinic(clinic);
-      this.props.history.push(url);
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this2 = this;
-
-      return _react["default"].createElement("main", {
-        className: "page-container address-search"
-      }, _react["default"].createElement("h1", {
-        className: "page-title"
-      }, "Enter your home address"), _react["default"].createElement("form", {
-        action: "#",
-        className: "address-form",
-        onSubmit: this.searchClinic
-      }, _react["default"].createElement("input", {
-        type: "text",
-        name: "place",
-        list: "cities",
-        placeholder: "Place",
-        onChange: this.onChange
-      }), _react["default"].createElement("datalist", {
-        id: "cities"
-      }, _react["default"].createElement("option", {
-        value: "Minsk"
-      }), _react["default"].createElement("option", {
-        value: "Homel"
-      }), _react["default"].createElement("option", {
-        value: "Mogilev"
-      }), _react["default"].createElement("option", {
-        value: "Brest"
-      }), _react["default"].createElement("option", {
-        value: "Vitebsk"
-      }), _react["default"].createElement("option", {
-        value: "Grodno"
-      })), _react["default"].createElement("input", {
-        type: "text",
-        name: "street",
-        placeholder: "Street",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "text",
-        name: "building",
-        placeholder: "Building",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "submit",
-        value: "Search"
-      })), this.props.error && _react["default"].createElement("p", {
-        className: "error"
-      }, this.props.error), this.props.clinics.length ? _react["default"].createElement("section", {
-        className: "search-results"
-      }, _react["default"].createElement("h2", {
-        className: "page-subtitle"
-      }, "Search results"), _react["default"].createElement("ul", {
-        className: "search-results-list category-list"
-      }, this.props.clinics.map(function (clinic, index) {
-        var url = '/new-appointment/clinic/' + clinic.alias; // change to alias
-
-        return _react["default"].createElement("li", {
-          key: index,
-          onClick: _this2.onClinicSelect.bind(_this2, event, clinic, url)
-        }, _react["default"].createElement("h3", {
-          className: "category-name"
-        }, _react["default"].createElement(_reactRouterDom.Link, {
-          to: url
-        }, clinic.name)), clinic.address && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Address:"), " ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Phone Number:"), " ", clinic.phoneNumber));
-      }))) : null);
-    }
-  }]);
-
-  return NewAppointment;
-}(_react["default"].Component);
-
-NewAppointment.propTypes = {
-  clinics: _propTypes["default"].arrayOf(_propTypes["default"].object),
-  error: _propTypes["default"].string,
-  searchClinic: _propTypes["default"].func,
-  saveClinic: _propTypes["default"].func,
-  history: _propTypes["default"].object
-};
-
-var mapStateToProps = function mapStateToProps(_ref) {
-  var appointments = _ref.appointments;
-  return {
-    clinics: appointments.clinics,
-    error: appointments.error
-  };
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({
-    searchClinic: function searchClinic(params) {
-      return (0, _appointments.searchClinic)(params);
-    },
-    saveClinic: function saveClinic(clinicId) {
-      return (0, _appointments.saveClinic)(clinicId);
-    }
-  }, dispatch);
-};
-
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NewAppointment);
-
-exports["default"] = _default;
-
-},{"../actions/appointments":110,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],132:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-var _moment = _interopRequireDefault(require("moment"));
-
-var _redux = require("redux");
-
-var _reactRouterDom = require("react-router-dom");
-
-var _reactRedux = require("react-redux");
-
-var _appointments = require("../actions/appointments");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
-  _inherits(NewAppointmentComplete, _React$Component);
-
-  function NewAppointmentComplete() {
-    var _this;
-
-    _classCallCheck(this, NewAppointmentComplete);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(NewAppointmentComplete).call(this));
-    _this.state = {
-      patient: null
-    };
-    _this.drawSelectedAppointment = _this.drawSelectedAppointment.bind(_assertThisInitialized(_this));
-    _this.completeRegistration = _this.completeRegistration.bind(_assertThisInitialized(_this));
-    _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(NewAppointmentComplete, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      if (!this.props.selectedAppointment) {
-        this.props.history.push('/new-appointment');
-      }
-    }
-  }, {
-    key: "drawSelectedAppointment",
-    value: function drawSelectedAppointment() {
-      var date = (0, _moment["default"])(this.props.selectedAppointment.datetime);
-      var month = date.format('MMMM');
-      var time = date.format('hh:mm');
-      var day = date.format('DD');
-      var weekday = date.format('ddd');
-      var doctor = this.props.selectedAppointment.doctor;
-      var doctorLabel = "".concat(doctor.title, ". ").concat(doctor.firstName, " ").concat(doctor.lastName, ", room: ").concat(doctor.room);
-      return _react["default"].createElement("div", {
-        className: "patient-selection-info"
-      }, _react["default"].createElement("div", {
-        className: "patient-selection-date"
-      }, month, _react["default"].createElement("span", {
-        className: "day"
-      }, day), weekday), _react["default"].createElement("div", {
-        className: "patient-selection-time"
-      }, time), _react["default"].createElement("div", {
-        className: "patient-selection-doctor"
-      }, doctorLabel));
-    }
-  }, {
-    key: "onChange",
-    value: function onChange(event) {
-      var _event$target = event.target,
-          name = _event$target.name,
-          value = _event$target.value;
-      this.setState(function (prevState) {
-        return {
-          patient: _objectSpread({}, prevState.patient, _defineProperty({}, name, value))
-        };
-      });
-    }
-  }, {
-    key: "completeRegistration",
-    value: function completeRegistration(event) {
-      event.preventDefault();
-      this.props.completeRegistration(this.state.patient, this.props.selectedAppointment);
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var appointment = this.props.selectedAppointment;
-      return _react["default"].createElement("main", {
-        className: "page-container"
-      }, this.props.registrationCode ? _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("h1", {
-        className: "page-title"
-      }, "Success!"), _react["default"].createElement("p", {
-        className: "appointment-notification"
-      }, "We have sent you an SMS with the details of your appointment."), _react["default"].createElement("div", {
-        className: "appointment-receipt"
-      }, _react["default"].createElement("p", {
-        className: "order-number"
-      }, "Order #", _react["default"].createElement("span", null, this.props.registrationCode)), _react["default"].createElement("p", {
-        className: "order-datetime"
-      }, (0, _moment["default"])(appointment.datetime).format('MMMM DD, hh:mm')), _react["default"].createElement("p", null, "Doctor: Therapist, ", appointment.doctor.title, ". ", appointment.doctor.firstName, " ", appointment.doctor.lastName), _react["default"].createElement("p", null, "Room: ", appointment.doctor.room), _react["default"].createElement("p", null, "Patient: ", this.state.patient.firstName, " ", this.state.patient.lastName)), _react["default"].createElement("p", {
-        className: "new-appointment-finish"
-      }, _react["default"].createElement(_reactRouterDom.Link, {
-        to: "/"
-      }, "Finish"))) : _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("div", {
-        className: "patient-selection"
-      }, _react["default"].createElement("h1", {
-        className: "patient-selection-label page-title"
-      }, "Your Selection:"), this.props.selectedAppointment && this.drawSelectedAppointment()), _react["default"].createElement("h2", {
-        className: "patient-details-form-title page-subtitle"
-      }, "Please, enter your details to finish registration"), _react["default"].createElement("p", {
-        className: "error"
-      }, this.props.error), _react["default"].createElement("form", {
-        action: "#",
-        className: "patient-details-form",
-        onSubmit: this.completeRegistration
-      }, _react["default"].createElement("input", {
-        type: "text",
-        name: "firstName",
-        placeholder: "First Name",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "text",
-        name: "lastName",
-        placeholder: "Last Name",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "tel",
-        name: "contactNumber",
-        placeholder: "Contact Number",
-        onChange: this.onChange
-      }), _react["default"].createElement("input", {
-        type: "submit",
-        value: "Register"
-      }))));
-    }
-  }]);
-
-  return NewAppointmentComplete;
-}(_react["default"].Component);
-
-NewAppointmentComplete.propTypes = {
-  selectedAppointment: _propTypes["default"].object,
-  registrationCode: _propTypes["default"].string,
-  error: _propTypes["default"].string,
-  completeRegistration: _propTypes["default"].func,
-  history: _propTypes["default"].object
-};
-
-var mapStateToProps = function mapStateToProps(_ref) {
-  var appointments = _ref.appointments;
-  return {
-    selectedAppointment: appointments.selectedAppointment,
-    registrationCode: appointments.registrationCode,
-    error: appointments.registrationError
-  };
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({
-    completeRegistration: function completeRegistration(patient, appointment) {
-      return (0, _appointments.completeRegistration)(patient, appointment);
-    }
-  }, dispatch);
-};
-
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(NewAppointmentComplete);
-
-exports["default"] = _default;
-
-},{"../actions/appointments":110,"moment":43,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],133:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var NotFound = function NotFound() {
-  return _react["default"].createElement("main", {
-    className: "page-container"
-  }, _react["default"].createElement("h1", {
-    className: "page-title"
-  }, "404"), _react["default"].createElement("p", null, "Page not found"));
-};
-
-var _default = NotFound;
-exports["default"] = _default;
-
-},{"react":90}],134:[function(require,module,exports){
+},{"prop-types":51,"react":90}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47572,7 +47574,7 @@ var _redux = require("redux");
 
 var _reactRouterDom = require("react-router-dom");
 
-var _account = require("../actions/account");
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -47757,7 +47759,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],135:[function(require,module,exports){
+},{"../../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],135:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -47889,7 +47891,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
   store: _store["default"]
 }, React.createElement(_reactRouterDom.BrowserRouter, null, React.createElement(_App["default"], null))), document.getElementById('root'));
 
-},{"./components/App":113,"./store":146,"react-dom":55,"react-redux":73,"react-router-dom":84}],138:[function(require,module,exports){
+},{"./components/App":112,"./store":146,"react-dom":55,"react-redux":73,"react-router-dom":84}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

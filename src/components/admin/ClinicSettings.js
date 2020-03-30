@@ -7,7 +7,7 @@ import {
     loadAccount, 
     getAddressList, 
     addNewAddress
-} from '../actions/account';
+} from '../../actions/account';
 
 class ClinicSettings extends React.Component {
     constructor() {

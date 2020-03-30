@@ -8,7 +8,7 @@ import Modal from './Modal';
 import {
     loadAccount, 
     createNewAppointment
-} from '../actions/account';
+} from '../../actions/account';
 
 const initialState = {
     isModalDisplayed: false,

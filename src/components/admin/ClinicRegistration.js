@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { registerClinic, resetRegistrationError } from '../actions/clinic-registration';
+import { 
+    registerClinic, 
+    resetRegistrationError 
+} from '../../actions/clinic-registration';
 import { bindActionCreators } from 'redux';
 
 const initialState = {

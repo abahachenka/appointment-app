@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
-import {requestUserSignIn, resetSignInError} from '../actions/account';
+import {
+    requestUserSignIn, 
+    resetSignInError
+} from '../../actions/account';
 
 const initialState = {
     userData: {

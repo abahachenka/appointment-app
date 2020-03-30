@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from './Modal';
 import { Link } from 'react-router-dom';
-import { activateAccount, checkInvitationToken} from '../actions/account';
+import { activateAccount, checkInvitationToken} from '../../actions/account';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
