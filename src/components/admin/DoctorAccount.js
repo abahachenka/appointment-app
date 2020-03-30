@@ -12,7 +12,10 @@ import {
 
 const initialState = {
     isModalDisplayed: false,
-    appointment: null
+    appointment: {
+        date: null,
+        time: '09:00'
+    }
 }
 
 class DoctorAccount extends React.Component { 
@@ -115,7 +118,7 @@ class DoctorAccount extends React.Component {
                         <form ref={(el) => this.appointmentForm = el} onSubmit={this.addNewAppointment}>
                             <input type="date" name="date" onChange={this.onChange}/>
                             <select name="time" onChange={this.onChange}>
-                                <option val="09:00">09:00</option>
+                                <option val="09:00" defaultValue>09:00</option>
                                 <option val="09:30">09:30</option>
                                 <option val="10:00">10:00</option>
                                 <option val="10:30">10:30</option>

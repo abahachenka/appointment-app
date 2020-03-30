@@ -46501,7 +46501,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var initialState = {
   isModalDisplayed: false,
-  appointment: null
+  appointment: {
+    date: null,
+    time: '09:00'
+  }
 };
 
 var DoctorAccount = /*#__PURE__*/function (_React$Component) {
@@ -46614,7 +46617,8 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         name: "time",
         onChange: this.onChange
       }, _react["default"].createElement("option", {
-        val: "09:00"
+        val: "09:00",
+        defaultValue: true
       }, "09:00"), _react["default"].createElement("option", {
         val: "09:30"
       }, "09:30"), _react["default"].createElement("option", {
