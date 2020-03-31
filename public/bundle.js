@@ -47222,7 +47222,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var initialState = {
   isInviteFormDisplayed: false,
-  invitation: null
+  isFormDisabled: true,
+  invitation: {
+    title: null,
+    firstName: null,
+    lastName: null,
+    room: null,
+    email: null
+  }
 };
 
 var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
@@ -47240,6 +47247,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
     _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_this));
     _this.inviteDoctor = _this.inviteDoctor.bind(_assertThisInitialized(_this));
     _this.resetInvitationForm = _this.resetInvitationForm.bind(_assertThisInitialized(_this));
+    _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -47283,15 +47291,30 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
         return {
           invitation: _objectSpread({}, prevState.invitation, _defineProperty({}, name, value))
         };
+      }, this.checkEmpty);
+    }
+  }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormDisabled = false;
+
+      for (var prop in this.state.invitation) {
+        if (!this.state.invitation[prop]) {
+          isFormDisabled = true;
+          break;
+        }
+      }
+
+      this.setState(function () {
+        return {
+          isFormDisabled: isFormDisabled
+        };
       });
     }
   }, {
     key: "closeModal",
     value: function closeModal() {
-      this.setState({
-        invitation: null,
-        isInviteFormDisplayed: false
-      });
+      this.setState(_objectSpread({}, initialState));
     }
   }, {
     key: "inviteDoctor",
@@ -47324,7 +47347,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("h1", {
         className: "data-section-title"
       }, categoryName), _react["default"].createElement("button", {
-        className: "data-section-btn",
+        className: "data-section-btn button-primary",
         onClick: this.openInviteForm
       }, "Invite")), _react["default"].createElement("p", {
         className: "error"
@@ -47367,7 +47390,8 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
         onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "submit",
-        value: "Send Invitation"
+        value: "Send Invitation",
+        disabled: this.state.isFormDisabled
       }))) : null);
     }
   }]);

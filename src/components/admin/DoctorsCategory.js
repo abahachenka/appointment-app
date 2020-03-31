@@ -13,7 +13,14 @@ import {
 
 const initialState = {
     isInviteFormDisplayed: false,
-    invitation: null
+    isFormDisabled: true,
+    invitation: {
+        title: null,
+        firstName: null,
+        lastName: null,
+        room: null,
+        email: null
+    }
 };
 
 class DoctorsCategory extends React.Component {
@@ -27,6 +34,7 @@ class DoctorsCategory extends React.Component {
         this.closeModal = this.closeModal.bind(this);
         this.inviteDoctor = this.inviteDoctor.bind(this);
         this.resetInvitationForm = this.resetInvitationForm.bind(this);
+        this.checkEmpty = this.checkEmpty.bind(this);
     }
 
     componentDidMount() {
@@ -61,14 +69,26 @@ class DoctorsCategory extends React.Component {
 
         this.setState(prevState => ({
             invitation: { ...prevState.invitation, [name]: value },
+        }), this.checkEmpty);
+    }
+
+    checkEmpty() {
+        let isFormDisabled = false;
+
+        for (let prop in this.state.invitation) {
+            if (!this.state.invitation[prop]) {
+                isFormDisabled = true;
+                break;
+            }
+        }
+
+        this.setState(() => ({
+            isFormDisabled
         }));
     }
 
     closeModal() {
-        this.setState({
-            invitation: null,
-            isInviteFormDisplayed: false
-        });
+        this.setState({...initialState});
     }
 
     inviteDoctor(event) {
@@ -96,7 +116,7 @@ class DoctorsCategory extends React.Component {
                 <section className="doctors data-section">
                     <header className="data-section-header">
                         <h1 className="data-section-title">{categoryName}</h1>
-                        <button className="data-section-btn" 
+                        <button className="data-section-btn button-primary" 
                             onClick={this.openInviteForm}>Invite</button>
                     </header>
                     <p className="error">{this.props.activeCategoryError}</p>
@@ -112,7 +132,7 @@ class DoctorsCategory extends React.Component {
                             <input type="text" name="lastName" placeholder="Last Name" onChange={this.onChange} />
                             <input type="text" name="room" placeholder="Room" onChange={this.onChange} />
                             <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
-                            <input type="submit" value="Send Invitation" />
+                            <input type="submit" value="Send Invitation" disabled={this.state.isFormDisabled}/>
                         </form>
                     </Modal>
                 ): null}
