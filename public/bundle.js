@@ -46054,7 +46054,7 @@ var initialState = {
     password: null,
     confirmPassword: null
   },
-  isRegistrationDisabled: true
+  isFormDisabled: true
 };
 
 var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
@@ -46071,6 +46071,7 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
+    _this.onBlur = _this.onBlur.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -46099,19 +46100,18 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "checkEmpty",
     value: function checkEmpty() {
-      var isFormIncomplete = false;
+      var isFormDisabled = false;
 
       for (var prop in this.state.clinic) {
         if (!this.state.clinic[prop]) {
-          isFormIncomplete = true;
-          return;
+          isFormDisabled = true;
+          break;
         }
       }
 
-      this.setState(function (prevState) {
+      this.setState(function () {
         return {
-          clinic: _objectSpread({}, prevState.clinic),
-          isRegistrationDisabled: isFormIncomplete
+          isFormDisabled: isFormDisabled
         };
       });
     }
@@ -46134,11 +46134,16 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
       this.checkEmpty();
     }
   }, {
+    key: "onBlur",
+    value: function onBlur() {
+      this.checkEmpty();
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
 
-      var isSubmitDisabled = this.state.isRegistrationDisabled || this.props.isPending;
+      var isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
       return _react["default"].createElement("main", {
         className: "page-container"
       }, _react["default"].createElement("h1", {
@@ -46155,32 +46160,38 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
         type: "text",
         name: "name",
         placeholder: "Clinic's name",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "tel",
         name: "phoneNumber",
         placeholder: "Contact number",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "text",
         name: "address",
         placeholder: "Address",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "email",
         name: "email",
         placeholder: "Email",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "password",
         name: "password",
         placeholder: "Password",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "password",
         name: "confirmPassword",
         placeholder: "Confirm Password",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "submit",
         value: "Register",

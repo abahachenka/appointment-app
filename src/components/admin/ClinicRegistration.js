@@ -15,7 +15,7 @@ const initialState = {
         password: null,
         confirmPassword: null
     },
-    isRegistrationDisabled: true
+    isFormDisabled: true
 }
 
 class ClinicRegistration extends React.Component {
@@ -28,6 +28,7 @@ class ClinicRegistration extends React.Component {
         this.onChange = this.onChange.bind(this);
         this.checkEmpty = this.checkEmpty.bind(this);
         this.resetForm = this.resetForm.bind(this);
+        this.onBlur = this.onBlur.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -50,18 +51,17 @@ class ClinicRegistration extends React.Component {
     }
 
     checkEmpty() {
-        let isFormIncomplete = false;
+        let isFormDisabled = false;
 
         for (let prop in this.state.clinic) {
             if (!this.state.clinic[prop]) {
-                isFormIncomplete = true;
-                return;
+                isFormDisabled = true;
+                break;
             }
         }
 
-        this.setState(prevState => ({
-            clinic: {...prevState.clinic},
-            isRegistrationDisabled: isFormIncomplete
+        this.setState(() => ({
+            isFormDisabled
         }));
     }
 
@@ -79,20 +79,24 @@ class ClinicRegistration extends React.Component {
         this.checkEmpty();
     }
 
+    onBlur() {
+        this.checkEmpty();
+    }
+
     render() {
-        const isSubmitDisabled = this.state.isRegistrationDisabled || this.props.isPending;
+        const isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
         
         return (
             <main className="page-container">
                 <h1 className="page-title">Register a clinic&lsquo;s account</h1>
                 <form ref={(el) => this.registrationForm = el} className="clinic-registration-form" onSubmit={this.handleSubmit} >
                     <p className="error">{this.props.error}</p>
-                    <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} />
-                    <input type="tel" name="phoneNumber" placeholder="Contact number" onChange={this.onChange} />
-                    <input type="text" name="address" placeholder="Address" onChange={this.onChange} />
-                    <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
-                    <input type="password" name="password" placeholder="Password" onChange={this.onChange} />
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} />
+                    <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} onBlur={this.onBlur} />
+                    <input type="tel" name="phoneNumber" placeholder="Contact number" onChange={this.onChange} onBlur={this.onBlur} />
+                    <input type="text" name="address" placeholder="Address" onChange={this.onChange} onBlur={this.onBlur} />
+                    <input type="email" name="email" placeholder="Email" onChange={this.onChange} onBlur={this.onBlur} />
+                    <input type="password" name="password" placeholder="Password" onChange={this.onChange} onBlur={this.onBlur} />
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} onBlur={this.onBlur} />
                     <input type="submit" value="Register" className="button-primary" disabled={isSubmitDisabled}/>
                 </form>
             </main>
