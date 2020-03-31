@@ -47626,6 +47626,7 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
     _this.state = _objectSpread({}, initialState);
     _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.onBlur = _this.onBlur.bind(_assertThisInitialized(_this));
     _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
     return _this;
@@ -47654,19 +47655,18 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "checkEmpty",
     value: function checkEmpty() {
-      var isFormIncomplete = false;
+      var isFormDisabled = false;
 
       for (var prop in this.state.userData) {
         if (!this.state.userData[prop]) {
-          isFormIncomplete = true;
-          return;
+          isFormDisabled = true;
+          break;
         }
       }
 
       this.setState(function (prevState) {
         return {
-          userData: _objectSpread({}, prevState.userData),
-          isFormDisabled: isFormIncomplete
+          isFormDisabled: isFormDisabled
         };
       });
     }
@@ -47689,6 +47689,11 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
       this.checkEmpty();
     }
   }, {
+    key: "onBlur",
+    value: function onBlur() {
+      this.checkEmpty();
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
@@ -47708,12 +47713,14 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
         type: "email",
         name: "email",
         placeholder: "email",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "password",
         name: "password",
         placeholder: "password",
-        onChange: this.onChange
+        onChange: this.onChange,
+        onBlur: this.onBlur
       }), _react["default"].createElement("input", {
         type: "submit",
         value: "Sign-In",

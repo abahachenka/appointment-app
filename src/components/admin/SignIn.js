@@ -24,6 +24,7 @@ class SignIn extends React.Component {
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.onBlur = this.onBlur.bind(this);
         this.checkEmpty = this.checkEmpty.bind(this);
         this.resetForm = this.resetForm.bind(this);
     }
@@ -47,18 +48,17 @@ class SignIn extends React.Component {
     }
 
     checkEmpty() {
-        let isFormIncomplete = false;
+        let isFormDisabled = false;
 
         for (let prop in this.state.userData) {
             if (!this.state.userData[prop]) {
-                isFormIncomplete = true;
-                return;
+                isFormDisabled = true;
+                break;
             }
         }
 
         this.setState(prevState => ({
-            userData: {...prevState.userData},
-            isFormDisabled: isFormIncomplete
+            isFormDisabled
         }));
     }
 
@@ -70,9 +70,13 @@ class SignIn extends React.Component {
         }
 
         this.setState(prevState => ({
-            userData: { ...prevState.userData, [name]: value },
+            userData: { ...prevState.userData, [name]: value}
         }));
 
+        this.checkEmpty();
+    }
+
+    onBlur() {
         this.checkEmpty();
     }
 
@@ -83,8 +87,8 @@ class SignIn extends React.Component {
             <main className="page-container">
                 <form ref={(el) => this.signinForm = el} className="sign-in-form" onSubmit={this.handleSubmit}>
                     {this.props.error ? (<p className="error">{this.props.error}</p>) : null}
-                    <input type="email" name="email" placeholder="email" onChange={this.onChange} />
-                    <input type="password" name="password" placeholder="password" onChange={this.onChange} />
+                    <input type="email" name="email" placeholder="email" onChange={this.onChange} onBlur={this.onBlur}/>
+                    <input type="password" name="password" placeholder="password" onChange={this.onChange} onBlur={this.onBlur} />
                     <input type="submit" value="Sign-In" className="button-primary" disabled={isSubmitDisabled} />
                     <p>OR</p>
                     <Link to="/register">Register a new clinic account</Link>
