@@ -9,20 +9,28 @@ import {
     addNewDoctorAddress
 } from '../../actions/account';
 
+const initialState = {
+    isModalDisplayed: false,
+    isFormDisabled: true,
+    newAddress: {
+        place: null,
+        street: null,
+        buildings: null
+    }
+}
+
 class DoctorSettings extends React.Component {
     constructor() {
         super();
 
-        this.state = {
-            isModalDisplayed: false,
-            newAddress: null
-        };
+        this.state = {...initialState};
 
         this.addNewAddress = this.addNewAddress.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.openAddNewAddressModal = this.openAddNewAddressModal.bind(this);
         this.onChange = this.onChange.bind(this);
         this.resetForm = this.resetForm.bind(this);
+        this.checkEmpty = this.checkEmpty.bind(this);
     }
 
     componentDidMount() {
@@ -50,10 +58,7 @@ class DoctorSettings extends React.Component {
     }
 
     closeModal() {
-        this.setState({
-            newAddress: null,
-            isModalDisplayed: false
-        });
+        this.setState({...initialState});
 
         this.resetForm();
     }
@@ -62,12 +67,27 @@ class DoctorSettings extends React.Component {
         this.addNewAddressForm.reset();
     }
 
+    checkEmpty() {
+        let isFormDisabled = false;
+
+        for (let prop in this.state.newAddress) {
+            if (!this.state.newAddress[prop]) {
+                isFormDisabled = true;
+                break;
+            }
+        }
+
+        this.setState(() => ({
+            isFormDisabled
+        }));
+    }
+
     onChange(event) {
         const {name, value} = event.target;
 
         this.setState(prevState => ({
             newAddress: { ...prevState.newAddress, [name]: value }
-        }));
+        }), this.checkEmpty);
     }
 
     render() {
@@ -89,7 +109,7 @@ class DoctorSettings extends React.Component {
                 <section className="address-cover data-section">
                     <header className="data-section-header">
                         <h2 className="data-section-title">Address Cover</h2>
-                        <button className="data-section-btn" onClick={this.openAddNewAddressModal}>Add</button>
+                        <button className="data-section-btn button-primary" onClick={this.openAddNewAddressModal}>Add</button>
                     </header>
                     <p className="error">{this.props.error}</p>
 
@@ -109,7 +129,7 @@ class DoctorSettings extends React.Component {
                                     <tr key={index}>
                                         <td>{address.place}</td>
                                         <td>{address.street}</td>
-                                        <td>{address.buildings}</td>
+                                        <td>{address.buildings.join(',')}</td>
                                     </tr>
                                 )
                             })}
@@ -119,12 +139,13 @@ class DoctorSettings extends React.Component {
                 </section>
                 {this.state.isModalDisplayed ? (
                     <Modal title="Add New Address" onClose={this.closeModal}>
-                        <p>Please add the details of doctor&#39;s service address. Several buildings can be separated with a comma.</p>
+                        <p>Please add the details of a new area, which is accepted for doctor's service.</p>
                         <form ref={(el) => this.addNewAddressForm = el} onSubmit={this.addNewAddress}>
                             <input type="text" name="place" placeholder="Place" onChange={this.onChange}/>
                             <input type="text" name="street" placeholder="Street" onChange={this.onChange}/>
                             <input type="text" name="buildings" placeholder="Buildings" onChange={this.onChange}/>
-                            <input type="submit" value="Add"/>
+                            <p className="input-hint">Please, separate several buildings numbers with a comma</p>
+                            <input type="submit" value="Add" disabled={this.state.isFormDisabled}/>
                         </form>
                     </Modal>
                 ): null}

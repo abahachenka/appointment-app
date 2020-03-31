@@ -47021,6 +47021,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var initialState = {
+  isModalDisplayed: false,
+  isFormDisabled: true,
+  newAddress: {
+    place: null,
+    street: null,
+    buildings: null
+  }
+};
+
 var DoctorSettings = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorSettings, _React$Component);
 
@@ -47030,15 +47040,13 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
     _classCallCheck(this, DoctorSettings);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(DoctorSettings).call(this));
-    _this.state = {
-      isModalDisplayed: false,
-      newAddress: null
-    };
+    _this.state = _objectSpread({}, initialState);
     _this.addNewAddress = _this.addNewAddress.bind(_assertThisInitialized(_this));
     _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_this));
     _this.openAddNewAddressModal = _this.openAddNewAddressModal.bind(_assertThisInitialized(_this));
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
+    _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -47074,16 +47082,31 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "closeModal",
     value: function closeModal() {
-      this.setState({
-        newAddress: null,
-        isModalDisplayed: false
-      });
+      this.setState(_objectSpread({}, initialState));
       this.resetForm();
     }
   }, {
     key: "resetForm",
     value: function resetForm() {
       this.addNewAddressForm.reset();
+    }
+  }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormDisabled = false;
+
+      for (var prop in this.state.newAddress) {
+        if (!this.state.newAddress[prop]) {
+          isFormDisabled = true;
+          break;
+        }
+      }
+
+      this.setState(function () {
+        return {
+          isFormDisabled: isFormDisabled
+        };
+      });
     }
   }, {
     key: "onChange",
@@ -47095,7 +47118,7 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
         return {
           newAddress: _objectSpread({}, prevState.newAddress, _defineProperty({}, name, value))
         };
-      });
+      }, this.checkEmpty);
     }
   }, {
     key: "render",
@@ -47121,7 +47144,7 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("h2", {
         className: "data-section-title"
       }, "Address Cover"), _react["default"].createElement("button", {
-        className: "data-section-btn",
+        className: "data-section-btn button-primary",
         onClick: this.openAddNewAddressModal
       }, "Add")), _react["default"].createElement("p", {
         className: "error"
@@ -47130,11 +47153,11 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Place"), _react["default"].createElement("th", null, "Street"), _react["default"].createElement("th", null, "Buildings"))), _react["default"].createElement("tbody", null, this.props.addressList.map(function (address, index) {
         return _react["default"].createElement("tr", {
           key: index
-        }, _react["default"].createElement("td", null, address.place), _react["default"].createElement("td", null, address.street), _react["default"].createElement("td", null, address.buildings));
+        }, _react["default"].createElement("td", null, address.place), _react["default"].createElement("td", null, address.street), _react["default"].createElement("td", null, address.buildings.join(',')));
       })))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Address",
         onClose: this.closeModal
-      }, _react["default"].createElement("p", null, "Please add the details of doctor's service address. Several buildings can be separated with a comma."), _react["default"].createElement("form", {
+      }, _react["default"].createElement("p", null, "Please add the details of a new area, which is accepted for doctor's service."), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.addNewAddressForm = el;
         },
@@ -47154,9 +47177,12 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
         name: "buildings",
         placeholder: "Buildings",
         onChange: this.onChange
-      }), _react["default"].createElement("input", {
+      }), _react["default"].createElement("p", {
+        className: "input-hint"
+      }, "Please, separate several buildings numbers with a comma"), _react["default"].createElement("input", {
         type: "submit",
-        value: "Add"
+        value: "Add",
+        disabled: this.state.isFormDisabled
       }))) : null);
     }
   }]);
