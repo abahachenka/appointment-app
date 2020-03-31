@@ -96,9 +96,9 @@ class DoctorCategories extends React.Component {
                                     return (
                                         <tr key={index}>
                                             <td><Link to={link}>{category.categoryName}</Link></td>
-                                            <td>0</td>
-                                            <td>0</td>
-                                            <td>0</td>
+                                            <td>{category.doctors.active}</td>
+                                            <td>{category.doctors.invited}</td>
+                                            <td>{category.doctors.active + category.doctors.invited}</td>
                                             <td className="controls">
                                                 <button disabled>Edit</button>
                                                 <button disabled>Delete</button>

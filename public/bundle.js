@@ -46886,7 +46886,7 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
           key: index
         }, _react["default"].createElement("td", null, _react["default"].createElement(_reactRouterDom.Link, {
           to: link
-        }, category.categoryName)), _react["default"].createElement("td", null, "0"), _react["default"].createElement("td", null, "0"), _react["default"].createElement("td", null, "0"), _react["default"].createElement("td", {
+        }, category.categoryName)), _react["default"].createElement("td", null, category.doctors.active), _react["default"].createElement("td", null, category.doctors.invited), _react["default"].createElement("td", null, category.doctors.active + category.doctors.invited), _react["default"].createElement("td", {
           className: "controls"
         }, _react["default"].createElement("button", {
           disabled: true
