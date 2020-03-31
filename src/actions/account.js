@@ -246,7 +246,7 @@ export const requestUserSignIn = (accountData) => {
                 }
             })
             .catch(err => {
-                dispatch(signInError(err.response.data));
+                dispatch(signInError(err.response && err.response.data));
             });
     }
 }

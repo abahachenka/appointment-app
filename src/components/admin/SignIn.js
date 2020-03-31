@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie'
 import {
     requestUserSignIn, 
-    resetSignInError
+    resetSignInError,
+    loadAccount
 } from '../../actions/account';
 
 const initialState = {
@@ -27,11 +29,28 @@ class SignIn extends React.Component {
         this.onBlur = this.onBlur.bind(this);
         this.checkEmpty = this.checkEmpty.bind(this);
         this.resetForm = this.resetForm.bind(this);
+        this.getAccountUrl = this.getAccountUrl.bind(this);
+    }
+
+    getAccountUrl() {
+       return this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account'; 
+    }
+
+    componentDidMount() {
+        if (!this.props.isAuthenticated && Cookies.get('token')) {
+            this.props.loadAccount();
+        }
+
+        if (this.props.isAuthenticated) {
+            const url = this.getAccountUrl();
+            
+            this.props.history.push(url);
+        }
     }
 
     componentDidUpdate() {
         if (this.props.isAuthenticated) {
-            const url = this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
+            const url = this.getAccountUrl();
             
             this.props.history.push(url);
         }
@@ -99,12 +118,14 @@ class SignIn extends React.Component {
 }
 
 SignIn.propTypes = {
+    account: PropTypes.object,
     isPending: PropTypes.bool,
     isAuthenticated: PropTypes.bool,
     error: PropTypes.string,
     requestSignIn: PropTypes.func.isRequired,
     resetError: PropTypes.func.isRequired,
     accountType: PropTypes.string,
+    loadAccount: PropTypes.func,
     history: PropTypes.object
 }
 
@@ -117,7 +138,8 @@ const mapStateToProps = ({signIn}) => ({
 
 const mapDispatchToProps = dispatch => bindActionCreators({
     requestSignIn: (userData) => requestUserSignIn(userData),
-    resetError: () => resetSignInError()
+    resetError: () => resetSignInError(),
+    loadAccount: () => loadAccount()
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(SignIn);

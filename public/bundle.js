@@ -44028,7 +44028,7 @@ var requestUserSignIn = function requestUserSignIn(accountData) {
         dispatch(signInError('Something went wrong'));
       }
     })["catch"](function (err) {
-      dispatch(signInError(err.response.data));
+      dispatch(signInError(err.response && err.response.data));
     });
   };
 };
@@ -45972,9 +45972,7 @@ var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
         className: "account-page page-container"
       }, _react["default"].createElement("header", {
         className: "account-header"
-      }, _react["default"].createElement("p", {
-        className: "error"
-      }, this.props.error), _react["default"].createElement("h1", {
+      }, _react["default"].createElement("h1", {
         className: titleClassName
       }, account && account.name), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/clinic-account/settings",
@@ -45992,7 +45990,7 @@ ClinicAccountPage.propTypes = {
   isAuthenticated: _propTypes["default"].bool,
   account: _propTypes["default"].object,
   loadAccount: _propTypes["default"].func,
-  error: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  error: _propTypes["default"].string,
   history: _propTypes["default"].object
 };
 
@@ -47659,7 +47657,8 @@ Logout.propTypes = {
 var mapStateToProps = function mapStateToProps(_ref) {
   var signIn = _ref.signIn;
   return {
-    account: signIn.account
+    account: signIn.account,
+    isAuthenticated: signIn.isAuthenticated
   };
 };
 
@@ -47760,6 +47759,8 @@ var _redux = require("redux");
 
 var _reactRouterDom = require("react-router-dom");
 
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
+
 var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -47811,14 +47812,32 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
     _this.onBlur = _this.onBlur.bind(_assertThisInitialized(_this));
     _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
+    _this.getAccountUrl = _this.getAccountUrl.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(SignIn, [{
+    key: "getAccountUrl",
+    value: function getAccountUrl() {
+      return this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (!this.props.isAuthenticated && _jsCookie["default"].get('token')) {
+        this.props.loadAccount();
+      }
+
+      if (this.props.isAuthenticated) {
+        var url = this.getAccountUrl();
+        this.props.history.push(url);
+      }
+    }
+  }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
       if (this.props.isAuthenticated) {
-        var url = this.props.accountType === 'doctor' ? '/doctor-account' : '/clinic-account';
+        var url = this.getAccountUrl();
         this.props.history.push(url);
       }
     }
@@ -47918,12 +47937,14 @@ var SignIn = /*#__PURE__*/function (_React$Component) {
 }(_react["default"].Component);
 
 SignIn.propTypes = {
+  account: _propTypes["default"].object,
   isPending: _propTypes["default"].bool,
   isAuthenticated: _propTypes["default"].bool,
   error: _propTypes["default"].string,
   requestSignIn: _propTypes["default"].func.isRequired,
   resetError: _propTypes["default"].func.isRequired,
   accountType: _propTypes["default"].string,
+  loadAccount: _propTypes["default"].func,
   history: _propTypes["default"].object
 };
 
@@ -47944,6 +47965,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     },
     resetError: function resetError() {
       return (0, _account.resetSignInError)();
+    },
+    loadAccount: function loadAccount() {
+      return (0, _account.loadAccount)();
     }
   }, dispatch);
 };
@@ -47952,7 +47976,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Sig
 
 exports["default"] = _default;
 
-},{"../../actions/account":109,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],135:[function(require,module,exports){
+},{"../../actions/account":109,"js-cookie":41,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],135:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -48612,7 +48636,9 @@ var signInReducer = function signInReducer() {
 
     case _actionTypes.ACCOUNT_LOAD_SUCCESS:
       return _objectSpread({}, state, {
-        account: action.payload.account
+        isAuthenticated: true,
+        account: action.payload.account,
+        accountType: action.payload.account.accountType
       });
 
     case _actionTypes.ACCOUNT_LOAD_ERROR:
@@ -48625,7 +48651,8 @@ var signInReducer = function signInReducer() {
     case _actionTypes.ACCOUNT_LOGOUT:
       {
         return _objectSpread({}, state, {
-          account: null
+          account: null,
+          isAuthenticated: false
         });
       }
 

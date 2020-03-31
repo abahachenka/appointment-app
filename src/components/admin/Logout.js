@@ -38,7 +38,8 @@ Logout.propTypes = {
 }
 
 const mapStateToProps = ({signIn}) => ({
-    account: signIn.account
+    account: signIn.account,
+    isAuthenticated: signIn.isAuthenticated
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

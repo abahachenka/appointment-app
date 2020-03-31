@@ -47,7 +47,9 @@ const signInReducer = (state = initialState, action) => {
         case ACCOUNT_LOAD_SUCCESS:
             return {
                 ...state,
-                account: action.payload.account
+                isAuthenticated: true,
+                account: action.payload.account,
+                accountType: action.payload.account.accountType
             }
         case ACCOUNT_LOAD_ERROR: {
             return {
@@ -58,7 +60,8 @@ const signInReducer = (state = initialState, action) => {
         case ACCOUNT_LOGOUT: {
             return {
                 ...state,
-                account: null
+                account: null,
+                isAuthenticated: false
             }
         }
         default: 

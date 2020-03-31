@@ -24,7 +24,6 @@ class ClinicAccountPage extends React.Component {
         return (
             <main className="account-page page-container">
                 <header className="account-header">
-                    <p className="error">{this.props.error}</p>
                     <h1 className={titleClassName}>{account && account.name}</h1>
                     <Link to="/clinic-account/settings" className="account-settings">Settings</Link>
                     <div className="account-details">
@@ -46,7 +45,7 @@ ClinicAccountPage.propTypes = {
     isAuthenticated: PropTypes.bool,
     account: PropTypes.object,
     loadAccount: PropTypes.func,
-    error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    error: PropTypes.string,
     history: PropTypes.object
 }
 
