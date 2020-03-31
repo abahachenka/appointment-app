@@ -15,15 +15,5 @@
         top: 10px;
         right: 0;
         width: 100px;
-        height: $input-height;
-        font-size: $input-font-size;
-        color: $white;
-        background: $primary;
-        border: none;
-
-        &:hover {
-            background: $primary-hover;
-            cursor: pointer;
-        }
     }
 }

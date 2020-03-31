@@ -62,15 +62,11 @@
     }
 
     input[type="submit"] {
-        border: none;
-        background: $primary;
-        color: $white;
         margin: 0;
+    }
 
-        &:hover {
-            background: $primary-hover;
-            cursor: pointer;
-        }
+    .input-hint {
+        margin: -10px 0 15px;
     }
 }
 

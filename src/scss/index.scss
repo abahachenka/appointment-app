@@ -68,21 +68,47 @@ a {
     background: $primary-button;
     color: $white;
     border: none;
+    height: $input-height;
+    font-size: $input-font-size;
+    cursor: pointer;
 
-&:not([disabled]):hover {
+    &:hover {
         background: $primary;
-        cursor: pointer;
     }
 }
 
-input:not([type="radio"]) {
-    height: $input-height;
-    font-size: $input-font-size;
+input{
+    &[type="text"] {
+        padding: 1px 5px;
+    }
+
+    &:not([type="radio"]) {
+        height: $input-height;
+        font-size: $input-font-size;
+    }
+
+    &[type="submit"] {
+        padding: 10px 30px;
+        background: $primary-button;
+        color: $white;
+        border: none;
+        line-height: 0.7;
+
+        &[disabled] {
+            background: $disabled;
+            color: $disabled-text;
+        }
+
+        &:not([disabled]):hover {
+            background: $primary;
+            cursor: pointer;
+        }
+    }
 }
 
-input[disabled] {
-    background: $disabled;
-    color: $disabled-text;
+.input-hint {
+    color: $success;
+    margin: 0;
 }
 
 .error {

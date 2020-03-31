@@ -12,29 +12,14 @@
     padding: $block-padding;
     background: $primary;
 
-    input {
-        font-size: $input-font-size;
-        height: $input-height;
-        border: none;
-    }
-
     input[type="text"] {
         margin-right: 10px;
         width: 290px;
-        padding: 2px 3px;
-        padding: 1px 5px;
+        border: none;
     }
 
     input[type="submit"] {
-        padding: 10px 30px;
-        background: $primary;
-        color: $white;
         border: 1px solid $white;
-        line-height: 0.7;
-
-        &:hover {
-            background: $primary-hover;
-        }
     }
 }
 

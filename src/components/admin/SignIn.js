@@ -57,7 +57,7 @@ class SignIn extends React.Component {
             }
         }
 
-        this.setState(prevState => ({
+        this.setState(() => ({
             isFormDisabled
         }));
     }
