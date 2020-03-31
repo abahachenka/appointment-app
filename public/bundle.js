@@ -47551,9 +47551,16 @@ var Logout = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      var account = this.props.account;
+      var name = account && (account.name || account.firstName + ' ' + account.lastName);
+      var accountUrl = account && account.name ? '/clinic-account' : '/doctor-account';
       return this.props.account ? _react["default"].createElement("div", {
         className: "logout"
-      }, _react["default"].createElement("button", {
+      }, _react["default"].createElement("span", {
+        className: "account-info"
+      }, "You are logged-in as ", _react["default"].createElement(_reactRouterDom.Link, {
+        to: accountUrl
+      }, name)), _react["default"].createElement("button", {
         onClick: this.logout
       }, "Logout")) : null;
     }

@@ -17,13 +17,29 @@
   position: absolute;
   right: 20px;
   top: 40px; }
+  .logout .account-info {
+    font-size: 14px;
+    margin-right: 10px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 13px;
+    max-width: 250px;
+    white-space: nowrap; }
+    .logout .account-info a {
+      text-decoration: underline;
+      color: white; }
+      .logout .account-info a:hover {
+        color: #f6f6f6;
+        text-decoration: none; }
   .logout button {
     border: 1px solid #fff;
     padding: 10px 15px;
     color: #fff;
     background: transparent;
     font-size: 16px;
-    cursor: pointer; }
+    cursor: pointer;
+    float: right; }
     .logout button:hover {
       background: #68b6ec; }
 

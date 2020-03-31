@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { accountLogout } from '../../actions/account';
 
 class Logout extends React.Component {
@@ -18,8 +18,13 @@ class Logout extends React.Component {
     }
 
     render() {
+        const {account} = this.props;
+        const name = account && (account.name || account.firstName + ' ' + account.lastName);
+        const accountUrl = (account && account.name) ? '/clinic-account' : '/doctor-account';
+
         return this.props.account ? (
             <div className="logout">
+                <span className="account-info">You are logged-in as <Link to={accountUrl}>{name}</Link></span>
                 <button onClick={this.logout}>Logout</button>
             </div>
         ): null;
