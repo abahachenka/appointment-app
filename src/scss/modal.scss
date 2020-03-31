@@ -28,6 +28,7 @@
         font-size: 18px;
         background: transparent;
         padding: 0;
+        color: $dark-violet;
         
         &:hover {
             cursor: pointer;
@@ -40,7 +41,7 @@
         font-weight: normal;
         margin: 0;
         padding: 0 50px 10px 0;
-        border-bottom: 1px solid $dark;
+        border-bottom: 1px solid $dark-violet;
     }
 
     .modal-description {

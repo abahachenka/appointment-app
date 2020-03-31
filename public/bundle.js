@@ -43706,7 +43706,7 @@ if (process.env.NODE_ENV === 'production') {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.accountLogout = exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.requestUserSignIn = exports.logout = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
+exports.accountLogout = exports.createNewAppointment = exports.addNewDoctorAddress = exports.addNewAddress = exports.getDoctorAddressList = exports.getAddressList = exports.activateAccount = exports.checkInvitationToken = exports.sendInvitation = exports.loadCategory = exports.loadDoctors = exports.loadDoctorCategories = exports.createNewDoctorCategory = exports.loadAccount = exports.loadDoctorAppointments = exports.requestUserSignIn = exports.logout = exports.loadDoctorAppointmentsError = exports.loadDoctorAppointmentsSuccess = exports.checkInvitationTokenError = exports.checkInvitationTokenSuccess = exports.activateAccountError = exports.activateAccountSuccess = exports.resetInvitationError = exports.getDoctorAddressListError = exports.getDoctorAddressListSuccess = exports.getAddressListError = exports.getAddressListSuccess = exports.sendInvitationError = exports.sendInvitationSuccess = exports.loadDoctorsError = exports.loadDoctorsSuccess = exports.loadDoctorCategoryError = exports.loadDoctorCategorySuccess = exports.resetAddCategoryError = exports.createNewDoctorCategoryError = exports.createNewDoctorCategorySuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.loadAccountError = exports.loadAccountSuccess = exports.resetSignInError = exports.signInError = exports.signInSuccess = exports.signInPending = void 0;
 
 var _userApi = require("../utils/user-api");
 
@@ -43822,6 +43822,14 @@ var createNewDoctorCategoryError = function createNewDoctorCategoryError(error) 
 };
 
 exports.createNewDoctorCategoryError = createNewDoctorCategoryError;
+
+var resetAddCategoryError = function resetAddCategoryError() {
+  return {
+    type: _actionTypes.RESET_DOCTOR_CATEGORY_ERROR
+  };
+};
+
+exports.resetAddCategoryError = resetAddCategoryError;
 
 var loadDoctorCategorySuccess = function loadDoctorCategorySuccess(category) {
   return {
@@ -45959,14 +45967,19 @@ var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var account = this.props.account;
+      var titleClassName = account && (account.phoneNumber || account.address) ? 'page-title with-border' : 'page-title';
       return _react["default"].createElement("main", {
         className: "account-page page-container"
+      }, _react["default"].createElement("header", {
+        className: "account-header"
       }, _react["default"].createElement("h1", {
-        className: "page-title"
+        className: titleClassName
       }, account && account.name), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/clinic-account/settings",
         className: "account-settings"
-      }, "Settings"), _react["default"].createElement(_DoctorCategories["default"], null));
+      }, "Settings"), _react["default"].createElement("div", {
+        className: "account-details"
+      }, account && account.phoneNumber && _react["default"].createElement("p", null, "Phone Number: ", account.phoneNumber), account && account.address && _react["default"].createElement("p", null, "Address: ", account.address))), _react["default"].createElement(_DoctorCategories["default"], null));
     }
   }]);
 
@@ -46620,7 +46633,7 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         to: "/doctor-account/settings",
         className: "account-settings"
       }, "Settings"), _react["default"].createElement("div", {
-        className: "doctor-details"
+        className: "account-details"
       }, _react["default"].createElement("p", null, "Specialisation: ", account.categoryName), _react["default"].createElement("p", null, "Room: ", account.room))) : null, _react["default"].createElement("section", {
         className: "data-section"
       }, _react["default"].createElement("header", {
@@ -46752,13 +46765,19 @@ var _reactRedux = require("react-redux");
 
 var _redux = require("redux");
 
-var _account = require("../../actions/account");
-
 var _Modal = _interopRequireDefault(require("./Modal"));
+
+var _account = require("../../actions/account");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -46776,6 +46795,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var initialState = {
+  isModalDisplayed: false,
+  isFormDisabled: true,
+  newCategory: null
+};
+
 var DoctorCategories = /*#__PURE__*/function (_React$Component) {
   _inherits(DoctorCategories, _React$Component);
 
@@ -46785,18 +46810,23 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
     _classCallCheck(this, DoctorCategories);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(DoctorCategories).call(this));
-    _this.state = {
-      isModalDisplayed: false,
-      newCategory: null
-    };
+    _this.state = _objectSpread({}, initialState);
     _this.showModal = _this.showModal.bind(_assertThisInitialized(_this));
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_this));
     _this.addNewCategory = _this.addNewCategory.bind(_assertThisInitialized(_this));
+    _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(DoctorCategories, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.props.categories && this.props.categories.length !== prevProps.categories.length) {
+        this.closeModal();
+      }
+    }
+  }, {
     key: "showModal",
     value: function showModal() {
       this.setState({
@@ -46812,17 +46842,28 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "onChange",
     value: function onChange(event) {
+      if (this.props.addCategoryError) {
+        this.props.resetAddCategoryError();
+      }
+
       this.setState({
         newCategory: event.target.value
+      }, this.checkEmpty);
+    }
+  }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormDisabled = !this.state.newCategory;
+      this.setState(function () {
+        return {
+          isFormDisabled: isFormDisabled
+        };
       });
     }
   }, {
     key: "closeModal",
     value: function closeModal() {
-      this.setState({
-        newCategory: null,
-        isModalDisplayed: false
-      });
+      this.setState(_objectSpread({}, initialState));
     }
   }, {
     key: "render",
@@ -46853,9 +46894,11 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
           disabled: true
         }, "Delete")));
       }))) : null), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
-        title: "Add New Doctors Category",
+        title: "Add New Category",
         onClose: this.closeModal
-      }, _react["default"].createElement("form", {
+      }, _react["default"].createElement("p", {
+        className: "error"
+      }, this.props.addCategoryError), _react["default"].createElement("form", {
         onSubmit: this.addNewCategory
       }, _react["default"].createElement("input", {
         type: "text",
@@ -46863,7 +46906,8 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
         onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "submit",
-        value: "Add"
+        value: "Add",
+        disabled: this.state.isFormDisabled
       }))) : null);
     }
   }]);
@@ -46874,14 +46918,16 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
 DoctorCategories.propTypes = {
   createNewCategory: _propTypes["default"].func,
   categories: _propTypes["default"].array,
-  error: _propTypes["default"].string
+  error: _propTypes["default"].string,
+  resetAddCategoryError: _propTypes["default"].func
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
   var doctorCategories = _ref.doctorCategories;
   return {
     categories: doctorCategories.categories,
-    error: doctorCategories.error
+    error: doctorCategories.error,
+    addCategoryError: doctorCategories.addCategoryError
   };
 };
 
@@ -46889,6 +46935,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
     createNewCategory: function createNewCategory(categoryName) {
       return (0, _account.createNewDoctorCategory)(categoryName);
+    },
+    resetAddCategoryError: function resetAddCategoryError() {
+      return (0, _account.resetAddCategoryError)();
     }
   }, dispatch);
 };
@@ -47834,7 +47883,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SAVE_SELECTED_DOCTOR_CATEGORY = exports.SAVE_SELECTED_CLINIC = exports.SAVE_USER_HOME_ADDRESS = exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.SAVE_SELECTED_DOCTOR_CATEGORY = exports.SAVE_SELECTED_CLINIC = exports.SAVE_USER_HOME_ADDRESS = exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.RESET_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -47863,6 +47912,8 @@ var CREATE_DOCTOR_CATEGORY_SUCCESS = 'CREATE_DOCTOR_CATEGORY_SUCCESS';
 exports.CREATE_DOCTOR_CATEGORY_SUCCESS = CREATE_DOCTOR_CATEGORY_SUCCESS;
 var CREATE_DOCTOR_CATEGORY_ERROR = 'CREATE_DOCTOR_CATEGORY_ERROR';
 exports.CREATE_DOCTOR_CATEGORY_ERROR = CREATE_DOCTOR_CATEGORY_ERROR;
+var RESET_DOCTOR_CATEGORY_ERROR = 'RESET_DOCTOR_CATEGORY_ERROR';
+exports.RESET_DOCTOR_CATEGORY_ERROR = RESET_DOCTOR_CATEGORY_ERROR;
 var LOAD_DOCTOR_CATEGORY_SUCCESS = 'LOAD_DOCTOR_CATEGORY_SUCCESS';
 exports.LOAD_DOCTOR_CATEGORY_SUCCESS = LOAD_DOCTOR_CATEGORY_SUCCESS;
 var LOAD_DOCTOR_CATEGORY_ERROR = 'LOAD_DOCTOR_CATEGORY_ERROR';
@@ -48239,7 +48290,8 @@ var initialState = {
   isInvitationAccepted: false,
   acceptInvitationError: '',
   isInvitationTokenValid: true,
-  invitationTokenError: ''
+  invitationTokenError: '',
+  addCategoryError: ''
 };
 
 var doctorCategoriesReducer = function doctorCategoriesReducer() {
@@ -48263,7 +48315,12 @@ var doctorCategoriesReducer = function doctorCategoriesReducer() {
 
     case _actionTypes.CREATE_DOCTOR_CATEGORY_ERROR:
       return _objectSpread({}, state, {
-        error: action.payload.error
+        addCategoryError: action.payload.error
+      });
+
+    case _actionTypes.RESET_DOCTOR_CATEGORY_ERROR:
+      return _objectSpread({}, state, {
+        addCategoryError: ''
       });
 
     case _actionTypes.LOAD_DOCTOR_CATEGORY_SUCCESS:

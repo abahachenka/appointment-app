@@ -3,6 +3,7 @@ import {
     DOCTOR_CATEGORIES_LOAD_ERROR,
     CREATE_DOCTOR_CATEGORY_SUCCESS,
     CREATE_DOCTOR_CATEGORY_ERROR,
+    RESET_DOCTOR_CATEGORY_ERROR,
     LOAD_DOCTOR_CATEGORY_SUCCESS,
     LOAD_DOCTOR_CATEGORY_ERROR,
     LOAD_DOCTORS_SUCCESS,
@@ -28,7 +29,8 @@ const initialState = {
     isInvitationAccepted: false,
     acceptInvitationError: '',
     isInvitationTokenValid: true,
-    invitationTokenError: ''
+    invitationTokenError: '',
+    addCategoryError: ''
 };
 
 const doctorCategoriesReducer = (state = initialState, action) => {
@@ -52,8 +54,15 @@ const doctorCategoriesReducer = (state = initialState, action) => {
         case CREATE_DOCTOR_CATEGORY_ERROR:
             return {
                 ...state,
-                error: action.payload.error
+                addCategoryError: action.payload.error
             };
+
+        case RESET_DOCTOR_CATEGORY_ERROR:
+            return {
+                ...state,
+                addCategoryError: ''
+            };
+
         case LOAD_DOCTOR_CATEGORY_SUCCESS:
             return {
                 ...state,

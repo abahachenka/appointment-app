@@ -19,11 +19,22 @@ class ClinicAccountPage extends React.Component {
 
     render() {
         const account = this.props.account;
+        const titleClassName = account && (account.phoneNumber || account.address) ? 'page-title with-border' : 'page-title';
 
         return (
             <main className="account-page page-container">
-                <h1 className="page-title">{account && account.name}</h1>
-                <Link to="/clinic-account/settings" className="account-settings">Settings</Link>
+                <header className="account-header">
+                    <h1 className={titleClassName}>{account && account.name}</h1>
+                    <Link to="/clinic-account/settings" className="account-settings">Settings</Link>
+                    <div className="account-details">
+                        {account && account.phoneNumber && (
+                            <p>Phone Number: {account.phoneNumber}</p>
+                        )}
+                        {account && account.address && (
+                            <p>Address: {account.address}</p>
+                        )}
+                    </div>
+                </header>
                 <DoctorCategories />
             </main>
         )

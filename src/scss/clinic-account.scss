@@ -1,8 +1,11 @@
 .account-page {
-    position: relative;
-
     .page-title {
         text-align: left;
+
+        &.with-border {
+            border-bottom: 1px solid $dark-violet;
+            padding: 8px 60px 8px 0;
+        }
     }
 
     .doctor-specialisations-list {
@@ -27,10 +30,16 @@
     }
 }
 
+
+
+.account-header {
+    position: relative;
+}
+
 .account-settings {
     position: absolute;
-    right: 30px;
-    top: 45px;
+    right: 0;
+    top: 8px;
     text-decoration: underline;
 
     &:hover {

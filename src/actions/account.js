@@ -33,6 +33,7 @@ import {
     DOCTOR_CATEGORIES_LOAD_ERROR,
     CREATE_DOCTOR_CATEGORY_SUCCESS,
     CREATE_DOCTOR_CATEGORY_ERROR,
+    RESET_DOCTOR_CATEGORY_ERROR,
     LOAD_DOCTOR_CATEGORY_SUCCESS,
     LOAD_DOCTOR_CATEGORY_ERROR,
     LOAD_DOCTORS_SUCCESS,
@@ -113,6 +114,10 @@ export const createNewDoctorCategoryError = (error) => ({
         error
     }
 });
+
+export const resetAddCategoryError = () => ({
+    type: RESET_DOCTOR_CATEGORY_ERROR
+})
 
 export const loadDoctorCategorySuccess = (category) => ({
     type: LOAD_DOCTOR_CATEGORY_SUCCESS,

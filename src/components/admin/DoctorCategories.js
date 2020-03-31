@@ -3,22 +3,35 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {createNewDoctorCategory} from '../../actions/account';
 import Modal from './Modal';
+import {
+    createNewDoctorCategory, 
+    resetAddCategoryError
+} from '../../actions/account';
+
+const initialState = {
+    isModalDisplayed: false,
+    isFormDisabled: true,
+    newCategory: null
+}
 
 class DoctorCategories extends React.Component {
     constructor() {
         super();
 
-        this.state = {
-            isModalDisplayed: false,
-            newCategory: null
-        };
+        this.state = {...initialState};
 
         this.showModal = this.showModal.bind(this);
         this.onChange = this.onChange.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.addNewCategory = this.addNewCategory.bind(this);
+        this.checkEmpty = this.checkEmpty.bind(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.categories && this.props.categories.length !== prevProps.categories.length) {
+            this.closeModal();
+        }
     }
 
     showModal() {
@@ -33,16 +46,25 @@ class DoctorCategories extends React.Component {
     }
 
     onChange(event) {
+        if (this.props.addCategoryError) {
+            this.props.resetAddCategoryError();
+        }
+
         this.setState({
             newCategory: event.target.value,
-        });
+        }, this.checkEmpty);
+    }
+
+    checkEmpty() {
+        let isFormDisabled = !this.state.newCategory;
+
+        this.setState(() => ({
+            isFormDisabled
+        }));
     }
 
     closeModal() {
-        this.setState({
-            newCategory: null,
-            isModalDisplayed: false
-        });
+        this.setState({...initialState});
     }
 
     render() {
@@ -89,10 +111,11 @@ class DoctorCategories extends React.Component {
                     ): null}
                 </section>
                 {this.state.isModalDisplayed ? (
-                    <Modal title="Add New Doctors Category" onClose={this.closeModal}>
+                    <Modal title="Add New Category" onClose={this.closeModal}>
+                        <p className="error">{this.props.addCategoryError}</p>
                         <form onSubmit={this.addNewCategory}>
                             <input type="text" placeholder="Category Name" onChange={this.onChange}/>
-                            <input type="submit" value="Add"/>
+                            <input type="submit" value="Add" disabled={this.state.isFormDisabled}/>
                         </form>
                     </Modal>
                 ): null}
@@ -105,16 +128,19 @@ class DoctorCategories extends React.Component {
 DoctorCategories.propTypes = {
     createNewCategory: PropTypes.func,
     categories: PropTypes.array,
-    error: PropTypes.string
+    error: PropTypes.string,
+    resetAddCategoryError: PropTypes.func
 }
 
 const mapStateToProps = ({doctorCategories}) => ({
     categories: doctorCategories.categories,
-    error: doctorCategories.error
+    error: doctorCategories.error,
+    addCategoryError: doctorCategories.addCategoryError
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    createNewCategory: (categoryName) => createNewDoctorCategory(categoryName)
+    createNewCategory: (categoryName) => createNewDoctorCategory(categoryName),
+    resetAddCategoryError: () => resetAddCategoryError()
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(DoctorCategories);
