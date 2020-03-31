@@ -46557,7 +46557,8 @@ var initialState = {
   appointment: {
     date: null,
     time: '09:00'
-  }
+  },
+  isFormDisabled: true
 };
 
 var DoctorAccount = /*#__PURE__*/function (_React$Component) {
@@ -46604,7 +46605,7 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         return {
           appointment: _objectSpread({}, prevState.appointment, _defineProperty({}, name, value))
         };
-      });
+      }, this.checkEmpty);
     }
   }, {
     key: "openModal",
@@ -46620,6 +46621,24 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
       this.props.createNewAppointment(this.state.appointment);
     }
   }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormDisabled = false;
+
+      for (var prop in this.state.appointment) {
+        if (!this.state.appointment[prop]) {
+          isFormDisabled = true;
+          break;
+        }
+      }
+
+      this.setState(function () {
+        return {
+          isFormDisabled: isFormDisabled
+        };
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
@@ -46629,12 +46648,14 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
           appointments = _this$props.appointments;
       return _react["default"].createElement("main", {
         className: "doctor-account-page account-page page-container"
-      }, _react["default"].createElement("p", null, this.props.error), account ? _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("h1", {
+      }, _react["default"].createElement("p", null, this.props.error), account ? _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("header", {
+        className: "account-header"
+      }, _react["default"].createElement("h1", {
         className: "page-title"
       }, account.title, ". ", account.firstName, " ", account.lastName), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/doctor-account/settings",
         className: "account-settings"
-      }, "Settings"), _react["default"].createElement("div", {
+      }, "Settings")), _react["default"].createElement("div", {
         className: "account-details"
       }, _react["default"].createElement("p", null, "Specialisation: ", account.categoryName), _react["default"].createElement("p", null, "Room: ", account.room))) : null, _react["default"].createElement("section", {
         className: "data-section"
@@ -46643,9 +46664,9 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("h2", {
         className: "data-section-title"
       }, "Appointments"), _react["default"].createElement("button", {
-        className: "data-section-btn",
+        className: "data-section-btn button-primary",
         onClick: this.openModal
-      }, "Add New")), appointments && appointments.length && _react["default"].createElement("table", {
+      }, "Add New")), _react["default"].createElement("table", {
         className: "data-table"
       }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Date"), _react["default"].createElement("th", null, "Time"), _react["default"].createElement("th", null, "Patient"))), _react["default"].createElement("tbody", null, appointments.map(function (appointment, index) {
         var datetime = (0, _moment["default"])(appointment.datetime);
@@ -46654,7 +46675,9 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         return _react["default"].createElement("tr", {
           key: index
         }, _react["default"].createElement("td", null, date), _react["default"].createElement("td", null, time), _react["default"].createElement("td", null, appointment.patient));
-      })))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
+      }), !appointments.length ? _react["default"].createElement("tr", null, _react["default"].createElement("td", {
+        colSpan: "3"
+      }, "There are no entries yet")) : null))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Appointment",
         onClose: this.closeModal
       }, _react["default"].createElement("form", {
@@ -46665,6 +46688,7 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("input", {
         type: "date",
         name: "date",
+        min: new Date().toISOString().split("T")[0],
         onChange: this.onChange
       }), _react["default"].createElement("select", {
         name: "time",
@@ -46708,7 +46732,8 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         val: "17:30"
       }, "17:30")), _react["default"].createElement("input", {
         type: "submit",
-        value: "OK"
+        value: "OK",
+        disabled: this.state.isFormDisabled
       }))) : null);
     }
   }]);

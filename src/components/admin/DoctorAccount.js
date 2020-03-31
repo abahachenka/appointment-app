@@ -15,7 +15,8 @@ const initialState = {
     appointment: {
         date: null,
         time: '09:00'
-    }
+    },
+    isFormDisabled: true
 }
 
 class DoctorAccount extends React.Component { 
@@ -49,7 +50,7 @@ class DoctorAccount extends React.Component {
 
         this.setState(prevState => ({
             appointment: { ...prevState.appointment, [name]: value },
-        }));
+        }), this.checkEmpty);
     }
 
     openModal() {
@@ -62,6 +63,21 @@ class DoctorAccount extends React.Component {
         this.props.createNewAppointment(this.state.appointment);
     }
 
+    checkEmpty() {
+        let isFormDisabled = false;
+
+        for (let prop in this.state.appointment) {
+            if (!this.state.appointment[prop]) {
+                isFormDisabled = true;
+                break;
+            }
+        }
+
+        this.setState(() => ({
+            isFormDisabled
+        }));
+    }
+
     render() {
         const {account, appointments} = this.props;
 
@@ -70,8 +86,11 @@ class DoctorAccount extends React.Component {
                 <p>{this.props.error}</p>
                 {account ? (
                     <React.Fragment>
-                        <h1 className="page-title">{account.title}. {account.firstName} {account.lastName}</h1>
-                        <Link to="/doctor-account/settings" className="account-settings">Settings</Link>
+                        <header className="account-header">
+                            <h1 className="page-title">{account.title}. {account.firstName} {account.lastName}</h1>
+                            <Link to="/doctor-account/settings" className="account-settings">Settings</Link>
+                        </header>
+
                         <div className="account-details">
                             <p>Specialisation: {account.categoryName}</p>
                             <p>Room: {account.room}</p>
@@ -82,41 +101,44 @@ class DoctorAccount extends React.Component {
                 <section className="data-section">
                     <header className="data-section-header">
                         <h2 className="data-section-title">Appointments</h2>
-                        <button className="data-section-btn" onClick={this.openModal}>Add New</button>
+                        <button className="data-section-btn button-primary" onClick={this.openModal}>Add New</button>
                     </header>
 
-                    {appointments && appointments.length && (
-                        <table className="data-table">
-                            <thead>
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Patient</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {appointments.map((appointment, index) => {
+                                const datetime = moment(appointment.datetime);
+                                const date = datetime.format('DD/MMM/YYYY');
+                                const time = datetime.format('HH:mm');
+                                
+                                return (
+                                    <tr key={index}>
+                                        <td>{date}</td>
+                                        <td>{time}</td>
+                                        <td>{appointment.patient}</td>
+                                    </tr>
+                                )
+                            })}
+                            {!appointments.length ? (
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Time</th>
-                                    <th>Patient</th>
+                                    <td colSpan="3">There are no entries yet</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {appointments.map((appointment, index) => {
-                                    const datetime = moment(appointment.datetime);
-                                    const date = datetime.format('DD/MMM/YYYY');
-                                    const time = datetime.format('HH:mm');
-                                    
-                                    return (
-                                        <tr key={index}>
-                                            <td>{date}</td>
-                                            <td>{time}</td>
-                                            <td>{appointment.patient}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    )}
+                            ) : null}
+                        </tbody>
+                    </table>
                 </section>
 
                 {this.state.isModalDisplayed ? (
                     <Modal title="Add New Appointment" onClose={this.closeModal}>
                         <form ref={(el) => this.appointmentForm = el} onSubmit={this.addNewAppointment}>
-                            <input type="date" name="date" onChange={this.onChange}/>
+                            <input type="date" name="date" min={new Date().toISOString().split("T")[0]} onChange={this.onChange}/>
                             <select name="time" onChange={this.onChange}>
                                 <option val="09:00" defaultValue>09:00</option>
                                 <option val="09:30">09:30</option>
@@ -137,7 +159,7 @@ class DoctorAccount extends React.Component {
                                 <option val="17:00">17:00</option>
                                 <option val="17:30">17:30</option>
                             </select>
-                            <input type="submit" value="OK"/>
+                            <input type="submit" value="OK" disabled={this.state.isFormDisabled}/>
                         </form>
                     </Modal>
                 ): null}
