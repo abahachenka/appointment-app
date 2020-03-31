@@ -46832,19 +46832,26 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
         className: "doctor-specialisations"
       }, _react["default"].createElement("h2", {
         className: "page-subtitle"
-      }, "Doctor Specialisations"), _react["default"].createElement("button", {
-        onClick: this.showModal
+      }, "Doctor Categories"), _react["default"].createElement("button", {
+        onClick: this.showModal,
+        className: "button-primary"
       }, "Add New"), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), categories && categories.length ? _react["default"].createElement("div", {
-        className: "doctor-specialisations-list"
-      }, _react["default"].createElement("ul", null, categories.map(function (category, index) {
+      }, this.props.error), categories && categories.length ? _react["default"].createElement("table", {
+        className: "data-table"
+      }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Category"), _react["default"].createElement("th", null, "Active"), _react["default"].createElement("th", null, "Invited"), _react["default"].createElement("th", null, "Total"), _react["default"].createElement("th", null))), _react["default"].createElement("tbody", null, categories.map(function (category, index) {
         var link = '/clinic-account/category/' + category.categoryAlias;
-        return _react["default"].createElement("li", {
+        return _react["default"].createElement("tr", {
           key: index
-        }, _react["default"].createElement(_reactRouterDom.Link, {
+        }, _react["default"].createElement("td", null, _react["default"].createElement(_reactRouterDom.Link, {
           to: link
-        }, category.categoryName));
+        }, category.categoryName)), _react["default"].createElement("td", null, "0"), _react["default"].createElement("td", null, "0"), _react["default"].createElement("td", null, "0"), _react["default"].createElement("td", {
+          className: "controls"
+        }, _react["default"].createElement("button", {
+          disabled: true
+        }, "Edit"), _react["default"].createElement("button", {
+          disabled: true
+        }, "Delete")));
       }))) : null), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Doctors Category",
         onClose: this.closeModal

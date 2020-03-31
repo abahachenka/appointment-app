@@ -46,19 +46,10 @@
         padding: 10px 110px 10px 0;
     }
 
-    button {
+    .button-primary {
         position: absolute;
         right: 0;
         top: 10px;
-        background: $primary;
-        border: none;
-        color: $white;
-        height: $input-height;
-        font-size: $input-font-size;
         width: 100px;
-
-        &:hover {
-            background: $primary-hover;
-        }
     }
 }

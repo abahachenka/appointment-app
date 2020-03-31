@@ -51,25 +51,41 @@ class DoctorCategories extends React.Component {
         return (
             <React.Fragment>
                 <section className="doctor-specialisations">
-                    <h2 className="page-subtitle">Doctor Specialisations</h2>
-                    <button onClick={this.showModal}>Add New</button>
+                    <h2 className="page-subtitle">Doctor Categories</h2>
+                    <button onClick={this.showModal} className="button-primary">Add New</button>
                     
                     <p className="error">{this.props.error}</p>
 
                     {categories && categories.length ? (
-                        <div className="doctor-specialisations-list">
-                            <ul>
+                        <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Active</th>
+                                        <th>Invited</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                 {categories.map((category, index) => {
                                     const link = '/clinic-account/category/' + category.categoryAlias;
 
                                     return (
-                                        <li key={index}>
-                                            <Link to={link}>{category.categoryName}</Link>
-                                        </li>
+                                        <tr key={index}>
+                                            <td><Link to={link}>{category.categoryName}</Link></td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td className="controls">
+                                                <button disabled>Edit</button>
+                                                <button disabled>Delete</button>
+                                            </td>
+                                        </tr>
                                     )
                                 })}
-                            </ul>
-                        </div>
+                            </tbody>
+                        </table>
                     ): null}
                 </section>
                 {this.state.isModalDisplayed ? (

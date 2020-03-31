@@ -361,18 +361,11 @@
   .doctor-specialisations .page-subtitle {
     border-bottom: 1px solid #000;
     padding: 10px 110px 10px 0; }
-  .doctor-specialisations button {
+  .doctor-specialisations .button-primary {
     position: absolute;
     right: 0;
     top: 10px;
-    background: #73c5ff;
-    border: none;
-    color: #fff;
-    height: 35px;
-    font-size: 16px;
     width: 100px; }
-    .doctor-specialisations button:hover {
-      background: #68b6ec; }
 
 .breadcrumbs {
   padding: 0; }
@@ -470,6 +463,12 @@
   .data-table tbody tr:not(.disabled):hover td {
     background: #d9efff;
     border-color: #d9efff; }
+  .data-table .controls {
+    color: #888;
+    width: 110px;
+    text-align: center; }
+    .data-table .controls button {
+      margin: 0 2px; }
 
 .data-section-header {
   position: relative; }

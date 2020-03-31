@@ -35,4 +35,14 @@
             }
         }
     }
+
+    .controls {
+        color: $disabled-text;
+        width: 110px;
+        text-align: center;
+
+        button {
+            margin: 0 2px;
+        }
+    }
 }
