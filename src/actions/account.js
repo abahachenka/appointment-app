@@ -275,7 +275,7 @@ export const loadAccount = () => {
                 dispatch(loadAccountSuccess(resp.data))
             })
             .catch(err => {
-                dispatch(loadAccountError(err.response.data));
+                dispatch(loadAccountError(err.response && err.response.data));
             });
     }
 }

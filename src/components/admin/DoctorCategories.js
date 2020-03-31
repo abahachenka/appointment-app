@@ -78,37 +78,40 @@ class DoctorCategories extends React.Component {
                     
                     <p className="error">{this.props.error}</p>
 
-                    {categories && categories.length ? (
-                        <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Active</th>
-                                        <th>Invited</th>
-                                        <th>Total</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {categories.map((category, index) => {
-                                    const link = '/clinic-account/category/' + category.categoryAlias;
+                    <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Active</th>
+                                    <th>Invited</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {categories.map((category, index) => {
+                                const link = '/clinic-account/category/' + category.categoryAlias;
 
-                                    return (
-                                        <tr key={index}>
-                                            <td><Link to={link}>{category.categoryName}</Link></td>
-                                            <td>{category.doctors.active}</td>
-                                            <td>{category.doctors.invited}</td>
-                                            <td>{category.doctors.active + category.doctors.invited}</td>
-                                            <td className="controls">
-                                                <button disabled>Edit</button>
-                                                <button disabled>Delete</button>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    ): null}
+                                return (
+                                    <tr key={index}>
+                                        <td><Link to={link}>{category.categoryName}</Link></td>
+                                        <td>{category.doctors.active}</td>
+                                        <td>{category.doctors.invited}</td>
+                                        <td>{category.doctors.active + category.doctors.invited}</td>
+                                        <td className="controls">
+                                            <button disabled>Edit</button>
+                                            <button disabled>Delete</button>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                            {!categories.length ? (
+                                <tr>
+                                    <td colSpan="5">There are no entries yet</td>
+                                </tr>
+                            ) : null}
+                        </tbody>
+                    </table>
                 </section>
                 {this.state.isModalDisplayed ? (
                     <Modal title="Add New Category" onClose={this.closeModal}>

@@ -5,7 +5,7 @@ class DoctorsList extends React.Component {
     render() {
         const doctors = this.props.items;
 
-        return doctors && doctors.length ? (
+        return (
             <table className="data-table">
                 <thead>
                     <tr>
@@ -32,9 +32,14 @@ class DoctorsList extends React.Component {
                         </tr>
                     )
                 })}
+                {!doctors.length ? (
+                    <tr>
+                        <td colSpan="6">There are no entries yet</td>
+                    </tr>
+                ) : null}
                 </tbody>
             </table>
-        ): null;
+        )
     }
 }
 

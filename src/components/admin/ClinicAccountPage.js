@@ -24,6 +24,7 @@ class ClinicAccountPage extends React.Component {
         return (
             <main className="account-page page-container">
                 <header className="account-header">
+                    <p className="error">{this.props.error}</p>
                     <h1 className={titleClassName}>{account && account.name}</h1>
                     <Link to="/clinic-account/settings" className="account-settings">Settings</Link>
                     <div className="account-details">

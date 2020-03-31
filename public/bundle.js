@@ -44058,7 +44058,7 @@ var loadAccount = function loadAccount() {
 
       dispatch(loadAccountSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadAccountError(err.response.data));
+      dispatch(loadAccountError(err.response && err.response.data));
     });
   };
 };
@@ -45972,7 +45972,9 @@ var ClinicAccountPage = /*#__PURE__*/function (_React$Component) {
         className: "account-page page-container"
       }, _react["default"].createElement("header", {
         className: "account-header"
-      }, _react["default"].createElement("h1", {
+      }, _react["default"].createElement("p", {
+        className: "error"
+      }, this.props.error), _react["default"].createElement("h1", {
         className: titleClassName
       }, account && account.name), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/clinic-account/settings",
@@ -46878,7 +46880,7 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
         className: "button-primary"
       }, "Add New"), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), categories && categories.length ? _react["default"].createElement("table", {
+      }, this.props.error), _react["default"].createElement("table", {
         className: "data-table"
       }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Category"), _react["default"].createElement("th", null, "Active"), _react["default"].createElement("th", null, "Invited"), _react["default"].createElement("th", null, "Total"), _react["default"].createElement("th", null))), _react["default"].createElement("tbody", null, categories.map(function (category, index) {
         var link = '/clinic-account/category/' + category.categoryAlias;
@@ -46893,7 +46895,9 @@ var DoctorCategories = /*#__PURE__*/function (_React$Component) {
         }, "Edit"), _react["default"].createElement("button", {
           disabled: true
         }, "Delete")));
-      }))) : null), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
+      }), !categories.length ? _react["default"].createElement("tr", null, _react["default"].createElement("td", {
+        colSpan: "5"
+      }, "There are no entries yet")) : null))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Category",
         onClose: this.closeModal
       }, _react["default"].createElement("p", {
@@ -47338,7 +47342,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
         className: "separator"
       }, ">")), _react["default"].createElement("li", null, _react["default"].createElement("a", {
         href: "/clinic-account"
-      }, "Doctor Specialisations"), _react["default"].createElement("span", {
+      }, "Doctor Categories"), _react["default"].createElement("span", {
         className: "separator"
       }, ">")), _react["default"].createElement("li", null, categoryName)), _react["default"].createElement("section", {
         className: "doctors data-section"
@@ -47492,7 +47496,7 @@ var DoctorsList = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       var doctors = this.props.items;
-      return doctors && doctors.length ? _react["default"].createElement("table", {
+      return _react["default"].createElement("table", {
         className: "data-table"
       }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Last Name"), _react["default"].createElement("th", null, "First Name"), _react["default"].createElement("th", null, "Title"), _react["default"].createElement("th", null, "Room"), _react["default"].createElement("th", null, "Email"), _react["default"].createElement("th", null, "Status"))), _react["default"].createElement("tbody", null, doctors.map(function (doctor, index) {
         var isDisabled = doctor.status === 'invited';
@@ -47500,7 +47504,9 @@ var DoctorsList = /*#__PURE__*/function (_React$Component) {
           key: index,
           className: isDisabled ? "disabled" : null
         }, _react["default"].createElement("td", null, doctor.lastName), _react["default"].createElement("td", null, doctor.firstName), _react["default"].createElement("td", null, doctor.title), _react["default"].createElement("td", null, doctor.room), _react["default"].createElement("td", null, doctor.email), _react["default"].createElement("td", null, doctor.status));
-      }))) : null;
+      }), !doctors.length ? _react["default"].createElement("tr", null, _react["default"].createElement("td", {
+        colSpan: "6"
+      }, "There are no entries yet")) : null));
     }
   }]);
 

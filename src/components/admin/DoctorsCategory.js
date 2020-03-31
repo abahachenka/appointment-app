@@ -107,7 +107,7 @@ class DoctorsCategory extends React.Component {
                         <span className="separator">&gt;</span>
                     </li>
                     <li>
-                        <a href="/clinic-account">Doctor Specialisations</a>
+                        <a href="/clinic-account">Doctor Categories</a>
                         <span className="separator">&gt;</span>
                     </li>
                     <li>{categoryName}</li>
