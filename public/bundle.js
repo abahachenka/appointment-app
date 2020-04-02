@@ -44231,7 +44231,7 @@ exports.accountLogout = accountLogout;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.cancelAppointment = exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.saveSelectedDoctorCategory = exports.saveSelectedClinic = exports.cancelAppointmentError = exports.cancelAppointmentSuccess = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = void 0;
+exports.cancelAppointment = exports.completeRegistration = exports.loadAppointments = exports.saveDoctorCategory = exports.saveClinic = exports.loadDoctorCategories = exports.searchClinic = exports.saveUserHomeAddress = exports.saveSelectedDoctorCategory = exports.saveSelectedClinic = exports.cancelAppointmentError = exports.cancelAppointmentSuccess = exports.registrationError = exports.registrationSuccess = exports.saveAppointment = exports.loadAppointmentsError = exports.loadAppointmentsSuccess = exports.loadDoctorCategoriesError = exports.loadDoctorCategoriesSuccess = exports.searchClinicError = exports.searchClinicSuccess = exports.searchClinicPending = void 0;
 
 var _appointmentsApi = require("../utils/appointments-api");
 
@@ -44240,6 +44240,14 @@ var _clinicsApi = require("../utils/clinics-api");
 var _doctorsApi = require("../utils/doctors-api");
 
 var _actionTypes = require("../constants/action-types");
+
+var searchClinicPending = function searchClinicPending() {
+  return {
+    type: _actionTypes.SEARCH_CLINIC_PENDING
+  };
+};
+
+exports.searchClinicPending = searchClinicPending;
 
 var searchClinicSuccess = function searchClinicSuccess(clinics) {
   return {
@@ -44395,6 +44403,7 @@ exports.saveUserHomeAddress = saveUserHomeAddress;
 var searchClinic = function searchClinic(params) {
   return function (dispatch) {
     dispatch(saveUserHomeAddress(params));
+    dispatch(searchClinicPending());
     (0, _clinicsApi.searchClinicByHomeAddress)(params).then(function (resp) {
       dispatch(searchClinicSuccess(resp.data));
     })["catch"](function (err) {
@@ -45348,10 +45357,16 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(NewAppointment).call(this));
     _this.state = {
-      search: null
+      search: {
+        place: null,
+        street: null,
+        building: null
+      },
+      isFormDisabled: true
     };
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.searchClinic = _this.searchClinic.bind(_assertThisInitialized(_this));
+    _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -45378,6 +45393,24 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
         return {
           search: _objectSpread({}, prevState.search, _defineProperty({}, name, value))
         };
+      }, this.checkEmpty);
+    }
+  }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormDisabled = false;
+
+      for (var prop in this.state.search) {
+        if (!this.state.search[prop]) {
+          isFormDisabled = true;
+          break;
+        }
+      }
+
+      this.setState(function () {
+        return {
+          isFormDisabled: isFormDisabled
+        };
       });
     }
   }, {
@@ -45391,6 +45424,7 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
+      var isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
       return _react["default"].createElement("main", {
         className: "page-container address-search"
       }, _react["default"].createElement("h1", {
@@ -45431,10 +45465,11 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
         onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "submit",
-        value: "Search"
+        value: "Search",
+        disabled: isSubmitDisabled
       })), this.props.error && _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), this.props.clinics.length ? _react["default"].createElement("section", {
+      }, this.props.error), this.props.clinics && this.props.clinics.length ? _react["default"].createElement("section", {
         className: "search-results"
       }, _react["default"].createElement("h2", {
         className: "page-subtitle"
@@ -45451,7 +45486,11 @@ var NewAppointment = /*#__PURE__*/function (_React$Component) {
         }, _react["default"].createElement(_reactRouterDom.Link, {
           to: url
         }, clinic.name)), clinic.address && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Address:"), " ", clinic.address), clinic.phoneNumber && _react["default"].createElement("p", null, _react["default"].createElement("strong", null, "Phone Number:"), " ", clinic.phoneNumber));
-      }))) : null);
+      }))) : this.props.clinics && this.props.clinics.length === 0 && _react["default"].createElement("section", {
+        className: "search-results"
+      }, _react["default"].createElement("h2", {
+        className: "page-subtitle"
+      }, "Search results"), _react["default"].createElement("p", null, "No entries found")));
     }
   }]);
 
@@ -45463,12 +45502,14 @@ NewAppointment.propTypes = {
   error: _propTypes["default"].string,
   searchClinic: _propTypes["default"].func,
   saveClinic: _propTypes["default"].func,
-  history: _propTypes["default"].object
+  history: _propTypes["default"].object,
+  isPending: _propTypes["default"].bool
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
   var appointments = _ref.appointments;
   return {
+    isPending: appointments.isClinicsSearchPending,
     clinics: appointments.clinics,
     error: appointments.error
   };
@@ -47995,7 +48036,7 @@ exports.API_URL = API_URL;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SAVE_SELECTED_DOCTOR_CATEGORY = exports.SAVE_SELECTED_CLINIC = exports.SAVE_USER_HOME_ADDRESS = exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.RESET_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
+exports.SAVE_SELECTED_DOCTOR_CATEGORY = exports.SAVE_SELECTED_CLINIC = exports.SAVE_USER_HOME_ADDRESS = exports.ACCOUNT_LOGOUT = exports.CANCEL_APPOINTMENT_ERROR = exports.CANCEL_APPOINTMENT_SUCCESS = exports.APPOINTMENT_REGISTRATION_ERROR = exports.APPOINTMENT_REGISTRATION_SUCCESS = exports.SAVE_SELECTED_APPOINTMENT = exports.LOAD_AVAILABLE_APPOINTMENTS_ERROR = exports.LOAD_AVAILABLE_APPOINTMENTS_SUCCESS = exports.LOAD_DOCTOR_CATEGORIES_ERROR = exports.LOAD_DOCTOR_CATEGORIES_SUCCESS = exports.SEARCH_CLINIC_ERROR = exports.SEARCH_CLINIC_SUCCESS = exports.SEARCH_CLINIC_PENDING = exports.LOAD_DOCTOR_APPOINTMENT_ERROR = exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = exports.GET_DOCTOR_ADDRESS_LIST_ERROR = exports.GET_DOCTOR_ADDRESS_LIST_SUCCESS = exports.GET_CLINIC_ADDRESS_LIST_ERROR = exports.GET_CLINIC_ADDRESS_LIST_SUCCESS = exports.CHECK_INVITATION_TOKEN_ERROR = exports.CHECK_INVITATION_TOKEN_SUCCESS = exports.ACTIVATION_ACCOUNT_ERROR = exports.ACTIVATION_ACCOUNT_SUCCESS = exports.SEND_INVITATION_ERROR_RESET = exports.SEND_INVITATION_ERROR = exports.SEND_INVITATION_SUCCESS = exports.LOAD_DOCTORS_ERROR = exports.LOAD_DOCTORS_SUCCESS = exports.LOAD_DOCTOR_CATEGORY_ERROR = exports.LOAD_DOCTOR_CATEGORY_SUCCESS = exports.RESET_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_ERROR = exports.CREATE_DOCTOR_CATEGORY_SUCCESS = exports.DOCTOR_CATEGORIES_LOAD_ERROR = exports.DOCTOR_CATEGORIES_LOAD_SUCCESS = exports.ACCOUNT_LOAD_ERROR = exports.ACCOUNT_LOAD_SUCCESS = exports.SIGN_IN_RESET_ERROR = exports.SIGN_IN_ERROR = exports.SIGN_IN_PENDING = exports.SIGN_IN_SUCCESS = exports.REGISTER_RESET_ERROR = exports.REGISTER_CLINIC_ERROR = exports.REGISTER_CLINIC_PENDING = exports.REGISTER_CLINIC_SUCCESS = void 0;
 var REGISTER_CLINIC_SUCCESS = 'REGISTER_CLINIC_SUCCESS';
 exports.REGISTER_CLINIC_SUCCESS = REGISTER_CLINIC_SUCCESS;
 var REGISTER_CLINIC_PENDING = 'REGISTER_CLINIC_PENDING';
@@ -48060,6 +48101,8 @@ var LOAD_DOCTOR_APPOINTMENT_SUCCESS = 'LOAD_DOCTOR_APPOINTMENT_SUCCESS';
 exports.LOAD_DOCTOR_APPOINTMENT_SUCCESS = LOAD_DOCTOR_APPOINTMENT_SUCCESS;
 var LOAD_DOCTOR_APPOINTMENT_ERROR = 'LOAD_DOCTOR_APPOINTMENT_ERROR';
 exports.LOAD_DOCTOR_APPOINTMENT_ERROR = LOAD_DOCTOR_APPOINTMENT_ERROR;
+var SEARCH_CLINIC_PENDING = 'SEARCH_CLINIC_PENDING';
+exports.SEARCH_CLINIC_PENDING = SEARCH_CLINIC_PENDING;
 var SEARCH_CLINIC_SUCCESS = 'SEARCH_CLINIC_SUCCESS';
 exports.SEARCH_CLINIC_SUCCESS = SEARCH_CLINIC_SUCCESS;
 var SEARCH_CLINIC_ERROR = 'SEARCH_CLINIC_ERROR';
@@ -48128,7 +48171,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var initialState = {
   userHomeAddress: null,
-  clinics: [],
+  isClinicsSearchPending: false,
+  clinics: null,
   selectedClinic: null,
   doctorCategories: [],
   selectedDoctorCategory: null,
@@ -48149,13 +48193,20 @@ var appointmentsReducer = function appointmentsReducer() {
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
+    case _actionTypes.SEARCH_CLINIC_PENDING:
+      return _objectSpread({}, state, {
+        isClinicsSearchPending: true
+      });
+
     case _actionTypes.SEARCH_CLINIC_SUCCESS:
       return _objectSpread({}, state, {
+        isClinicsSearchPending: false,
         clinics: action.payload.clinics
       });
 
     case _actionTypes.SEARCH_CLINIC_ERROR:
       return _objectSpread({}, state, {
+        isClinicsSearchPending: false,
         error: action.payload.error
       });
 

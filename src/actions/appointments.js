@@ -7,6 +7,7 @@ import {searchClinicByHomeAddress} from '../utils/clinics-api';
 import {getDoctorCategories} from '../utils/doctors-api';
 
 import {
+    SEARCH_CLINIC_PENDING, 
     SEARCH_CLINIC_SUCCESS, 
     SEARCH_CLINIC_ERROR,
     LOAD_DOCTOR_CATEGORIES_SUCCESS,
@@ -22,6 +23,10 @@ import {
     SAVE_SELECTED_DOCTOR_CATEGORY,
     SAVE_USER_HOME_ADDRESS
 } from '../constants/action-types';
+
+export const searchClinicPending = () => ({
+    type: SEARCH_CLINIC_PENDING
+});
 
 export const searchClinicSuccess = clinics => ({
     type: SEARCH_CLINIC_SUCCESS,
@@ -121,6 +126,7 @@ export const saveUserHomeAddress = address => ({
 export const searchClinic = params => {
     return dispatch => {
         dispatch(saveUserHomeAddress(params));
+        dispatch(searchClinicPending());
 
         searchClinicByHomeAddress(params)
             .then(resp => {

@@ -1,4 +1,5 @@
 import {
+    SEARCH_CLINIC_PENDING,
     SEARCH_CLINIC_SUCCESS, 
     SEARCH_CLINIC_ERROR,
     LOAD_DOCTOR_CATEGORIES_SUCCESS,
@@ -17,7 +18,8 @@ import {
 
 const initialState = {
     userHomeAddress: null,
-    clinics: [],
+    isClinicsSearchPending: false,
+    clinics: null,
     selectedClinic: null,
     doctorCategories: [],
     selectedDoctorCategory: null,
@@ -39,15 +41,22 @@ const initialState = {
 
 const appointmentsReducer = (state = initialState, action) => {
     switch (action.type) {
+        case SEARCH_CLINIC_PENDING:
+            return {
+                ...state,
+                isClinicsSearchPending: true
+            }
         case SEARCH_CLINIC_SUCCESS: 
             return {
                 ...state,
+                isClinicsSearchPending: false,
                 clinics: action.payload.clinics
             }
 
         case SEARCH_CLINIC_ERROR:
             return {
                 ...state,
+                isClinicsSearchPending: false,
                 error: action.payload.error
             }
 

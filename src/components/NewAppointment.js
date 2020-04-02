@@ -10,11 +10,17 @@ class NewAppointment extends React.Component {
         super();
 
         this.state = {
-            search: null
+            search: {
+                place: null,
+                street: null,
+                building: null
+            },
+            isFormDisabled: true
         };
 
         this.onChange = this.onChange.bind(this);
         this.searchClinic = this.searchClinic.bind(this);
+        this.checkEmpty = this.checkEmpty.bind(this);
     }
 
     componentDidMount() {
@@ -25,7 +31,6 @@ class NewAppointment extends React.Component {
 
     searchClinic(event) {
         event.preventDefault();
-
         this.props.searchClinic(this.state.search);
     }
 
@@ -34,6 +39,21 @@ class NewAppointment extends React.Component {
 
         this.setState(prevState => ({
             search: { ...prevState.search, [name]: value },
+        }), this.checkEmpty);
+    }
+
+    checkEmpty() {
+        let isFormDisabled = false;
+
+        for (let prop in this.state.search) {
+            if (!this.state.search[prop]) {
+                isFormDisabled = true;
+                break;
+            }
+        }
+
+        this.setState(() => ({
+            isFormDisabled
         }));
     }
 
@@ -43,6 +63,7 @@ class NewAppointment extends React.Component {
     }
 
     render() {
+        const isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
         return (
             <main className="page-container address-search">
                 <h1 className="page-title">Enter your home address</h1>
@@ -59,14 +80,14 @@ class NewAppointment extends React.Component {
 
                     <input type="text" name="street" placeholder="Street" onChange={this.onChange} />
                     <input type="text" name="building" placeholder="Building" onChange={this.onChange} />
-                    <input type="submit" value="Search" />
+                    <input type="submit" value="Search" disabled={isSubmitDisabled}/>
                 </form>
 
                 {this.props.error && (
                     <p className="error">{this.props.error}</p>
                 )}
 
-                {this.props.clinics.length ? (
+                {(this.props.clinics && this.props.clinics.length) ? (
                     <section className="search-results">
                         <h2 className="page-subtitle">Search results</h2>
                         <ul className="search-results-list category-list">
@@ -87,7 +108,12 @@ class NewAppointment extends React.Component {
                             })}
                         </ul>
                     </section>
-                ) : null}
+                ) : (this.props.clinics && this.props.clinics.length === 0) && (
+                     <section className="search-results">
+                        <h2 className="page-subtitle">Search results</h2>
+                        <p>No entries found</p>
+                    </section>
+                )}
             </main>
         )
     }
@@ -99,10 +125,12 @@ NewAppointment.propTypes = {
     error: PropTypes.string,
     searchClinic: PropTypes.func,
     saveClinic: PropTypes.func,
-    history: PropTypes.object
+    history: PropTypes.object,
+    isPending: PropTypes.bool
 }
 
 const mapStateToProps = ({appointments}) => ({
+    isPending: appointments.isClinicsSearchPending,
     clinics: appointments.clinics,
     error: appointments.error
 });
