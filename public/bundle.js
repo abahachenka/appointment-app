@@ -46068,6 +46068,10 @@ var _react = _interopRequireDefault(require("react"));
 
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
+var _Modal = _interopRequireDefault(require("./Modal"));
+
+var _reactRouterDom = require("react-router-dom");
+
 var _reactRedux = require("react-redux");
 
 var _clinicRegistration = require("../../actions/clinic-registration");
@@ -46108,7 +46112,8 @@ var initialState = {
     password: null,
     confirmPassword: null
   },
-  isFormDisabled: true
+  isFormDisabled: true,
+  isModalDisplayed: false
 };
 
 var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
@@ -46125,7 +46130,8 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
     _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
-    _this.onBlur = _this.onBlur.bind(_assertThisInitialized(_this));
+    _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_this));
+    _this.showModal = _this.showModal.bind(_assertThisInitialized(_this));
     _this.createMarkup = _this.createMarkup.bind(_assertThisInitialized(_this));
     return _this;
   }
@@ -46134,16 +46140,22 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps) {
       if (this.props.isCompleted && this.props.isCompleted !== prevProps.isCompleted) {
-        alert('Registration is successfully completed. You can sign-in into your account.');
-        this.setState(initialState);
-        this.resetForm();
-        this.props.resetError();
+        this.showModal();
       }
+    }
+  }, {
+    key: "showModal",
+    value: function showModal() {
+      this.setState({
+        isModalDisplayed: true
+      });
     }
   }, {
     key: "resetForm",
     value: function resetForm() {
+      this.setState(initialState);
       this.registrationForm.reset();
+      this.props.resetError();
     }
   }, {
     key: "handleSubmit",
@@ -46185,13 +46197,7 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
         return {
           clinic: _objectSpread({}, prevState.clinic, _defineProperty({}, name, value))
         };
-      });
-      this.checkEmpty();
-    }
-  }, {
-    key: "onBlur",
-    value: function onBlur() {
-      this.checkEmpty();
+      }, this.checkEmpty());
     }
   }, {
     key: "createMarkup",
@@ -46201,17 +46207,20 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
       };
     }
   }, {
+    key: "closeModal",
+    value: function closeModal() {
+      this.resetForm();
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
 
-      var isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
-      return _react["default"].createElement("main", {
+      return _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("main", {
         className: "page-container"
       }, _react["default"].createElement("h1", {
         className: "page-title"
       }, "Register a clinic\u2018s account"), _react["default"].createElement("form", {
-        noValidate: true,
         ref: function ref(el) {
           return _this2.registrationForm = el;
         },
@@ -46224,44 +46233,45 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
         type: "text",
         name: "name",
         placeholder: "Clinic's name",
-        onChange: this.onChange,
-        onBlur: this.onBlur
+        onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "tel",
         name: "phoneNumber",
         placeholder: "Contact number",
-        onChange: this.onChange,
-        onBlur: this.onBlur
+        onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "text",
         name: "address",
         placeholder: "Address",
-        onChange: this.onChange,
-        onBlur: this.onBlur
+        onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "email",
         name: "email",
         placeholder: "Email",
-        onChange: this.onChange,
-        onBlur: this.onBlur
+        onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "password",
         name: "password",
         placeholder: "Password",
-        onChange: this.onChange,
-        onBlur: this.onBlur
+        onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "password",
         name: "confirmPassword",
         placeholder: "Confirm Password",
-        onChange: this.onChange,
-        onBlur: this.onBlur
+        onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "submit",
         value: "Register",
         className: "button-primary",
-        disabled: isSubmitDisabled
-      })));
+        disabled: this.state.isFormDisabled
+      }))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
+        title: "Successful Registration",
+        onClose: this.closeModal
+      }, _react["default"].createElement("div", {
+        className: "modal-success-message"
+      }, _react["default"].createElement("p", null, "Registration is successfully completed!", _react["default"].createElement("br", null), "You can ", _react["default"].createElement(_reactRouterDom.Link, {
+        to: "/admin"
+      }, "sign in"), " to your account."))) : null);
     }
   }]);
 
@@ -46300,7 +46310,7 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cli
 
 exports["default"] = _default;
 
-},{"../../actions/clinic-registration":111,"prop-types":51,"react":90,"react-redux":73,"redux":92}],126:[function(require,module,exports){
+},{"../../actions/clinic-registration":111,"./Modal":133,"prop-types":51,"react":90,"react-redux":73,"react-router-dom":84,"redux":92}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

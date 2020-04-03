@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Modal from './Modal';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { 
     registerClinic, 
@@ -15,7 +17,8 @@ const initialState = {
         password: null,
         confirmPassword: null
     },
-    isFormDisabled: true
+    isFormDisabled: true,
+    isModalDisplayed: false
 }
 
 class ClinicRegistration extends React.Component {
@@ -28,21 +31,25 @@ class ClinicRegistration extends React.Component {
         this.onChange = this.onChange.bind(this);
         this.checkEmpty = this.checkEmpty.bind(this);
         this.resetForm = this.resetForm.bind(this);
-        this.onBlur = this.onBlur.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.showModal = this.showModal.bind(this);
         this.createMarkup = this.createMarkup.bind(this);
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.isCompleted && this.props.isCompleted !== prevProps.isCompleted) {
-            alert('Registration is successfully completed. You can sign-in into your account.');
-            this.setState(initialState);
-            this.resetForm();
-            this.props.resetError();
+            this.showModal();
         }
     }
 
+    showModal() {
+        this.setState({isModalDisplayed: true});
+    }
+
     resetForm() {
+        this.setState(initialState);
         this.registrationForm.reset();
+        this.props.resetError();
     }
 
     handleSubmit(event) {
@@ -75,36 +82,43 @@ class ClinicRegistration extends React.Component {
 
         this.setState(prevState => ({
             clinic: { ...prevState.clinic, [name]: value },
-        }));
-
-        this.checkEmpty();
-    }
-
-    onBlur() {
-        this.checkEmpty();
+        }), this.checkEmpty());
     }
 
     createMarkup(str) {
         return {__html: str};
     }
 
+    closeModal() {
+        this.resetForm();
+    }
+
     render() {
-        const isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
-        
         return (
-            <main className="page-container">
-                <h1 className="page-title">Register a clinic&lsquo;s account</h1>
-                <form noValidate ref={(el) => this.registrationForm = el} className="clinic-registration-form" onSubmit={this.handleSubmit} >
-                    <p className="error" dangerouslySetInnerHTML={this.createMarkup(this.props.error)} />
-                    <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} onBlur={this.onBlur} />
-                    <input type="tel" name="phoneNumber" placeholder="Contact number" onChange={this.onChange} onBlur={this.onBlur} />
-                    <input type="text" name="address" placeholder="Address" onChange={this.onChange} onBlur={this.onBlur} />
-                    <input type="email" name="email" placeholder="Email" onChange={this.onChange} onBlur={this.onBlur} />
-                    <input type="password" name="password" placeholder="Password" onChange={this.onChange} onBlur={this.onBlur} />
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} onBlur={this.onBlur} />
-                    <input type="submit" value="Register" className="button-primary" disabled={isSubmitDisabled}/>
-                </form>
-            </main>
+            <React.Fragment>
+                <main className="page-container">
+                    <h1 className="page-title">Register a clinic&lsquo;s account</h1>
+                    <form ref={(el) => this.registrationForm = el} className="clinic-registration-form" onSubmit={this.handleSubmit} >
+                        <p className="error" dangerouslySetInnerHTML={this.createMarkup(this.props.error)} />
+                        <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} />
+                        <input type="tel" name="phoneNumber" placeholder="Contact number" onChange={this.onChange} />
+                        <input type="text" name="address" placeholder="Address" onChange={this.onChange} />
+                        <input type="email" name="email" placeholder="Email" onChange={this.onChange} />
+                        <input type="password" name="password" placeholder="Password" onChange={this.onChange} />
+                        <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} />
+                        <input type="submit" value="Register" className="button-primary" disabled={this.state.isFormDisabled}/>
+                    </form>
+                </main>
+
+                {this.state.isModalDisplayed ? (
+                    <Modal title="Successful Registration" onClose={this.closeModal}>
+                        <div className="modal-success-message">
+                            <p>Registration is successfully completed!<br /> 
+                            You can <Link to="/admin">sign in</Link> to your account.</p>
+                        </div>
+                    </Modal>
+                ) : null}
+            </React.Fragment>
         )
     }
 }

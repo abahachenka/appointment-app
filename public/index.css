@@ -454,7 +454,9 @@
     margin: -10px 0 15px; }
 
 .modal-success-message {
-  text-align: center; }
+  text-align: center;
+  line-height: 1.5;
+  font-size: 16px; }
   .modal-success-message p:last-child {
     margin-bottom: 0; }
   .modal-success-message .button {
@@ -513,7 +515,7 @@
   padding: 8px 60px 8px 0; }
 
 .doctor-account-page .account-settings {
-  top: 70px; }
+  top: 15px; }
 
 .doctor-account-page .data-section {
   margin: 40px 0; }
