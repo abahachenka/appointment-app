@@ -112,7 +112,7 @@ class ClinicRegistration extends React.Component {
 
                 {this.state.isModalDisplayed ? (
                     <Modal title="Successful Registration" onClose={this.closeModal}>
-                        <div className="modal-success-message">
+                        <div className="modal-message">
                             <p>Registration is successfully completed!<br /> 
                             You can <Link to="/admin">sign in</Link> to your account.</p>
                         </div>

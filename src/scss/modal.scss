@@ -71,7 +71,7 @@
     }
 }
 
-.modal-success-message {
+.modal-message {
     text-align: center;
     line-height: 1.5;
     font-size: 16px;
@@ -80,13 +80,7 @@
         margin-bottom: 0;
     }
 
-    .button {
-        text-decoration: none;
-        display: inline-block;
-        background: $primary;
-        color: $white;
-        border: none;
+    .button-primary {
         width: 100%;
-        padding: 10px 20px;
     }
 }

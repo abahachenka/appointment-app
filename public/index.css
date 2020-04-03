@@ -453,20 +453,14 @@
   .modal .input-hint {
     margin: -10px 0 15px; }
 
-.modal-success-message {
+.modal-message {
   text-align: center;
   line-height: 1.5;
   font-size: 16px; }
-  .modal-success-message p:last-child {
+  .modal-message p:last-child {
     margin-bottom: 0; }
-  .modal-success-message .button {
-    text-decoration: none;
-    display: inline-block;
-    background: #73c5ff;
-    color: #fff;
-    border: none;
-    width: 100%;
-    padding: 10px 20px; }
+  .modal-message .button-primary {
+    width: 100%; }
 
 .data-table {
   width: 100%;
@@ -564,9 +558,13 @@ a {
   border: none;
   height: 35px;
   font-size: 16px;
-  cursor: pointer; }
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  line-height: 35px; }
   .button-primary:hover {
-    background: #73c5ff; }
+    background: #73c5ff;
+    color: #fff; }
 
 input[type="text"] {
   padding: 1px 5px; }

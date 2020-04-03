@@ -44118,9 +44118,7 @@ exports.loadCategory = loadCategory;
 
 var sendInvitation = function sendInvitation(categoryId, invitation) {
   return function (dispatch) {
-    (0, _doctorsApi.sendDoctorInvitation)(categoryId, invitation).then(function (resp) {
-      console.log(resp); // outputs email link
-
+    (0, _doctorsApi.sendDoctorInvitation)(categoryId, invitation).then(function () {
       dispatch(sendInvitationSuccess());
       dispatch(loadDoctors(categoryId));
     })["catch"](function (err) {
@@ -44143,12 +44141,12 @@ var checkInvitationToken = function checkInvitationToken(token) {
 
 exports.checkInvitationToken = checkInvitationToken;
 
-var activateAccount = function activateAccount(token, password) {
+var activateAccount = function activateAccount(token, password, confirmPassword) {
   return function (dispatch) {
-    (0, _doctorsApi.updateDoctorsAccount)(token, password).then(function () {
+    (0, _doctorsApi.updateDoctorsAccount)(token, password, confirmPassword).then(function () {
       dispatch(activateAccountSuccess());
     })["catch"](function (err) {
-      dispatch(activateAccountSuccess(err.response.data));
+      dispatch(activateAccountError(err.response.data));
     });
   };
 };
@@ -45801,8 +45799,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var initialState = {
-  account: null,
-  isSuccessMessageDisplayed: false
+  account: {
+    password: null,
+    confirmPassword: null
+  },
+  isSuccessMessageDisplayed: false,
+  isFormDisabled: true
 };
 
 var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
@@ -45817,6 +45819,8 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
     _this.state = _objectSpread({}, initialState);
     _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_this));
+    _this.createMarkup = _this.createMarkup.bind(_assertThisInitialized(_this));
+    _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -45844,12 +45848,25 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
       var _this$state$account = this.state.account,
           password = _this$state$account.password,
           confirmPassword = _this$state$account.confirmPassword;
+      this.props.activateAccount(token, password, confirmPassword);
+    }
+  }, {
+    key: "checkEmpty",
+    value: function checkEmpty() {
+      var isFormDisabled = false;
 
-      if (token && password === confirmPassword) {
-        this.props.activateAccount(token, password);
-      } else {
-        alert('Something went wrong');
+      for (var prop in this.state.account) {
+        if (!this.state.account[prop]) {
+          isFormDisabled = true;
+          break;
+        }
       }
+
+      this.setState(function () {
+        return {
+          isFormDisabled: isFormDisabled
+        };
+      });
     }
   }, {
     key: "onChange",
@@ -45861,7 +45878,14 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
         return {
           account: _objectSpread({}, prevState.account, _defineProperty({}, name, value))
         };
-      });
+      }, this.checkEmpty);
+    }
+  }, {
+    key: "createMarkup",
+    value: function createMarkup(str) {
+      return {
+        __html: str
+      };
     }
   }, {
     key: "render",
@@ -45873,8 +45897,9 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
       }), _react["default"].createElement(_Modal["default"], {
         title: "Accept Invitation"
       }, !this.state.isSuccessMessageDisplayed && this.props.isTokenValid && _react["default"].createElement(_react["default"].Fragment, null, _react["default"].createElement("p", null, "You have been invited to create a doctors account. Please, finish your registration."), _react["default"].createElement("p", {
-        className: "error"
-      }, this.props.acceptInvitationError), _react["default"].createElement("form", {
+        className: "error",
+        dangerouslySetInnerHTML: this.createMarkup(this.props.acceptInvitationError)
+      }), _react["default"].createElement("form", {
         ref: function ref(el) {
           return _this2.acceptInvitationForm = el;
         },
@@ -45891,15 +45916,18 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
         onChange: this.onChange
       }), _react["default"].createElement("input", {
         type: "submit",
-        value: "Register"
+        value: "Register",
+        disabled: this.state.isFormDisabled
       }))), this.state.isSuccessMessageDisplayed && _react["default"].createElement("div", {
-        className: "modal-success-message"
+        className: "modal-message"
       }, _react["default"].createElement("p", null, "Your account has been successfully activated. ", _react["default"].createElement("br", null), "Now you may sign-in."), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
         to: "/admin",
-        className: "button"
-      }, "OK"))), this.props.isTokenValid === false && _react["default"].createElement("div", null, _react["default"].createElement("p", null, "The link is invalid!"), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
+        className: "button-primary"
+      }, "OK"))), this.props.isTokenValid === false && _react["default"].createElement("div", {
+        className: "modal-message"
+      }, _react["default"].createElement("p", null, "The link is invalid!"), _react["default"].createElement("p", null, _react["default"].createElement(_reactRouterDom.Link, {
         to: "/",
-        className: "button"
+        className: "button-primary"
       }, "Close")))));
     }
   }]);
@@ -45910,10 +45938,11 @@ var AcceptInvitation = /*#__PURE__*/function (_React$Component) {
 AcceptInvitation.propTypes = {
   activateAccount: _propTypes["default"].func,
   isInvitationAccepted: _propTypes["default"].bool,
-  acceptInvitationError: _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].object]),
+  acceptInvitationError: _propTypes["default"].string,
   match: _propTypes["default"].object,
   checkInvitationToken: _propTypes["default"].func,
-  isTokenValid: _propTypes["default"].bool
+  isTokenValid: _propTypes["default"].bool,
+  error: _propTypes["default"].string
 };
 
 var mapStateToProps = function mapStateToProps(_ref) {
@@ -45928,8 +45957,8 @@ var mapStateToProps = function mapStateToProps(_ref) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return (0, _redux.bindActionCreators)({
-    activateAccount: function activateAccount(token, password) {
-      return (0, _account.activateAccount)(token, password);
+    activateAccount: function activateAccount(token, password, confirmPassword) {
+      return (0, _account.activateAccount)(token, password, confirmPassword);
     },
     checkInvitationToken: function checkInvitationToken(token) {
       return (0, _account.checkInvitationToken)(token);
@@ -46268,7 +46297,7 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
         title: "Successful Registration",
         onClose: this.closeModal
       }, _react["default"].createElement("div", {
-        className: "modal-success-message"
+        className: "modal-message"
       }, _react["default"].createElement("p", null, "Registration is successfully completed!", _react["default"].createElement("br", null), "You can ", _react["default"].createElement(_reactRouterDom.Link, {
         to: "/admin"
       }, "sign in"), " to your account."))) : null);
@@ -48991,11 +49020,12 @@ var sendDoctorInvitation = function sendDoctorInvitation(categoryId, invitation)
 
 exports.sendDoctorInvitation = sendDoctorInvitation;
 
-var updateDoctorsAccount = function updateDoctorsAccount(token, password) {
+var updateDoctorsAccount = function updateDoctorsAccount(token, password, confirmPassword) {
   var url = _config.API_URL + '/auth/accept-invitation';
   return _axios["default"].put(url, {
     token: token,
-    password: password
+    password: password,
+    confirmPassword: confirmPassword
   });
 };
 

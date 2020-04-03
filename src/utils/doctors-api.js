@@ -58,10 +58,10 @@ export const sendDoctorInvitation = (categoryId, invitation) => {
     });
 }
 
-export const updateDoctorsAccount = (token, password) => {
+export const updateDoctorsAccount = (token, password, confirmPassword) => {
     const url = API_URL + '/auth/accept-invitation';
 
-    return axios.put(url, {token, password});
+    return axios.put(url, {token, password, confirmPassword});
 }
 
 export const requestInvitationTokenCheck = (token) => {

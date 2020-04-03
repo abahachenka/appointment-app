@@ -334,8 +334,7 @@ export const loadCategory = (alias) => {
 export const sendInvitation = (categoryId, invitation) => {
     return dispatch => {
         sendDoctorInvitation(categoryId, invitation)
-            .then(resp => {
-                console.log(resp); // outputs email link
+            .then(() => {
                 dispatch(sendInvitationSuccess());
                 dispatch(loadDoctors(categoryId));
             })
@@ -357,14 +356,14 @@ export const checkInvitationToken = (token) => {
     }
 }
 
-export const activateAccount = (token, password) => {
+export const activateAccount = (token, password, confirmPassword) => {
     return dispatch => {
-        updateDoctorsAccount(token, password)
+        updateDoctorsAccount(token, password, confirmPassword)
             .then(() => {
                 dispatch(activateAccountSuccess());
             })
             .catch(err => {
-                dispatch(activateAccountSuccess(err.response.data));
+                dispatch(activateAccountError(err.response.data));
             });
     }
 }

@@ -7,8 +7,12 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 const initialState = {
-    account: null,
-    isSuccessMessageDisplayed: false
+    account: {
+        password: null,
+        confirmPassword: null
+    },
+    isSuccessMessageDisplayed: false,
+    isFormDisabled: true
 };
 
 class AcceptInvitation extends React.Component {
@@ -19,6 +23,8 @@ class AcceptInvitation extends React.Component {
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.createMarkup = this.createMarkup.bind(this);
+        this.checkEmpty = this.checkEmpty.bind(this);
     }
 
     componentDidMount() {
@@ -40,11 +46,22 @@ class AcceptInvitation extends React.Component {
         const token = this.props.match.params.token;
         const {password, confirmPassword} = this.state.account;
         
-        if (token && password === confirmPassword) {
-            this.props.activateAccount(token, password);
-        } else {
-            alert('Something went wrong');
+        this.props.activateAccount(token, password, confirmPassword);
+    }
+
+    checkEmpty() {
+        let isFormDisabled = false;
+
+        for (let prop in this.state.account) {
+            if (!this.state.account[prop]) {
+                isFormDisabled = true;
+                break;
+            }
         }
+
+        this.setState(() => ({
+            isFormDisabled
+        }));
     }
 
     onChange(event) {
@@ -52,7 +69,11 @@ class AcceptInvitation extends React.Component {
 
         this.setState(prevState => ({
             account: { ...prevState.account, [name]: value }
-        }));
+        }), this.checkEmpty);
+    }
+
+    createMarkup(str) {
+        return {__html: str};
     }
 
     render() {
@@ -66,34 +87,34 @@ class AcceptInvitation extends React.Component {
                             <p>You have been invited to create a doctors account.
                                 Please, finish your registration.
                             </p>
-                            <p className="error">{this.props.acceptInvitationError}</p>
+                            <p className="error" dangerouslySetInnerHTML={this.createMarkup(this.props.acceptInvitationError)} />
                             <form ref={(el) => this.acceptInvitationForm = el} onSubmit={this.handleSubmit}>
                                 <input type="password" name="password" placeholder="Password" onChange={this.onChange} />
                                 <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={this.onChange} />
 
-                                <input type="submit" value="Register" />
+                                <input type="submit" value="Register" disabled={this.state.isFormDisabled}/>
                             </form>
                         </React.Fragment>
                     )}
                     {this.state.isSuccessMessageDisplayed && (
-                        <div className="modal-success-message">
+                        <div className="modal-message">
                             <p>
                                 Your account has been successfully activated. <br/>
                                 Now you may sign-in.
                             </p>
                             <p>
-                                <Link to="/admin" className="button">OK</Link>
+                                <Link to="/admin" className="button-primary">OK</Link>
                             </p>
                         </div>
                     )}
 
                     {this.props.isTokenValid ===false && (
-                        <div>
+                        <div className="modal-message">
                             <p>
                                 The link is invalid!
                             </p>
                             <p>
-                                <Link to="/" className="button">Close</Link>
+                                <Link to="/" className="button-primary">Close</Link>
                             </p>
                         </div>
                     )}
@@ -107,10 +128,11 @@ class AcceptInvitation extends React.Component {
 AcceptInvitation.propTypes = {
     activateAccount: PropTypes.func,
     isInvitationAccepted: PropTypes.bool,
-    acceptInvitationError: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    acceptInvitationError: PropTypes.string,
     match: PropTypes.object,
     checkInvitationToken: PropTypes.func,
-    isTokenValid: PropTypes.bool
+    isTokenValid: PropTypes.bool,
+    error: PropTypes.string
 }
 
 const mapStateToProps = ({doctorCategories}) => ({
@@ -121,7 +143,7 @@ const mapStateToProps = ({doctorCategories}) => ({
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    activateAccount: (token, password) => activateAccount(token, password),
+    activateAccount: (token, password, confirmPassword) => activateAccount(token, password, confirmPassword),
     checkInvitationToken: (token) => checkInvitationToken(token)
 }, dispatch);
 
