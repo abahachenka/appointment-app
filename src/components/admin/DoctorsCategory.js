@@ -48,6 +48,7 @@ class DoctorsCategory extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.isInvitationSent && this.props.isInvitationSent !== prevProps.isInvitationSent) {
+            alert("Invitation is sent");
             this.setState(initialState);
             this.resetInvitationForm();
             this.props.resetInvitationError();
@@ -76,7 +77,7 @@ class DoctorsCategory extends React.Component {
         let isFormDisabled = false;
 
         for (let prop in this.state.invitation) {
-            if (!this.state.invitation[prop]) {
+            if (!this.state.invitation[prop] || this.state.invitation[prop] === "Title") {
                 isFormDisabled = true;
                 break;
             }
@@ -125,9 +126,13 @@ class DoctorsCategory extends React.Component {
 
                 {this.state.isInviteFormDisplayed ? (
                     <Modal title="Invite a Doctor" onClose={this.closeModal}>
-                        <form ref={(el) => this.invitationForm = el} onSubmit={this.inviteDoctor}>
+                        <form noValidate ref={(el) => this.invitationForm = el} onSubmit={this.inviteDoctor}>
                             <p className="error">{this.props.invitationError}</p>
-                            <input type="text" name="title" placeholder="Title" onChange={this.onChange} />
+                            <select name="title" placeholder="Title" onChange={this.onChange}>
+                                <option keys={0} defaultValue>Title</option>
+                                <option keys={1}>Mrs.</option>
+                                <option keys={2}>Mr.</option>
+                            </select>
                             <input type="text" name="firstName" placeholder="First Name" onChange={this.onChange} />
                             <input type="text" name="lastName" placeholder="Last Name" onChange={this.onChange} />
                             <input type="text" name="room" placeholder="Room" onChange={this.onChange} />

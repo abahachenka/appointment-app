@@ -47378,6 +47378,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps) {
       if (this.props.isInvitationSent && this.props.isInvitationSent !== prevProps.isInvitationSent) {
+        alert("Invitation is sent");
         this.setState(initialState);
         this.resetInvitationForm();
         this.props.resetInvitationError();
@@ -47413,7 +47414,7 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
       var isFormDisabled = false;
 
       for (var prop in this.state.invitation) {
-        if (!this.state.invitation[prop]) {
+        if (!this.state.invitation[prop] || this.state.invitation[prop] === "Title") {
           isFormDisabled = true;
           break;
         }
@@ -47471,18 +47472,25 @@ var DoctorsCategory = /*#__PURE__*/function (_React$Component) {
         title: "Invite a Doctor",
         onClose: this.closeModal
       }, _react["default"].createElement("form", {
+        noValidate: true,
         ref: function ref(el) {
           return _this2.invitationForm = el;
         },
         onSubmit: this.inviteDoctor
       }, _react["default"].createElement("p", {
         className: "error"
-      }, this.props.invitationError), _react["default"].createElement("input", {
-        type: "text",
+      }, this.props.invitationError), _react["default"].createElement("select", {
         name: "title",
         placeholder: "Title",
         onChange: this.onChange
-      }), _react["default"].createElement("input", {
+      }, _react["default"].createElement("option", {
+        keys: 0,
+        defaultValue: true
+      }, "Title"), _react["default"].createElement("option", {
+        keys: 1
+      }, "Mrs."), _react["default"].createElement("option", {
+        keys: 2
+      }, "Mr.")), _react["default"].createElement("input", {
         type: "text",
         name: "firstName",
         placeholder: "First Name",
