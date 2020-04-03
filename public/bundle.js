@@ -46126,6 +46126,7 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
     _this.checkEmpty = _this.checkEmpty.bind(_assertThisInitialized(_this));
     _this.resetForm = _this.resetForm.bind(_assertThisInitialized(_this));
     _this.onBlur = _this.onBlur.bind(_assertThisInitialized(_this));
+    _this.createMarkup = _this.createMarkup.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -46193,6 +46194,13 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
       this.checkEmpty();
     }
   }, {
+    key: "createMarkup",
+    value: function createMarkup(str) {
+      return {
+        __html: str
+      };
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
@@ -46203,14 +46211,16 @@ var ClinicRegistration = /*#__PURE__*/function (_React$Component) {
       }, _react["default"].createElement("h1", {
         className: "page-title"
       }, "Register a clinic\u2018s account"), _react["default"].createElement("form", {
+        noValidate: true,
         ref: function ref(el) {
           return _this2.registrationForm = el;
         },
         className: "clinic-registration-form",
         onSubmit: this.handleSubmit
       }, _react["default"].createElement("p", {
-        className: "error"
-      }, this.props.error), _react["default"].createElement("input", {
+        className: "error",
+        dangerouslySetInnerHTML: this.createMarkup(this.props.error)
+      }), _react["default"].createElement("input", {
         type: "text",
         name: "name",
         placeholder: "Clinic's name",

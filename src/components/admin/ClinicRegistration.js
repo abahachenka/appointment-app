@@ -29,6 +29,7 @@ class ClinicRegistration extends React.Component {
         this.checkEmpty = this.checkEmpty.bind(this);
         this.resetForm = this.resetForm.bind(this);
         this.onBlur = this.onBlur.bind(this);
+        this.createMarkup = this.createMarkup.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -83,14 +84,18 @@ class ClinicRegistration extends React.Component {
         this.checkEmpty();
     }
 
+    createMarkup(str) {
+        return {__html: str};
+    }
+
     render() {
         const isSubmitDisabled = this.state.isFormDisabled || this.props.isPending;
         
         return (
             <main className="page-container">
                 <h1 className="page-title">Register a clinic&lsquo;s account</h1>
-                <form ref={(el) => this.registrationForm = el} className="clinic-registration-form" onSubmit={this.handleSubmit} >
-                    <p className="error">{this.props.error}</p>
+                <form noValidate ref={(el) => this.registrationForm = el} className="clinic-registration-form" onSubmit={this.handleSubmit} >
+                    <p className="error" dangerouslySetInnerHTML={this.createMarkup(this.props.error)} />
                     <input type="text" name="name" placeholder="Clinic's name" onChange={this.onChange} onBlur={this.onBlur} />
                     <input type="tel" name="phoneNumber" placeholder="Contact number" onChange={this.onChange} onBlur={this.onBlur} />
                     <input type="text" name="address" placeholder="Address" onChange={this.onChange} onBlur={this.onBlur} />
