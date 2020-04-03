@@ -4,4 +4,6 @@ To run the project locally, complete the following steps:
 2. Run `gulp` to build the project
 3. Run `npm start` to start a server
 
-REST API is available [here](https://github.com/abahachenka/appointment-app-api) 
+REST API is available [here](https://github.com/abahachenka/appointment-app-api)
+
+[DEMO LINK](https://appointment-by.herokuapp.com/)
