@@ -35,7 +35,8 @@ const initialState = {
     categoriesWithFilters: [
         'dentist',
         'therapist',
-        'gynaecologist'
+        'gynecologist',
+        'physician'
     ]
 };
 

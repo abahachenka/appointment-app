@@ -65,7 +65,7 @@ class AvailableAppointments extends React.Component {
     drawAppointment(appointment, index) {
         const time = moment(appointment.datetime).format('hh:mm');
         const doctor = appointment.doctor;
-        const doctorName = doctor.title + '. ' + doctor.firstName + ' ' + doctor.lastName;
+        const doctorName = doctor.title + doctor.firstName + ' ' + doctor.lastName;
 
         return (
             <li key={index} onClick={this.saveAppointment.bind(this, appointment)}>

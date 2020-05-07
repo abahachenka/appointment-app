@@ -87,7 +87,7 @@ class DoctorAccount extends React.Component {
                 {account ? (
                     <React.Fragment>
                         <header className="account-header">
-                            <h1 className="page-title">{account.title}. {account.firstName} {account.lastName}</h1>
+                            <h1 className="page-title">{account.title} {account.firstName} {account.lastName}</h1>
                             <Link to="/doctor-account/settings" className="account-settings">Settings</Link>
                         </header>
 

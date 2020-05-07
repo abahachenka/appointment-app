@@ -44040,7 +44040,7 @@ var loadDoctorAppointments = function loadDoctorAppointments() {
     (0, _appointmentsApi.getDoctorAppointments)().then(function (resp) {
       dispatch(loadDoctorAppointmentsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorAppointmentsError(err.response.data));
+      dispatch(loadDoctorAppointmentsError(err.response && err.response.data));
     });
   };
 };
@@ -44071,7 +44071,7 @@ var createNewDoctorCategory = function createNewDoctorCategory(categoryName) {
       dispatch(createNewDoctorCategorySuccess());
       dispatch(loadDoctorCategories());
     })["catch"](function (err) {
-      dispatch(createNewDoctorCategoryError(err.response.data));
+      dispatch(createNewDoctorCategoryError(err.response && err.response.data));
     });
   };
 };
@@ -44083,7 +44083,7 @@ var loadDoctorCategories = function loadDoctorCategories() {
     (0, _doctorsApi.getDoctorCategories)().then(function (resp) {
       dispatch(loadDoctorCategoriesSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoriesError(err.response.data));
+      dispatch(loadDoctorCategoriesError(err.response && err.response.data));
     });
   };
 };
@@ -44095,7 +44095,7 @@ var loadDoctors = function loadDoctors(categoryId) {
     (0, _doctorsApi.getDoctors)(categoryId).then(function (resp) {
       dispatch(loadDoctorsSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(loadDoctorsError(err.response.data));
+      dispatch(loadDoctorsError(err.response && err.response.data));
     });
   };
 };
@@ -44109,7 +44109,7 @@ var loadCategory = function loadCategory(alias) {
       dispatch(loadDoctorCategorySuccess(category));
       dispatch(loadDoctors(category._id));
     })["catch"](function (err) {
-      dispatch(loadDoctorCategoryError(err.response.data));
+      dispatch(loadDoctorCategoryError(err.response && err.response.data));
     });
   };
 };
@@ -44122,7 +44122,7 @@ var sendInvitation = function sendInvitation(categoryId, invitation) {
       dispatch(sendInvitationSuccess());
       dispatch(loadDoctors(categoryId));
     })["catch"](function (err) {
-      dispatch(sendInvitationError(err.response.data));
+      dispatch(sendInvitationError(err.response && err.response.data));
     });
   };
 };
@@ -44134,7 +44134,7 @@ var checkInvitationToken = function checkInvitationToken(token) {
     (0, _doctorsApi.requestInvitationTokenCheck)(token).then(function () {
       dispatch(checkInvitationTokenSuccess());
     })["catch"](function (err) {
-      dispatch(checkInvitationTokenError(err.response.data));
+      dispatch(checkInvitationTokenError(err.response && err.response.data));
     });
   };
 };
@@ -44146,7 +44146,7 @@ var activateAccount = function activateAccount(token, password, confirmPassword)
     (0, _doctorsApi.updateDoctorsAccount)(token, password, confirmPassword).then(function () {
       dispatch(activateAccountSuccess());
     })["catch"](function (err) {
-      dispatch(activateAccountError(err.response.data));
+      dispatch(activateAccountError(err.response && err.response.data));
     });
   };
 };
@@ -44158,7 +44158,7 @@ var getAddressList = function getAddressList() {
     (0, _clinicsApi.getClinicAddressCover)().then(function (resp) {
       dispatch(getAddressListSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(getAddressListError(err.response.data));
+      dispatch(getAddressListError(err.response && err.response.data));
     });
   };
 };
@@ -44170,7 +44170,7 @@ var getDoctorAddressList = function getDoctorAddressList() {
     (0, _doctorsApi.getDoctorAddressCover)().then(function (resp) {
       dispatch(getDoctorAddressListSuccess(resp.data));
     })["catch"](function (err) {
-      dispatch(getDoctorAddressListError(err.response.data));
+      dispatch(getDoctorAddressListError(err.response && err.response.data));
     });
   };
 };
@@ -44680,7 +44680,7 @@ var AvailableAppointments = /*#__PURE__*/function (_React$Component) {
     value: function drawAppointment(appointment, index) {
       var time = (0, _moment["default"])(appointment.datetime).format('hh:mm');
       var doctor = appointment.doctor;
-      var doctorName = doctor.title + '. ' + doctor.firstName + ' ' + doctor.lastName;
+      var doctorName = doctor.title + doctor.firstName + ' ' + doctor.lastName;
       return _react["default"].createElement("li", {
         key: index,
         onClick: this.saveAppointment.bind(this, appointment)
@@ -45610,7 +45610,7 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
       var day = date.format('DD');
       var weekday = date.format('ddd');
       var doctor = this.props.selectedAppointment.doctor;
-      var doctorLabel = "".concat(doctor.title, ". ").concat(doctor.firstName, " ").concat(doctor.lastName, ", room: ").concat(doctor.room);
+      var doctorLabel = "".concat(doctor.title, " ").concat(doctor.firstName, " ").concat(doctor.lastName, ", room: ").concat(doctor.room);
       return _react["default"].createElement("div", {
         className: "patient-selection-info"
       }, _react["default"].createElement("div", {
@@ -46505,18 +46505,20 @@ var ClinicSettings = /*#__PURE__*/function (_React$Component) {
         className: "data-section-header"
       }, _react["default"].createElement("h2", {
         className: "data-section-title"
-      }, "Address Cover"), _react["default"].createElement("button", {
+      }, "Service Area Coverage"), _react["default"].createElement("button", {
         className: "data-section-btn button-primary",
         onClick: this.openAddNewAddressModal
       }, "Add")), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), this.props.addressList && this.props.addressList.length && _react["default"].createElement("table", {
+      }, this.props.error), _react["default"].createElement("table", {
         className: "data-table"
       }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Place"), _react["default"].createElement("th", null, "Street"), _react["default"].createElement("th", null, "Buildings"))), _react["default"].createElement("tbody", null, this.props.addressList.map(function (address, index) {
         return _react["default"].createElement("tr", {
           key: index
         }, _react["default"].createElement("td", null, address.place), _react["default"].createElement("td", null, address.street), _react["default"].createElement("td", null, address.buildings.join(',')));
-      }))))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
+      }), !this.props.addressList.length ? _react["default"].createElement("tr", null, _react["default"].createElement("td", {
+        colSpan: "3"
+      }, "There are no entries yet")) : null)))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Address",
         onClose: this.closeModal
       }, _react["default"].createElement("p", null, "Please add the details of a new area, which is accepted for clinic's service."), _react["default"].createElement("form", {
@@ -46740,7 +46742,7 @@ var DoctorAccount = /*#__PURE__*/function (_React$Component) {
         className: "account-header"
       }, _react["default"].createElement("h1", {
         className: "page-title"
-      }, account.title, ". ", account.firstName, " ", account.lastName), _react["default"].createElement(_reactRouterDom.Link, {
+      }, account.title, " ", account.firstName, " ", account.lastName), _react["default"].createElement(_reactRouterDom.Link, {
         to: "/doctor-account/settings",
         className: "account-settings"
       }, "Settings")), _react["default"].createElement("div", {
@@ -47214,7 +47216,7 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       var account = this.props.account;
-      var doctorName = account && "".concat(account.title, ". ").concat(account.firstName, " ").concat(account.lastName);
+      var doctorName = account && "".concat(account.title, " ").concat(account.firstName, " ").concat(account.lastName);
       return _react["default"].createElement("main", {
         className: "account-page page-container"
       }, _react["default"].createElement("ul", {
@@ -47231,18 +47233,20 @@ var DoctorSettings = /*#__PURE__*/function (_React$Component) {
         className: "data-section-header"
       }, _react["default"].createElement("h2", {
         className: "data-section-title"
-      }, "Address Cover"), _react["default"].createElement("button", {
+      }, "Service Area Coverage"), _react["default"].createElement("button", {
         className: "data-section-btn button-primary",
         onClick: this.openAddNewAddressModal
       }, "Add")), _react["default"].createElement("p", {
         className: "error"
-      }, this.props.error), this.props.addressList && this.props.addressList.length && _react["default"].createElement("table", {
+      }, this.props.error), _react["default"].createElement("table", {
         className: "data-table"
       }, _react["default"].createElement("thead", null, _react["default"].createElement("tr", null, _react["default"].createElement("th", null, "Place"), _react["default"].createElement("th", null, "Street"), _react["default"].createElement("th", null, "Buildings"))), _react["default"].createElement("tbody", null, this.props.addressList.map(function (address, index) {
         return _react["default"].createElement("tr", {
           key: index
         }, _react["default"].createElement("td", null, address.place), _react["default"].createElement("td", null, address.street), _react["default"].createElement("td", null, address.buildings.join(',')));
-      })))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
+      }), !this.props.addressList.length ? _react["default"].createElement("tr", null, _react["default"].createElement("td", {
+        colSpan: "3"
+      }, "There are no entries yet")) : null))), this.state.isModalDisplayed ? _react["default"].createElement(_Modal["default"], {
         title: "Add New Address",
         onClose: this.closeModal
       }, _react["default"].createElement("p", null, "Please add the details of a new area, which is accepted for doctor's service."), _react["default"].createElement("form", {
@@ -48242,7 +48246,7 @@ var initialState = {
   registrationError: '',
   cancelError: '',
   isAppointmentCancelled: false,
-  categoriesWithFilters: ['dentist', 'therapist', 'gynaecologist']
+  categoriesWithFilters: ['dentist', 'therapist', 'gynecologist', 'physician']
 };
 
 var appointmentsReducer = function appointmentsReducer() {
@@ -49089,7 +49093,7 @@ var requestSignIn = function requestSignIn(userData) {
 exports.requestSignIn = requestSignIn;
 
 var requestAccountData = function requestAccountData() {
-  return _axios["default"].post(SIGNIN_API_URL + '/account', {}, {
+  return _axios["default"].get(SIGNIN_API_URL + '/account', {
     headers: {
       'x-access-token': getAuthToken()
     }

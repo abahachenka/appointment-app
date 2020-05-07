@@ -13,7 +13,7 @@ export const requestSignIn = userData => {
 }
 
 export const requestAccountData = () => {
-    return axios.post(SIGNIN_API_URL + '/account', {}, {
+    return axios.get(SIGNIN_API_URL + '/account', {
         headers: {
             'x-access-token': getAuthToken()
         }

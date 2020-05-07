@@ -105,34 +105,37 @@ class ClinicSettings extends React.Component {
 
                     <section className="address-cover data-section">
                         <header className="data-section-header">
-                            <h2 className="data-section-title">Address Cover</h2>
+                            <h2 className="data-section-title">Service Area Coverage</h2>
                             <button className="data-section-btn button-primary" onClick={this.openAddNewAddressModal}>Add</button>
                         </header>
                         <p className="error">{this.props.error}</p>
 
-                        {this.props.addressList && this.props.addressList.length && (
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Place</th>
-                                        <th>Street</th>
-                                        <th>Buildings</th>
-                                        
+                        <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Place</th>
+                                    <th>Street</th>
+                                    <th>Buildings</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {this.props.addressList.map((address, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td>{address.place}</td>
+                                        <td>{address.street}</td>
+                                        <td>{address.buildings.join(',')}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                {this.props.addressList.map((address, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td>{address.place}</td>
-                                            <td>{address.street}</td>
-                                            <td>{address.buildings.join(',')}</td>
-                                        </tr>
-                                    )
-                                })}
-                                </tbody>
-                            </table>
-                        )}
+                                )
+                            })}
+                            {!this.props.addressList.length ? (
+                            <tr>
+                                <td colSpan="3">There are no entries yet</td>
+                            </tr>
+                            ) : null}
+                            </tbody>
+                        </table>
                     </section>
                 </main>
                 {this.state.isModalDisplayed ? (

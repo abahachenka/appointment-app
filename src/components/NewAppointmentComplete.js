@@ -32,7 +32,7 @@ class NewAppointmentComplete extends React.Component {
         const day = date.format('DD');
         const weekday = date.format('ddd');
         const doctor = this.props.selectedAppointment.doctor;
-        const doctorLabel =`${doctor.title}. ${doctor.firstName} ${doctor.lastName}, room: ${doctor.room}`;
+        const doctorLabel =`${doctor.title} ${doctor.firstName} ${doctor.lastName}, room: ${doctor.room}`;
 
         return (
             <div className="patient-selection-info">

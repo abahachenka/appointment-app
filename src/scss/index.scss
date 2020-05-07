@@ -44,7 +44,9 @@ a {
 .page-container {
     flex: 1;
     padding: $block-padding;
-    width: 1140px;
+    max-width: 1140px;
+    min-width: 480px;
+    width: 100%;
     box-sizing: border-box;
     margin: 0 auto;
 }
@@ -81,6 +83,8 @@ a {
 }
 
 input{
+    border: 1px solid $gray;
+
     &[type="text"] {
         padding: 1px 5px;
     }
