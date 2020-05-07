@@ -45651,7 +45651,7 @@ var NewAppointmentComplete = /*#__PURE__*/function (_React$Component) {
         className: "page-title"
       }, "Success!"), _react["default"].createElement("p", {
         className: "appointment-notification"
-      }, "We have sent you an SMS with the details of your appointment."), _react["default"].createElement("div", {
+      }, "Please, take a picture of the details of your appointment."), _react["default"].createElement("div", {
         className: "appointment-receipt"
       }, _react["default"].createElement("p", {
         className: "order-number"

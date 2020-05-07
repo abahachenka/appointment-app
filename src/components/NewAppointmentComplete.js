@@ -74,7 +74,7 @@ class NewAppointmentComplete extends React.Component {
                     <React.Fragment>
                         <h1 className="page-title">Success!</h1>
                         <p className="appointment-notification">
-                            We have sent you an SMS with the details of your appointment.
+                            Please, take a picture of the details of your appointment.
                         </p>
                         <div className="appointment-receipt">
                             <p className="order-number">Order #<span>{this.props.registrationCode}</span></p>
