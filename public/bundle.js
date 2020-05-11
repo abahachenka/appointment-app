@@ -48086,7 +48086,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.API_URL = void 0;
-var API_URL = process.env.REACT_APP_STAGE === 'prod' ? 'https://appointment-by-api.herokuapp.com' : 'http://localhost:3000';
+var API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://appointment-by-api.herokuapp.com';
 exports.API_URL = API_URL;
 
 }).call(this,require('_process'))
